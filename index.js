@@ -13,7 +13,8 @@ var
     colors = require('colors'),
     clone = require('nodegit').Clone.clone,
     fs = require('fs'),
-    rimraf = require('rimraf');
+    rimraf = require('rimraf'),
+    cancelOption = 'cancel...';
 
 program
     .version('0.0.1');
@@ -54,10 +55,14 @@ function promptForInstall(names) {
         type: "list",
         name: "project",
         message: "Select the project you wish to install",
-        choices: names
+        choices: names.concat(cancelOption)
     }];
     
     inquirer.prompt(promptFor, function(response) {
+        if(response.project === cancelOption) {
+            console.log('Installtion cancelled, bye bye!'.green);
+            process.exit();
+        }
         installProject(response.project);
     });
 }
@@ -80,9 +85,9 @@ function installProject(project) {
                         installBower(project, next);    
                     }
                 ],
-                function(error, result){
-                    console.log('final');
-                    console.log(result);
+                function(err, result){
+                    if (err) return console.log(err.red);
+                    console.log('Installation of project %s complete! Have fun!!!'.blue, project);
                 }
             );
         }, function (err) {
@@ -96,7 +101,7 @@ function installBower(project, callback) {
     var child = exec('cd ' + project + ' && bower install -F', function(err, stdout, stderr) {
         if (err) throw err;
         console.log(stdout);
-        console.log('Installation of project %s complete! Have fun!!!'.blue, project);
+        console.log('Bower components installed for project %s!'.green, project);
         callback();
     });
 }
