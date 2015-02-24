@@ -1,0 +1,35 @@
+{
+  "name": "worm-hole",
+  "version": "0.0.1",
+  "homepage": "https://github.com/OperationSpark/motion-poem",
+  "authors": [
+    "jfraboni <john@operationspark.org>"
+  ],
+  "description": "A template project for programmer art built using CreateJS",
+  "main": "index.html",
+  "keywords": [
+    "Operation",
+    "Spark",
+    "motion",
+    "poem"
+  ],
+  "license": "CC",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "lodash": "~3.2.0",
+    "easeljs": "~0.8.0",
+    "TweenJS": "~0.6.0",
+    "PreloadJS": "~0.6.0",
+    "SoundJS": "~0.6.0",
+    "chance": "~0.7.3",
+    "racket": "~0.0.20",
+    "opspark-draw": "~0.3.14",
+    "jquery": "~2.1.3"
+  }
+}

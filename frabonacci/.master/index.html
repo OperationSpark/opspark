@@ -1,0 +1,103 @@
+<!doctype html>
+
+<html>
+    <head>
+        <meta charset="utf-8">
+
+        <title>Operation Spark || Motion Poem</title>
+        <meta name="description" content="Operation Spark Motion Poem">
+        <meta name="author" content="operationspark.org">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <link href="css/bootstrap.min.css" rel="stylesheet" media="screen">
+        <link href="css/style.css" rel="stylesheet">
+
+        <!-- all core CreateJS and 3rd party libraries are listed here: -->
+        <script src="bower_components/jquery/dist/jquery.min.js"></script>
+        <script src="bower_components/lodash/lodash.min.js"></script>
+        <script src="bower_components/easeljs/lib/easeljs-0.8.0.min.js"></script>
+        <script src="bower_components/opspark-draw/draw.js"></script>
+        
+        <script src="js/util/load.js"></script>
+        <script src="js/ui.js"></script>
+        <script src="js/opspark.js"></script>
+    </head>
+    <body>
+        <div style="position: absolute;">
+            <canvas id="canvas" width="500" height="500"></canvas>
+        </div>
+        
+        <script id="motion-poem">
+            (function(){
+                'use strict';
+                
+                var 
+                    load = window.opspark.load,
+                    ui = window.opspark.ui,
+                    app = window.opspark.makeApp(),
+                    canvas = app.canvas, 
+                    view = app.view;
+                
+                // TODO 1 : Declare our variables //
+                var
+                    settings,
+                    values,
+                    i,
+                    shape, 
+                    template;
+                
+                // Here, we're loading our required data //
+                load.json('data.json').then(function(data) {
+                    settings = data;
+                    app.addUpdateable({update: update});
+                    initialize();
+                });
+                
+                // TODO 2 : Implement the initialize() function //
+                function initialize() {
+                    values = _.clone(settings[settings.activeDataSet]);
+                    i = values.max;
+                    template = ui.makeTemplate();
+                }
+                
+                function update() {
+                    if (i) {
+                        drawShape();
+                        applyScale(shape);
+                        i--;
+                    } else {
+                        view.removeChildAt(0);
+                        if (!view.numChildren) {
+                            initialize();
+                        }
+                    }
+                }
+                
+                function drawShape() {
+                    values.goldenAngle *= values.degrade;
+                    
+                    values.rotation += values.goldenAngle;
+                    values.rotation -= Math.floor(values.rotation / 360) * 360;
+                    
+                    values.radius *= values.radiusGrowthFactor;
+                    
+                    shape = template.clone();
+                    shape.x = Math.cos(values.rotation * Math.PI / 180) * values.radius + (canvas.width / 2);
+                    shape.y = Math.sin(values.rotation * Math.PI / 180) * values.radius + (canvas.height / 2);
+                    shape.rotation = values.rotation;
+                    
+                    view.addChildAt(shape, 0);
+                }
+                
+                function applyScale(shape) {
+                    values.scaleX += values.growthX;
+                    values.scaleY += values.growthY;
+                    
+                    shape.scaleX = values.scaleX;
+                    shape.scaleY = values.scaleX;
+                }
+                
+            })();
+        </script>
+    </body>
+</html>

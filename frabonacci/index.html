@@ -1,0 +1,75 @@
+<!doctype html>
+
+<html>
+    <head>
+        <meta charset="utf-8">
+
+        <title>Operation Spark || Motion Poem</title>
+        <meta name="description" content="Operation Spark Motion Poem">
+        <meta name="author" content="operationspark.org">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <link href="css/bootstrap.min.css" rel="stylesheet" media="screen">
+        <link href="css/style.css" rel="stylesheet">
+
+        <!-- all core CreateJS and 3rd party libraries are listed here: -->
+        <script src="bower_components/jquery/dist/jquery.min.js"></script>
+        <script src="bower_components/lodash/lodash.min.js"></script>
+        <script src="bower_components/easeljs/lib/easeljs-0.8.0.min.js"></script>
+        <script src="bower_components/opspark-draw/draw.js"></script>
+        
+        <script src="js/util/load.js"></script>
+        <script src="js/ui.js"></script>
+        <script src="js/opspark.js"></script>
+    </head>
+    <body>
+        <div style="position: absolute;">
+            <canvas id="canvas" width="500" height="500"></canvas>
+        </div>
+        
+        <script id="motion-poem">
+            (function(){
+                'use strict';
+                
+                var 
+                    _ = window._,
+                    load = window.opspark.load,
+                    ui = window.opspark.ui,
+                    app = window.opspark.makeApp(),
+                    canvas = app.canvas, 
+                    view = app.view;
+                
+                // TODO 1 : Declare our variables //
+                
+                
+                // Here, we're loading our required data //
+                load.json('data.json').then(function(data) {
+                    settings = data;
+                    app.addUpdateable({update: update});
+                    initialize();
+                });
+                
+                // TODO 2 : Implement the initialize() function //
+                function initialize() {
+                    
+                }
+                
+                // TODO 4 : Implement the update function //
+                function update() {
+                    
+                }
+                
+                // TODO 3 : Implement the drawShape function //
+                function drawShape() {
+                    
+                }
+                
+                // TODO 5 : Implement the applyScale //
+                function applyScale(shape) {
+                    
+                }
+                
+            })();
+        </script>
+    </body>
+</html>

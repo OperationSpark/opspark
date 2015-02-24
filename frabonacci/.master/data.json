@@ -1,0 +1,40 @@
+{
+    "activeDataSet": "one",
+    
+    "one" : {
+        "growthX": 0.010001,
+        "growthY": 0.01018,
+        "scaleX": 0.45,
+        "scaleY": 0.19,
+        "degrade": 1.001,
+        "max": 314,
+        "goldenAngle": 137.508,
+        "radius": 40,
+        "radiusGrowthFactor": 1.005,
+        "rotation": 0
+    },
+    "two" : {
+        "growthX": 0.01015,
+        "growthY": 0.01018,
+        "scaleX": 0.30,
+        "scaleY": 1,
+        "degrade": 0.9998,
+        "max": 314,
+        "goldenAngle": 137.508,
+        "radius": 20,
+        "radiusGrowthFactor": 1.013,
+        "rotation": 0
+    },
+    "three" : {
+        "growthX": 0.01008,
+        "growthY": 0.01015,
+        "scaleX": 0.60,
+        "scaleY": 0.60,
+        "degrade": 0.9999,
+        "max": 314,
+        "goldenAngle": 142.508,
+        "radius": 20,
+        "radiusGrowthFactor": 1.013,
+        "rotation": 0
+    }
+}
