@@ -18,19 +18,13 @@ var
     cancelOption = '[cancel]',
     projectEntriesPath = '.projects.json';
 
-program
-    .version('0.0.1');
-    
 program    
+    .option('-m, --master', 'Keep master files')
+    .version('0.0.1')
     .command('install')
     .description('List installable projects.')
     .action(list);
-    
-// program    
-//     .command('install [project]')
-//     .description('Install an Operation Spark project into your website workspace.')
-//     .action(installProject);
-    
+
 program.parse(process.argv);
 
 function list() {
@@ -97,6 +91,10 @@ function installProject(project) {
                         removeGitRemnants(projectName, next);
                     },
                     function (next) {
+                        if (program.master) return next();
+                        removeMaster(projectName, next);
+                    },
+                    function (next) {
                         installBower(projectName, next);
                     },
                     function (next) {
@@ -138,11 +136,19 @@ function installBower(project, callback) {
     });
 }
 
-function removeGitRemnants(project, callback) {
-    fs.unlinkSync(project + '/.gitignore');
-    rimraf(project + '/.git', function (err) {
+function removeGitRemnants(projectName, callback) {
+    fs.unlinkSync(projectName + '/.gitignore');
+    rimraf(projectName + '/.git', function (err) {
         if (err) return console.log(err);
-        console.log('git remnants successfully removed from project %s'.green, project);
+        console.log('git remnants successfully removed from project %s'.green, projectName);
+        callback();
+    });
+}
+
+function removeMaster(projectName, callback) {
+    rimraf(projectName + '/.master', function (err) {
+        if (err) return console.log(err);
+        console.log('master successfully removed from project %s'.green, projectName);
         callback();
     });
 }
