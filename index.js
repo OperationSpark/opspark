@@ -127,7 +127,7 @@ function appendProjectEntry(project, callback) {
 }
 
 function installBower(project, callback) {
-    if (!fs.existsSync(__dirname + '/' + project + '/bower.json')) return callback();
+    if (!fs.existsSync(project + '/bower.json')) return callback();
     console.log('Installing bower components, please wait...'.green);
     var exec = require('child_process').exec;
     var child = exec('cd ' + project + ' && bower install -F', function(err, stdout, stderr) {
