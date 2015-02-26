@@ -5,6 +5,7 @@
 var 
     _ = require('lodash'),
     fsJson = require('fs-json')(),
+    changeCase = require('change-case'),
     async = require('async'),
     github = require('octonode'),
     client = github.client(),
@@ -116,6 +117,7 @@ function appendProjectEntry(project, callback) {
     projectEntries = (projectEntries ? projectEntries : {projects: []});
     projectEntries.projects.push({
         name: project.name, 
+        title: changeCase.titleCase(project.name),
         description: project.description.replace('PROJECT:: ', ''), 
         date: new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'})
     });
