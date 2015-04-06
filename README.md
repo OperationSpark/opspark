@@ -106,7 +106,7 @@ To see built-in help, you can always run the command:
 
 This will list commands and optional flags available to you in the `opspark` npm utility.
 
-For more personable help, tug on the sleeve of one of your awesome Operation Spark developers teaching your bootcamp, or, contact us via our Slack chat group.  If you're not a member of our Slack group, please request an invitation via our website at operationspark.org.
+For more personable help, tug on the sleeve of one of your awesome Operation Spark developers teaching your bootcamp, or, contact us via our Slack chat group.  If you're not a member of our Slack group, please request an invitation via our website at <a href="operationspark.org">operationspark.org</a>.
 
 ## For Teachers and Developers
 
