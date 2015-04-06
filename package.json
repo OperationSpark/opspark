@@ -1,6 +1,6 @@
 {
   "name": "opspark",
-  "version": "1.0.5",
+  "version": "1.1.0",
   "description": "A node utility supporting installation and configuration of operation spark projects",
   "main": "index.js",
   "scripts": {
