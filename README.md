@@ -126,7 +126,7 @@ To do this:
         npm install -g opspark
 
 4. Finally, to install and initialize the website files, run the command:
-       os init-ws
+        os init-ws
 
 This will download a completed version of the `index.html` and `portfolio.html` files, and  initialize the `portfolio.html`.  You will probably want to change the default content and style, heh, heh!
 
