@@ -116,7 +116,9 @@ If you want to get a fast head-start, instead of having to step through the [pre
 
 To do this:
 
-1. If you want to publish the website live on GitHub Pages, as is the pattern with our website project, you may first want to pair your Clould9 workspace with with a GitHub repository, so named for your GitHub username.  <a href="https://github.com/OperationSpark/first-website/blob/master/README.md" target="_blank">See the instructions to do so in the First Website lesson</a>.  If you don't want to publish your website, you can skip this step.
+1. If you want to publish the website live on GitHub Pages, as is the pattern with our website project, you will first want to create a GitHub repository, so named for your GitHub username, as in, my-github-username.github.io, and then clone it into a new Clould9 workspace (step 2).  <a href="https://github.com/OperationSpark/first-website/blob/master/README.md" target="_blank">See the instructions to do so in the First Website lesson on setting up the GitHub repository for a GitHub Pages website</a>.
+    
+    If you don't want to publish your website, you can skip this step and move on to step 2.
 
 2.  If you've completed the optional step 1, clone a new Clould9 workspace using the ssh option from your website's GitHub repository and make it an HTML5 environment.
 
@@ -130,7 +132,7 @@ To do this:
 
         os init-ws
 
-This will download a completed version of the `index.html` and `portfolio.html` files, and  initialize the `portfolio.html`.  You will probably want to change the default content and style, heh, heh!
+This will download a completed version of the `index.html` and `portfolio.html` files, and  initialize the `portfolio.html`.  You will probably want to change the default content and style with your own content, if you're going to publish it, heh, heh!
 
 ### Keeping Master Files
 
