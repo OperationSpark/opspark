@@ -123,9 +123,11 @@ To do this:
     If you skipped the optional step 1, the simply create a new Clould9 workspace, using HTML5.
 
 3. Next, once your Clould9 workspace has finished spooling-up, globally install the opspark npm utility by running the command:
+
         npm install -g opspark
 
 4. Finally, to install and initialize the website files, run the command:
+
         os init-ws
 
 This will download a completed version of the `index.html` and `portfolio.html` files, and  initialize the `portfolio.html`.  You will probably want to change the default content and style, heh, heh!
