@@ -74,7 +74,7 @@ describe('init', function() {
                 expect(html).to.have.string(init.portfolioScript);
                 
                 fs.unlinkSync('index.html');
-                //fs.unlinkSync('portfolio.html');
+                fs.unlinkSync('portfolio.html');
                 done();
             });
         });

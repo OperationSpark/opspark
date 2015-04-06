@@ -64,9 +64,9 @@ function installProject(project) {
     // TODO : Provide overloadeded method to install with name //
     //if (!projectName) return list();
     var projectName = project.name;
-    var rootDirectory = require('app-root-path').path;
+    var rootDirectory = './'
     
-    if (!fs.existsSync(rootDirectory + '/projects')) mkdirp.sync(rootDirectory + '/projects');
+    if (!fs.existsSync(rootDirectory + 'projects')) mkdirp.sync(rootDirectory + '/projects');
     var projectDirectory = rootDirectory + '/projects/' + projectName;
     if (fs.existsSync(projectDirectory)) return console.log('Project %s already installed! Please delete manually before reinstalling, or install another project.', projectName);
     

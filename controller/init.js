@@ -50,7 +50,7 @@ module.exports.website = function(next){
 };
 
 function installWebsiteFiles(next) {
-    var rootDirectory = require('app-root-path').path;
+    var rootDirectory = './';
     var numFiles = configWebsite.url.length;
     var downloaded = 0;
     configWebsite.url.forEach(function(fileUrl){
