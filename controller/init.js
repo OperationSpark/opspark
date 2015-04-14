@@ -15,8 +15,8 @@ module.exports.jQueryCdnScript = jQueryCdnScript;
 module.exports.portfolioScript = portfolioScript;
 
 
-function portfolio(filepath) {
-    filepath = (filepath ? filepath : configPortfolio.filepath);
+function portfolio() {
+    var filepath = configPortfolio.filepath;
     if (!fs.existsSync(filepath)) return console.log(configPortfolio.help.incomplete.red);
     var html = fs.readFileSync(filepath, 'utf8');
     var $ = cheerio.load(html);
@@ -57,7 +57,7 @@ function installWebsiteFiles(next) {
         var filename = url.parse(fileUrl).pathname.split('/').pop();
         var message = 'Downloading ' + filename + ', please wait...';
         console.log(message.green);
-        var wget = 'wget -P ' + rootDirectory + ' ' + fileUrl;
+        var wget = 'wget -P -nc ' + rootDirectory + ' ' + fileUrl;
         var child = exec(wget, function(err, stdout, stderr) {
             if (err) return next(err);
             message = filename + ' downloaded to ' + rootDirectory;
