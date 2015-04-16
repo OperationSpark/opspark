@@ -13,24 +13,40 @@ var
     colors = require('colors'),
     clone = require('nodegit').Clone.clone,
     fs = require('fs'),
+    url = require('url'),
+    exec = require('child_process').exec,
     mkdirp = require('mkdirp'),
     rimraf = require('rimraf'),
     cancelOption = '[cancel]',
+    rootDirectory = './',
     projectEntriesPath = 'projects/projects.json';
-    
-module.exports.list =  function() {
+
+module.exports.install = function() {
+    list(function (err, projects) {
+        if (err) return console.log(err + ''.red);
+        selectProject(projects, function(err, project) {
+            if (err) return console.log(err + ''.red);
+            installProject(project, null, function () {
+                
+            });
+        });
+    });
+};
+
+function list(next) {
     console.log('Retrieving list of projects, please wait...'.green);
     opspark.repos(1, 100, function (err, repos) {
-        if (err) return console.log(err + ''.red);
+        if (err) return next(err);
         var projects = repos.filter(function (repo) {
             //console.log(repo.description.blue);
             return /PROJECT::/.test(repo.description);
         });
-        promptForInstall(projects);
+        next(null, projects);
     });
-};
+}
+module.exports.list = list;
 
-function promptForInstall(projects) {
+function selectProject(projects, complete) {
     async.waterfall([
         function(next) {
             inquirer.prompt([{
@@ -54,20 +70,19 @@ function promptForInstall(projects) {
                         default: true
                 }],
                 function(confirm) {
-                    if (confirm.install) { installProject(project); }
+                    if (confirm.install) return complete(null, project);
+                    selectProject(projects, complete);
                 });
         }
     ]);
 }
+module.exports.selectProject = selectProject;
 
-function installProject(project) {
-    // TODO : Provide overloadeded method to install with name //
-    //if (!projectName) return list();
+function installProject(project, pairedWith, complete) {
     var projectName = project.name;
-    var rootDirectory = './'
-    
-    if (!fs.existsSync(rootDirectory + 'projects')) mkdirp.sync(rootDirectory + '/projects');
-    var projectDirectory = rootDirectory + '/projects/' + projectName;
+    var projectsDirectory = rootDirectory + 'projects';
+    if (!fs.existsSync(projectsDirectory)) mkdirp.sync(projectsDirectory);
+    var projectDirectory = projectsDirectory + '/' + projectName;
     if (fs.existsSync(projectDirectory)) return console.log('Project %s already installed! Please delete manually before reinstalling, or install another project.', projectName);
     
     console.log('Installing project %s... please wait...'.green, projectName);
@@ -89,58 +104,90 @@ function installProject(project) {
                         installBower(projectDirectory, next);
                     },
                     function (next) {
-                        appendProjectEntry(project, next);
+                        appendProjectEntry(project, pairedWith, next);
                     }
                 ],
                 function(err, result){
                     if (err) return console.log(err + ''.red);
                     console.log('Installation of project %s complete! Have fun!!!'.blue, projectName);
+                    complete();
                 }
             );
         }, function (err) {
             console.log(err);
         });
 }
+module.exports.installProject = installProject;
 
-function appendProjectEntry(project, callback) {
+function appendProjectEntry(project, pairedWith, complete) {
     var projectEntries = fsJson.loadSync(projectEntriesPath);
     projectEntries = (projectEntries ? projectEntries : {projects: []});
-    projectEntries.projects.push({
+    var entry = {
         name: project.name, 
         title: changeCase.titleCase(project.name),
         description: project.description.replace('PROJECT:: ', ''), 
         date: new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'})
-    });
+    };
+    if (pairedWith) entry.pairedWith = pairedWith;
+    projectEntries.projects.push(entry);
     fsJson.saveSync(projectEntriesPath, projectEntries);
     console.log('Project entry saved!'.green);
-    callback();
+    complete();
 }
 
-function installBower(projectDirectory, callback) {
-    if (!fs.existsSync(projectDirectory + '/bower.json')) return callback();
+function installBower(projectDirectory, complete) {
+    if (!fs.existsSync(projectDirectory + '/bower.json')) return complete();
     console.log('Installing bower components, please wait...'.green);
     var exec = require('child_process').exec;
     var child = exec('cd ' + projectDirectory + ' && bower install -F', function(err, stdout, stderr) {
         if (err) throw err;
         console.log(stdout);
         console.log('Bower components installed for project %s!'.green, projectDirectory);
-        callback();
+        complete();
     });
 }
 
-function removeGitRemnants(projectDirectory, callback) {
-    fs.unlinkSync(projectDirectory + '/.gitignore');
+function removeGitRemnants(projectDirectory, complete) {
+    var gitignore = projectDirectory + '/.gitignore';
+    if (fs.existsSync(gitignore)) { fs.unlinkSync(gitignore); }
     rimraf(projectDirectory + '/.git', function (err) {
         if (err) return console.log(err);
         console.log('git remnants successfully removed from project %s'.green, projectDirectory);
-        callback();
+        complete();
     });
 }
 
-function removeMaster(projectDirectory, callback) {
+function removeSvnRemnants(projectDirectory, complete) {
+    rimraf(projectDirectory + '/.svn', function (err) {
+        if (err) return console.log(err);
+        console.log('svn remnants successfully removed from project %s'.green, projectDirectory);
+        complete();
+    });
+}
+
+function removeMaster(projectDirectory, complete) {
     rimraf(projectDirectory + '/.master', function (err) {
         if (err) return console.log(err);
         console.log('master successfully removed from project %s'.green, projectDirectory);
-        callback();
+        complete();
     });
 }
+
+function download(uri, complete) {
+    var projectsDirectory = rootDirectory + 'projects';
+    if (!fs.existsSync(projectsDirectory)) mkdirp.sync(projectsDirectory);
+    
+    var project = url.parse(uri).pathname.split('/').pop();
+    var projectDirectory = projectsDirectory + '/' + project;
+    var message = 'Downloading ' + project + ', please wait...';
+    console.log(message.green);
+    
+    var cmd = 'svn checkout ' + uri + ' ' + projectDirectory;
+    var child = exec(cmd, function(err, stdout, stderr) {
+        if (err) return complete(err);
+        message = project + ' downloaded to ' + projectDirectory;
+        console.log(message.green);
+        removeSvnRemnants(projectDirectory, complete);
+    });
+}
+module.exports.download = download;

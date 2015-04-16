@@ -57,7 +57,8 @@ function installWebsiteFiles(next) {
         var filename = url.parse(fileUrl).pathname.split('/').pop();
         var message = 'Downloading ' + filename + ', please wait...';
         console.log(message.green);
-        var wget = 'wget -P -nc ' + rootDirectory + ' ' + fileUrl;
+        console.log(fileUrl);
+        var wget = 'wget -nc -P ' + rootDirectory + ' ' + fileUrl;
         var child = exec(wget, function(err, stdout, stderr) {
             if (err) return next(err);
             message = filename + ' downloaded to ' + rootDirectory;

@@ -1,4 +1,7 @@
 {
+    "github": {"msg": 
+        {"enterUsername": "Enter the GitHub username of our partner (you can ask them to type it)"}
+    },
     "website": {"url": ["https://raw.githubusercontent.com/OperationSpark/first-website/master/.master/index.html", "https://raw.githubusercontent.com/OperationSpark/portfolio/master/.master/portfolio.html"]},
     "portfolio": {
         "filepath": "portfolio.html",
