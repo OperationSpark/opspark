@@ -27,21 +27,21 @@ module.exports.install = function() {
         selectProject(projects, function(err, project) {
             if (err) return console.log(err + ''.red);
             installProject(project, null, function () {
-                
+                console.log('Have fun!!!'.green);
             });
         });
     });
 };
 
-function list(next) {
+function list(complete) {
     console.log('Retrieving list of projects, please wait...'.green);
     opspark.repos(1, 100, function (err, repos) {
-        if (err) return next(err);
+        if (err) return complete(err);
         var projects = repos.filter(function (repo) {
             //console.log(repo.description.blue);
             return /PROJECT::/.test(repo.description);
         });
-        next(null, projects);
+        complete(null, projects);
     });
 }
 module.exports.list = list;
@@ -91,37 +91,47 @@ function installProject(project, pairedWith, complete) {
     clone(uri, projectDirectory, null)
         .then(function(repo) {
             console.log('Successfully cloned project!'.green);
-            async.series(
-                [
-                    function (next) {
-                        removeGitRemnants(projectDirectory, next);
-                    },
-                    function (next) {
-                        if (program.master) return next();
-                        removeMaster(projectDirectory, next);
-                    },
-                    function (next) {
-                        installBower(projectDirectory, next);
-                    },
-                    function (next) {
-                        appendProjectEntry(project, pairedWith, next);
-                    }
-                ],
-                function(err, result){
-                    if (err) return console.log(err + ''.red);
-                    console.log('Installation of project %s complete! Have fun!!!'.blue, projectName);
-                    complete();
-                }
-            );
+            initializeProject(project, pairedWith, projectDirectory, complete);
         }, function (err) {
             console.log(err);
         });
 }
 module.exports.installProject = installProject;
 
+function initializeProject(project, pairedWith, projectDirectory, complete) {
+    async.series(
+        [
+            function (next) {
+                removeGitRemnants(projectDirectory, next);
+            },
+            function (next) {
+                if (program.master) return next();
+                removeMaster(projectDirectory, next);
+            },
+            function (next) {
+                installBower(projectDirectory, next);
+            },
+            function (next) {
+                appendProjectEntry(project, pairedWith, next);
+            }
+        ],
+        function(err, result){
+            if (err) return console.log(err + ''.red);
+            console.log('Installation of project %s complete!'.blue, project.name);
+            complete();
+        }
+    );
+}
+module.exports.initializeProject = initializeProject;
+
 function appendProjectEntry(project, pairedWith, complete) {
-    var projectEntries = fsJson.loadSync(projectEntriesPath);
-    projectEntries = (projectEntries ? projectEntries : {projects: []});
+    var projectEntries = loadOrCreateEntries();
+    var e = _.where(projectEntries.projects, { 'name': project.name})[0];
+    debugger
+    if (e) {
+        console.log('Project entry exists for %s, skipping entry...'.green, project.name);
+        return complete();
+    }
     var entry = {
         name: project.name, 
         title: changeCase.titleCase(project.name),
@@ -131,9 +141,10 @@ function appendProjectEntry(project, pairedWith, complete) {
     if (pairedWith) entry.pairedWith = pairedWith;
     projectEntries.projects.push(entry);
     fsJson.saveSync(projectEntriesPath, projectEntries);
-    console.log('Project entry saved!'.green);
+    console.log('Project entry for %s saved!'.green, project.name);
     complete();
 }
+module.exports.appendProjectEntry = appendProjectEntry;
 
 function installBower(projectDirectory, complete) {
     if (!fs.existsSync(projectDirectory + '/bower.json')) return complete();
@@ -146,7 +157,7 @@ function installBower(projectDirectory, complete) {
         complete();
     });
 }
-
+module.exports.installBower = installBower;
 function removeGitRemnants(projectDirectory, complete) {
     var gitignore = projectDirectory + '/.gitignore';
     if (fs.existsSync(gitignore)) { fs.unlinkSync(gitignore); }
@@ -156,6 +167,7 @@ function removeGitRemnants(projectDirectory, complete) {
         complete();
     });
 }
+module.exports.removeGitRemnants = removeGitRemnants;
 
 function removeSvnRemnants(projectDirectory, complete) {
     rimraf(projectDirectory + '/.svn', function (err) {
@@ -164,6 +176,7 @@ function removeSvnRemnants(projectDirectory, complete) {
         complete();
     });
 }
+module.exports.removeSvnRemnants = removeSvnRemnants;
 
 function removeMaster(projectDirectory, complete) {
     rimraf(projectDirectory + '/.master', function (err) {
@@ -172,6 +185,7 @@ function removeMaster(projectDirectory, complete) {
         complete();
     });
 }
+module.exports.removeMaster = removeMaster;
 
 function download(uri, complete) {
     var projectsDirectory = rootDirectory + 'projects';
@@ -191,3 +205,8 @@ function download(uri, complete) {
     });
 }
 module.exports.download = download;
+
+function loadOrCreateEntries() {
+    return fsJson.loadSync(projectEntriesPath) || {projects: []};
+}
+module.exports.loadOrCreateEntries = loadOrCreateEntries;

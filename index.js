@@ -7,6 +7,7 @@ var
     appRoot = require('app-root-path'),
     init = require('./controller/init'),
     projects = require('./controller/projects'),
+    janitor = require('./controller/janitor'),
     pair = require('./controller/pair'),
     program = require('commander');
 
@@ -36,10 +37,14 @@ program
     .action(pairup);
     
 program
-    .option('-m, --master', 'Keep master files')
     .command('pairdown')
     .description('Downloads and installs a project from the GitHub Pages repository of the student with whom the using student paired.')
     .action(pairdown);
+    
+program
+    .command('fix')
+    .description('Reads the projects directory, reconciles the installed projects with the projects.json file, and removes any git or svn cruft from installed projects.')
+    .action(fix);
 
 program.parse(process.argv);
 
@@ -59,4 +64,10 @@ function pairdown() {
 
 function initPortfolio() {
     init.portfolio();
+}
+
+function fix() {
+    janitor.fix(function(err) {
+        if (err) console.log(err);
+    });
 }
