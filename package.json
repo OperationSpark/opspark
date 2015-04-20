@@ -4,7 +4,7 @@
   "description": "A node utility supporting installation and configuration of operation spark projects",
   "main": "index.js",
   "scripts": {
-    "test": "test"
+    "test": "mocha"
   },
   "repository": {
     "type": "git",

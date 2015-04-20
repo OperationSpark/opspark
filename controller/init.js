@@ -15,8 +15,8 @@ module.exports.jQueryCdnScript = jQueryCdnScript;
 module.exports.portfolioScript = portfolioScript;
 
 
-function portfolio() {
-    var filepath = configPortfolio.filepath;
+function portfolio(filepath) {
+    filepath = (filepath ? filepath : configPortfolio.filepath);
     if (!fs.existsSync(filepath)) return console.log(configPortfolio.help.incomplete.red);
     var html = fs.readFileSync(filepath, 'utf8');
     var $ = cheerio.load(html);

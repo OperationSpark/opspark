@@ -6,7 +6,8 @@ var
     mocha = require('mocha'),
     should = require('should'),
     colors = require('colors'),
-    init = require('../controller/init');
+    init = require('../controller/init'),
+    tempPortfolioPath = 'test/files/temp-portfolio.html';
     
 describe('init', function() {
     afterEach(function () {
@@ -34,16 +35,14 @@ describe('init', function() {
         });
         
         it('should load portfolio and replace end-body-tag with jQuery-cdn-script, portfolio-script and end-body-tag', function(done) {
-            var filepath = 'test/files/temp-portfolio.html';
-            
             // for the test, make a copy of a pre-initialized portfolio.html //
-            fs.copySync('test/files/portfolio.html', filepath);
+            fs.copySync('test/files/portfolio.html', tempPortfolioPath);
             
-            var html = fs.readFileSync(filepath, 'utf8');
+            var html = fs.readFileSync(tempPortfolioPath, 'utf8');
             expect(html).to.not.have.string(init.jQueryCdnScript);
             expect(html).to.not.have.string(init.portfolioScript);
-            init.portfolio(filepath);
-            html = fs.readFileSync(filepath, 'utf8');
+            init.portfolio(tempPortfolioPath);
+            html = fs.readFileSync(tempPortfolioPath, 'utf8');
             expect(html).to.have.string(init.portfolioScript);
             done();
         });

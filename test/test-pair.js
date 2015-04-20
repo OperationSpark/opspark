@@ -4,14 +4,53 @@ var
     chai = require('./helpers/chai'),
     sinon = require('sinon'),
     mocha = require('mocha'),
-    stdin = require('mock-stdin').stdin(),
-    pair = require('../controller/pair');
+    mockery = require('mockery');
+    
+var list = [
+    {id: 29655824, name: 'line-crawler'}, 
+    {id: 29925564, name: 'circularity'}, 
+    {id: 30997229, name: 'worm-hole'}];
     
 describe('pair', function() {
     describe('#up()', function() {
-        this.timeout(15000);
-        it('verifies github user, prompts for install, installs project, record username under project entry in opspark.json', function(done) {
+        afterEach(function() {
+            mockery.disable();
+            mockery.deregisterAll();
+        })
+        
+        /*
+         * Functional: This test merely seals the order of execution for the 
+         * process as all sub-processes are unit-tested.
+         */
+        it('verifies the order of execution: promptForInput of partner github username, github user to verify user, projects.list, projects.selectProject, projects.installProject', function(done) {
+            this.timeout(15000);
+            
+            var complete = sinon.spy();
+            
+            var username = 'jfraboni'; 
+            var user = {login: 'jfraboni'};
+            var project = {name: 'someProject'};
+            
+            mockery.registerAllowable(pair);
+            
+            var mockView = { promptForInput: function (message, callback) { callback(null, username); } };
+            mockery.registerMock('../view', mockView);
+            
+            var mockGithub = { user: function (username, callback) { callback(null, user); } };
+            mockery.registerMock('./github', mockGithub);
+            
+            var mockProjects = { 
+                list: function (callback) { callback(null, list); },
+                selectProject: function (list, callback) { callback(null, project); },
+                installProject: function (project, username, callback) { complete(); callback(); }
+            };
+            mockery.registerMock('./projects', mockProjects);
+            
+            mockery.enable({ useCleanCache: true });
+            
+            var pair = require('../controller/pair');
             pair.up(function() {
+                assert(complete.called);
                 done();
             });
         });
