@@ -11,7 +11,6 @@ var
     program = require('commander'),
     inquirer = require("inquirer"),
     colors = require('colors'),
-    clone = require('nodegit').Clone.clone,
     fs = require('fs'),
     url = require('url'),
     exec = require('child_process').exec,
@@ -85,16 +84,24 @@ function installProject(project, pairedWith, complete) {
     var projectDirectory = projectsDirectory + '/' + projectName;
     if (fs.existsSync(projectDirectory)) return console.log('Project %s already installed! Please delete manually before reinstalling, or install another project.', projectName);
     
-    console.log('Installing project %s... please wait...'.green, projectName);
+    console.log('Installing project %s, please wait...'.green, projectName);
     var uri = 'https://github.com/OperationSpark/' + projectName;
+    console.log('Cloning %s, please wait...'.green, uri);
     
-    clone(uri, projectDirectory, null)
-        .then(function(repo) {
-            console.log('Successfully cloned project!'.green);
-            initializeProject(project, pairedWith, projectDirectory, complete);
-        }, function (err) {
-            console.log(err);
-        });
+    var cmd = 'git clone ' + uri + ' ' + projectDirectory;
+    var child = exec(cmd, function(err, stdout, stderr) {
+        if (err) return complete(err);
+        console.log('Successfully cloned project!'.green);
+        initializeProject(project, pairedWith, projectDirectory, complete);
+    });
+    
+    // clone(uri, projectDirectory, null)
+    //     .then(function(repo) {
+    //         console.log('Successfully cloned project!'.green);
+    //         initializeProject(project, pairedWith, projectDirectory, complete);
+    //     }, function (err) {
+    //         console.log(err);
+    //     });
 }
 module.exports.installProject = installProject;
 
