@@ -5,9 +5,7 @@ var
     fsJson = require('fs-json')(),
     changeCase = require('change-case'),
     async = require('async'),
-    github = require('octonode'),
-    client = github.client(),
-    opspark = client.org('OperationSpark'),
+    github = require('./github'),
     program = require('commander'),
     inquirer = require("inquirer"),
     colors = require('colors'),
@@ -34,7 +32,7 @@ module.exports.install = function() {
 
 function list(complete) {
     console.log('Retrieving list of projects, please wait...'.green);
-    opspark.repos(1, 100, function (err, repos) {
+    github.repos(function (err, repos) {
         if (err) return complete(err);
         var projects = repos.filter(function (repo) {
             //console.log(repo.description.blue);
@@ -94,14 +92,6 @@ function installProject(project, pairedWith, complete) {
         console.log('Successfully cloned project!'.green);
         initializeProject(project, pairedWith, projectDirectory, complete);
     });
-    
-    // clone(uri, projectDirectory, null)
-    //     .then(function(repo) {
-    //         console.log('Successfully cloned project!'.green);
-    //         initializeProject(project, pairedWith, projectDirectory, complete);
-    //     }, function (err) {
-    //         console.log(err);
-    //     });
 }
 module.exports.installProject = installProject;
 

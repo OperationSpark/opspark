@@ -15,7 +15,8 @@ describe('projects', function() {
         stdin.restore();
     });
     
-    describe('#list()', function() {
+    // REQUIRES AUTH //
+    describe.skip('#list()', function() {
         this.timeout(3000);
         it('returns loosely valid list of projects from github.com/OperationSpark', function(done) {
             projects.list(function(err, projects) {
@@ -24,7 +25,6 @@ describe('projects', function() {
                 done();
             });
         });
-        
     });
     
     describe('#download()', function() {
