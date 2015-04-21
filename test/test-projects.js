@@ -27,7 +27,7 @@ describe('projects', function() {
         });
     });
     
-    describe('#download()', function() {
+    describe.skip('#download()', function() {
         this.timeout(15000);
         
         it('should download a project or any directory', function(done) {
