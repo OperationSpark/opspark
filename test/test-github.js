@@ -44,7 +44,7 @@ describe('github', function() {
         });
     });
     
-    describe('#writeToken()', function() {
+    describe.skip('#writeToken()', function() {
         it('should create dir if none, and write token', function(done) {
             github.writeToken({token: "foo"});
             assert(fs.existsSync('../opspark'));
