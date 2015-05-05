@@ -15,6 +15,16 @@ describe('projects', function() {
         stdin.restore();
     });
     
+    describe('#listProjectsOf()', function() {
+        this.timeout(3000);
+        it('returns valid projects.json for user', function() {
+            projects.listProjectsOf('jfraboni').then(function(projects) {
+                expect(projects).to.have.property('projects');
+            });
+        });
+    });
+    
+    // TODO : mock //
     // REQUIRES AUTH //
     describe.skip('#list()', function() {
         this.timeout(3000);

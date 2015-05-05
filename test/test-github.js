@@ -1,6 +1,7 @@
 var 
     config = require('../config'),
     _ = require('lodash'),
+    util = require('util'),
     fs = require('fs-extra'),
     fsJson = require('fs-json')(),
     chai = require('./helpers/chai'),
@@ -8,6 +9,7 @@ var
     mocha = require('mocha'),
     should = require('should'),
     colors = require('colors'),
+    env = require('../controller/env'),
     github = require('../controller/github');
     
 describe('github', function() {
@@ -32,16 +34,6 @@ describe('github', function() {
             });
         });
         
-    });
-    
-    describe('#projects()', function() {
-        this.timeout(3000);
-        it('returns valid projects.json for user', function(done) {
-            github.projects('jfraboni', function(err, user) {
-                //expect(user).to.have.property('login').and.to.equal('jfraboni');
-                done();
-            });
-        });
     });
     
     describe.skip('#writeToken()', function() {
@@ -73,6 +65,7 @@ describe('github', function() {
         });
     });
     
+    // deprecated: todo : remove //
     describe.skip('#listAuth()', function() {
         this.timeout(15000);
         it('should list valid GitHub auths for the user', function(done) {
@@ -80,18 +73,6 @@ describe('github', function() {
                 if (err) console.log(err);
                 done();
             });
-        });
-    });
-    
-    /*
-     * Run manually : depends on env and OS
-     */
-    describe.skip('#getUserHome()', function() {
-        it('should return home dir of user, platform independent', function(done) {
-            var userhome = github.getUserHome();
-            console.log(userhome);
-            expect(userhome).to.include('/home/ubuntu');
-            done();
         });
     });
     
@@ -110,6 +91,15 @@ describe('github', function() {
                 assert(_.has(auth, 'token'));
                 done();
             });
+        });
+    });
+    
+    describe('#getNoteForHost()', function() {
+        it('returns auth note unique to env', function(done) {
+            var note = util.format(config.github.note, env.hostname());
+            console.log(github.getNoteForHost());
+            expect(github.getNoteForHost()).to.equal(note);
+            done();
         });
     });
     

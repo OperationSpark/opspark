@@ -1,13 +1,20 @@
 'use strict';
 
 var 
-    config = require('../config'),
+    config = require('../config').pair,
+    _ = require('lodash'),
+    util = require('util'),
+    Q = require('q'),
+    inquirer = require('inquirer'),
+    cancelOption = '[cancel]',
+    colors = require('colors'),
     view = require('../view'),
     github = require('./github'),
-    projects = require('./projects');
+    projects = require('./projects'),
+    _session;
 
 module.exports.up = function(complete) {
-    view.promptForInput(config.github.msg.enterUsername, 
+    view.promptForInput(config.msg.enterPartnerName, 
         function(err, username) {
             if (err) return complete(err);
             github.user(username, function(err, user) {
@@ -26,6 +33,74 @@ module.exports.up = function(complete) {
         });
 };
 
-module.exports.down = function(complete) {
-    console.log('coming soon...');
-};
+function down() {
+    _session = {};
+    return getUserForSession()
+        .then(getPartnerName)
+        .then(github.user)
+        .then(function(user) { return user.login; }, onGitHubError)
+        .then(projects.listProjectsOf)
+        .then(listPartneredProjects)
+        .then(projects.download)
+        .then(function() {
+            projects.appendProjectEntry(_session.pairedProject, _session.partner, function() {
+                console.log('Sweet! The project you paired on, %s, is now installed!'.green, _session.pairedProject.title);
+            });
+        })
+        .fail(function(err) {
+            if (err.message === 'GitHub user not found') {
+                console.log(util.format('Hmm, we couldn\'t a GitHub user with the name %s!\nPlease check the spelling of your partner\'s GitHub username and try again.', _session.partner));
+                return down();
+            } else {
+                throw err;
+            } 
+        })
+        .catch(function(err) { console.log(err.message.red) })
+        .done();
+}
+module.exports.down = down;
+
+function listPartneredProjects(projects) {
+    var deferred = Q.defer();
+    var pairedOnProjects = _.where(projects, { 'pairedWith': [_session.username] });
+    
+    inquirer.prompt([{
+        type: "list",
+        name: "project",
+        message: "Select from the projects you paired on, the one you wish to install",
+        choices: _.pluck(pairedOnProjects, 'title').concat(cancelOption)}], 
+        function(response) {
+            if(response.project === cancelOption) {
+                console.log('Installation cancelled, bye bye!'.green);
+                process.exit();
+            }
+            var pairedProject = _.where(pairedOnProjects, {'title': response.project})[0];
+            _session.pairedProject = pairedProject;
+            deferred.resolve(_session.partnerRepo + '/trunk/projects/' + pairedProject.name);
+    });
+    return deferred.promise;
+}
+
+function onGitHubError(err) {
+    if (err.statusCode === 404) { 
+        throw new Error('GitHub user not found');
+    }
+}
+
+function getUserForSession() {
+    return github.getOrObtainUser()
+        .then(function(user) {
+            _session.username = user.login;
+        });
+}
+
+function getPartnerName() {
+    var deferred = Q.defer();
+    view.promptForInput(config.msg.enterPartnerName, function (err, input) {
+        _session.partner = input;
+        _session.partnerRepo = util.format('https://github.com/%s/%s.github.io', input, input);
+        if (err) deferred.reject(err);
+        else deferred.resolve(input);
+    });
+    return deferred.promise;
+}

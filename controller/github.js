@@ -1,32 +1,43 @@
 'use strict';
 
 var 
+    config = require('../config'),
+    Q = require('q'),
     _ = require('lodash'),
+    util = require('util'),
     fs = require('fs'),
     fsJson = require('fs-json')(),
+    child = require('./child'),
     view = require('../view'),
     mkdirp = require('mkdirp'),
     exec = require('child_process').exec,
     request = require('request'),
     github = require('octonode'),
-    authDirectory = getUserHome() + '/opspark',
-    authFilePath = authDirectory + '/github',
+    env = require('./env'),
+    applicationDirectory = env.home() + '/opspark',
+    authFilePath = applicationDirectory + '/github',
+    userFilePath = applicationDirectory + '/user',
     _auth,
+    _user,
     _client,
-    _opspark;
+    _opspark,
+    _session;
     
 // TODO : consider the "module level" vars, like _client in this implementation, are they necessary.
 
 
-module.exports.user = function(username, complete) {
+function user(username, complete) {
+    var deferred = Q.defer();
     getOrCreateClient(function (err, client) {
-        if (err) return complete(err);
+        if (err) return deferred.reject(err);
         client.get('/users/' + username, {}, function (err, status, body, headers) {
-            if (err) return complete(err);
-            return complete(null, body);
+            if (err) deferred.reject(err);
+            else deferred.resolve(body);
         });
     });
-};
+    return deferred.promise.nodeify(complete);
+}
+module.exports.user = user;
 
 module.exports.repo = function (username, repoName, complete) {
     getOrCreateClient(function (err, client) {
@@ -36,20 +47,6 @@ module.exports.repo = function (username, repoName, complete) {
             console.log(bod);
             complete(null, bod);
         });
-    });
-};
-
-// TODO : UPDATE TO USE TOKEN //
-module.exports.projects = function (username, complete) {
-    var projects;
-    var userRepo = username + '/' + username + '.github.io';
-    var url = 'https://raw.githubusercontent.com/' + userRepo + '/master/projects/projects.json';
-    
-    request(url, function (err, response, body) {
-        if (err) return complete(err);
-        projects = JSON.parse(body);
-        console.log(body);
-        complete(null, projects);
     });
 };
 
@@ -64,8 +61,19 @@ module.exports.limit = function (complete) {
     });
 };
 
+
+/*
+ * TODO : 
+ * 1. Case for token exists but has been deleted locally:
+ *      a. curl to delete existing token, (user will need to provide creds).
+ *      b. re-curl to install new token.
+ *      OR
+ *      a. add a timestamp to the hostname.
+ */
 function authorize(username, complete) {
-    var cmd = 'curl https://api.github.com/authorizations --user "' + username + '" --data \'{"scopes":["public_repo", "gist"],"note":"opspark: cli util to install, setup, and grade student projects"}\'';
+    _session = {username: username};
+    var note = getNoteForHost();
+    var cmd = 'curl https://api.github.com/authorizations --user "' + username + '" --data \'{"scopes":["public_repo", "gist"],"note":"' + note + '","note_url":"https://www.npmjs.com/package/opspark"}\'';
     var child = exec(cmd);
     child.stdout.on('data', function(data) {
         console.log('stdout: ', data);
@@ -77,6 +85,7 @@ function authorize(username, complete) {
             }
             console.log('github login succeeded!');
             writeToken(_auth);
+            obtainAndWriteUser(username);
         }
     });
     child.stderr.on('data', function(data) {
@@ -90,7 +99,7 @@ function authorize(username, complete) {
 module.exports.authorize = authorize;
 
 function writeToken(token) {
-    if (!fs.existsSync(authDirectory)) mkdirp.sync(authDirectory);
+    ensureApplicationDirectory();
     fsJson.saveSync(authFilePath, token);
 }
 module.exports.writeToken = writeToken;
@@ -111,16 +120,39 @@ function getOrObtainAuth(complete) {
     if (_auth) return complete(null, _auth);
     if (fs.existsSync(authFilePath)) {
         _auth = fsJson.loadSync(authFilePath);
-        // assume if we have a token key, we've corectly loaded the auth //
-        if (_.has(_auth, 'token')) return complete(null, _auth);
+        hasAuthorization(_auth.token, function(err, response, body) {
+            if (!err && response.statusCode == 200) {
+                return complete(null, _auth);
+            } else {
+                console.log('Hmm, something\'s not right!'.green);
+                console.log('Let\'s try to login to GitHub again:'.green);
+                fs.unlinkSync(authFilePath);
+                obtainAuthorization(complete);
+            }
+        });
+    } else {
+        obtainAuthorization(complete);
     }
-    
+}
+module.exports.getOrObtainAuth = getOrObtainAuth;
+
+function obtainAuthorization(complete) {
     view.promptForInput('Enter your GitHub username', function (err, input) {
         if (err) return complete(err);
         authorize(input, function(){
             complete(null, _auth);
         });
     });
+}
+
+function hasAuthorization(token, complete) {
+    var options = {
+        url: util.format('https://api.github.com/?access_token=%s', token),
+        headers: {
+            'User-Agent': config.userAgent
+        }
+    };
+    request(options, complete);
 }
 
 function getOrCreateClient(complete) {
@@ -134,19 +166,59 @@ function getOrCreateClient(complete) {
     });
 }
 
-// TODO : consider moving to another module //
-function getUserHome() {
-  return process.env[(process.platform == 'win32') ? 'USERPROFILE' : 'HOME'];
-}
-module.exports.getUserHome = getUserHome;
-
 function listAuths(username, complete) {
-    var cmd = 'curl --user "' + username + '" https://api.github.com/authorizations';
+    var cmd = 'curl -A "' + config.userAgent + '" --user "' + username + '" https://api.github.com/authorizations';
     var child = exec(cmd, function(err, stdout, stderr) {
         if (err) return complete(err);
-        console.log(stdout.green);
-        console.log(stderr.green);
+        console.log('stdout: ', stdout.green);
+        console.log('stdout: ', stderr.green);
         complete(err, stdout, stderr);
     });
 }
 module.exports.listAuths = listAuths;
+
+function getNoteForHost() {
+    return util.format(config.github.note, env.hostname());
+}
+module.exports.getNoteForHost = getNoteForHost;
+
+function getOrObtainUser() {
+    if(_user) return Q.when(_user);
+    if (fs.existsSync(userFilePath)) {
+        _user = fsJson.loadSync(userFilePath);
+        return Q.when(_user);
+    }
+    return obtainUser();
+}
+module.exports.getOrObtainUser = getOrObtainUser;
+
+function obtainUser() {
+    console.log('Before proceeding, we need your GitHub user information:');
+    return promptForUserName().then(obtainAndWriteUser);
+}
+
+function promptForUserName() {
+    var deferred = Q.defer();
+    view.promptForInput('Enter your GitHub username', function (err, input) {
+        if (err) return deferred.reject(err);
+        deferred.resolve(input);
+    });
+    return deferred.promise;
+}
+
+function obtainAndWriteUser(username) {
+    return user(username)
+        .then(function(user) {
+            writeUser(_user = user);
+            return user;
+        });
+}
+
+function writeUser(user) {
+    ensureApplicationDirectory();
+    fsJson.saveSync(userFilePath, user);
+}
+
+function ensureApplicationDirectory() {
+    if (!fs.existsSync(applicationDirectory)) mkdirp.sync(applicationDirectory);
+}

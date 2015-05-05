@@ -1,6 +1,7 @@
 {
     "github": {"msg": 
-        {"enterUsername": "Enter the GitHub username of our partner (you can ask them to type it)"}
+        {"enterUsername": "Enter the GitHub username of our partner (you can ask them to type it)"},
+        "note": "opspark for %s: cli util to install, setup, and grade student projects"
     },
     "website": {"url": ["https://raw.githubusercontent.com/OperationSpark/first-website/master/.master/index.html", "https://raw.githubusercontent.com/OperationSpark/portfolio/master/.master/portfolio.html"]},
     "portfolio": {
@@ -10,5 +11,10 @@
             "noPortfolioList": "Whoops, we can't find an a <ul> with an id of portfolio.\n\nCheck your portfolio.html file, and ensure that you have appropriately given your portfolio <ul> the id of portfolio, so that the opening tag looks like <ul id=\"portfolio\">!\n\nOnce you do this, save your file and try again to initialize your portfolio, thanks!",
             "portfolioScriptTagExists": "Whoops, you are trying to initialize your portfolio.html file, but it appears the portfolio script tag already exists.\n\nDouble check your portfolio.html or ask for help."
         }
-    }
+    },
+    "pair": {
+        "msg": {
+            "enterPartnerName": "Enter the GitHub username of your partner (you can ask them to type it)"}
+    },
+    "userAgent": "opspark"
 }
