@@ -32,13 +32,13 @@ program
     
 program
     .option('-m, --master', 'Keep master files')
-    .command('pair')
-    .description('Installs a project for pair programming.')
+    .command('pairup')
+    .description('Installs a project for pair programming. The workspace owner will be asked to provide the GitHub username of their partner.')
     .action(pairup);
     
 program
     .command('pairdown')
-    .description('Downloads and installs a project from the GitHub Pages repository of the student with whom the using student paired.')
+    .description('Downloads and installs a project from the GitHub Pages repository of the student with whom the using student paired. Will fail if project is already installed.')
     .action(pairdown);
     
 program
