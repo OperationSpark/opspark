@@ -16,7 +16,7 @@ var
 program    
     .version('1.1.5');
     
-program.command('pub').action(function() { publish.publish('opspark').then(function (result) {
+program.command('pub').action(function() { publish.publish('opspark', 'fix child stderr').then(function (result) {
     console.log(result);
 }); });
 

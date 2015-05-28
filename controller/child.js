@@ -8,20 +8,19 @@ var
 
 function execute(command) {
     return new Promise(function (resolve, reject) {
-        var err, response;
+        var stderr, stdout;
         var child = exec(command);
         child.stdout.on('data', function(data) {
-            response = data;
+            stdout = data;
             console.log('stdout: ', data);
         });
         child.stderr.on('data', function(data) {
-            err = data;
+            stderr = data;
             console.log('stderr: ', data);
         });
         child.on('close', function(code) {
             console.log('closing code: ' + code);
-            if (err) return reject(err);
-            return resolve(response);
+            return resolve({stdout: stdout, stderr: stderr, code: code});
         });
     });
 }

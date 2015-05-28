@@ -8,7 +8,7 @@ var
 
 module.exports.publish = function (repository, commitMessage) {
         return addAll()
-            .then(commit('updates'))
+            .then(commit(commitMessage))
             .then(push(repository));
 };
 

@@ -20,14 +20,14 @@ describe('child', function() {
         it('returns successfully after successfully executing a command', function() {
             return child.execute('ls').then(function(result) {
                 console.log('Result is', result);
-                expect(result).to.contain('package.json');
+                expect(result.stdout).to.contain('package.json');
             });
         });
         
         it('returns unsuccessfully after unsuccessfully executing a command', function() {
             return child.execute('lssssss').catch(function(result) {
                 console.log('Result is', result);
-                expect(result).to.contain('lssssss: not found');
+                expect(result.stderr).to.contain('lssssss: not found');
             });
         });
     });
