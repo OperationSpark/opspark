@@ -8,6 +8,7 @@ var
     sinon = require('sinon'),
     mocha = require('mocha'),
     should = require('should'),
+    stdin = require('mock-stdin').stdin(),
     colors = require('colors'),
     env = require('../controller/env'),
     github = require('../controller/github');

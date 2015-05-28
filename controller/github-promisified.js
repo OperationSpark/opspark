@@ -2,8 +2,7 @@
 
 var 
     config = require('../config'),
-    Promise = require("bluebird"),
-    Q = require("bluebird-q"),
+    Q = require('q'),
     _ = require('lodash'),
     util = require('util'),
     fs = require('fs'),
@@ -14,7 +13,7 @@ var
     mkdirp = require('mkdirp'),
     exec = require('child_process').exec,
     request = require('request'),
-    octonode = require('octonode'),
+    github = require('octonode'),
     env = require('./env'),
     applicationDirectory = env.home() + '/opspark',
     authFilePath = applicationDirectory + '/github',
@@ -160,7 +159,7 @@ function getOrCreateClient(complete) {
     
     getOrObtainAuth(function(err, auth) {
         if (err) return complete(err);
-        _client = octonode.client(auth.token);
+        _client = github.client(auth.token);
         _opspark = _client.org('OperationSpark');
         complete(null, _client);
     });
@@ -184,35 +183,44 @@ module.exports.getNoteForHost = getNoteForHost;
 
 function getOrObtainUser() {
     if(_user) return Q.when(_user);
-    if (fs.existsSync(userFilePath)) {
-        _user = fsJson.loadSync(userFilePath);
-        if (_user) return Q.when(_user);
-        return Q.reject(new Error('A race condition occurred while trying to load the user!'));
-    }
-    return obtainUser();
+    return ggetOrObtainAuth()
+        .then(loadUser)
+        .then(function(user) {
+            return user || view.promptForInput('Enter your GitHub username')
+                .then(obtainAndWriteUser);
+        });
+    // if (fs.existsSync(userFilePath)) {
+    //     _user = fsJson.loadSync(userFilePath);
+    //     return Q.when(_user);
+    // }
+    // return obtainUser();
 }
 module.exports.getOrObtainUser = getOrObtainUser;
 
+function loadUser() {
+    var user;
+    if (fs.existsSync(userFilePath)) {
+        user = fsJson.loadSync(userFilePath);
+    }
+    return user;
+}
+
 function obtainUser() {
-    /*
-     * First, check if we have auth, get or obtain auth.
-     * 
-     * 1. If we have auth and no user, it's cause the env was authed before 
-     *    we were storing the user, so just get the user.
-     * 2. If we don't have auth, just auth, then return the user, cause the auth 
-     *    process installs the user.
-     */
-    return new Promise(function(resolve, reject) {
-        getOrObtainAuth(function(err, auth) {
-            if (err) return reject(err);
-            if(_user) return resolve(_user);
-            console.log('Before we proceed, we need to retrieve your GitHub user:');
-            return view.promptForInput('Enter your GitHub username')
+    ggetOrObtainAuth()
+        .then(loadUser)
+        .then(function(user) {
+            return user || view.promptForInput('Enter your GitHub username')
                 .then(obtainAndWriteUser);
         });
-    });
+    // do we have auth, if yes, ask for username, then get user //
+    // if (_auth) {
+    //     console.log('Before proceeding, we need your GitHub user information:');
+    //     return view.promptForInput('Enter your GitHub username')
+    //         .then(obtainAndWriteUser);
+    // } else {
+    //     return ggetOrObtainAuth().then(getOrObtainUser);
+    // }
 }
-module.exports.obtainUser = obtainUser;
 
 function promptForUserName() {
     var deferred = Q.defer();
@@ -224,7 +232,7 @@ function promptForUserName() {
 }
 
 function obtainAndWriteUser(username) {
-    return user(username)
+    return uuser(username)
         .then(function(user) {
             writeUser(_user = user);
             return user;
@@ -238,4 +246,112 @@ function writeUser(user) {
 
 function ensureApplicationDirectory() {
     if (!fs.existsSync(applicationDirectory)) mkdirp.sync(applicationDirectory);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+function uuser(username, complete) {
+    var deferred = Q.defer();
+    ggetOrCreateClient().then(function(client){
+        client.get('/users/' + username, {}, function (err, status, body, headers) {
+            if (err) deferred.reject(err);
+            else deferred.resolve(body);
+        });
+    });
+    return deferred.promise;
+}
+
+function ggetOrCreateClient() {
+    if(_client) return Q(_client);
+    return ggetOrObtainAuth()
+        .then(createClient);
+}
+
+function createClient(auth) {
+    _client = github.client(auth.token);
+    _opspark = _client.org('OperationSpark');
+    return Q(_client);
+}
+
+function ggetOrObtainAuth() {
+    if(_auth) return Q(_auth);
+    if (fs.existsSync(authFilePath)) {
+        _auth = fsJson.loadSync(authFilePath);
+        return hhasAuthorization(_auth.token).catch(reauth);
+    } else {
+        return oobtainAuthorization();
+    }
+}
+
+// function loadAuth() {
+//     if (fs.existsSync(authFilePath)) return Q(fsJson.loadSync(authFilePath));
+//     return Q.reject(new Error('No local auth found!'));
+// }
+
+function reauth() {
+    console.log('Hmm, something\'s not right!'.green);
+    console.log('Let\'s try to login to GitHub again:'.green);
+    fs.unlinkSync(authFilePath);
+    return oobtainAuthorization();
+}
+
+function oobtainAuthorization() {
+    return view.promptForInput('Enter your GitHub username')
+        .then(function (username) {
+            return aauthorize(username)
+                .then(writeToken)
+                .then(function() {
+                    obtainAndWriteUser(username);
+                });
+        });
+}
+
+function aauthorize(username) {
+    var deferred, note, cmd, child, auth, err;
+    
+    deferred = Q.defer(),
+    note = getNoteForHost(),
+    cmd = 'curl https://api.github.com/authorizations --user "' + username + '" --data \'{"scopes":["public_repo", "gist"],"note":"' + note + '","note_url":"https://www.npmjs.com/package/opspark"}\'',
+    child = exec(cmd);
+    
+    child.stdout.on('data', function(data) {
+        console.log('stdout: ', data);
+        if (data.indexOf('token') > -1) {
+            try {
+                auth = JSON.parse(data);
+            } catch (error) {
+                return deferred.reject(error);
+            }
+            console.log('GitHub login succeeded!'.green);
+        }
+    });
+    child.stderr.on('data', function(data) {
+        console.log(data);
+        err = data;
+    });
+    child.on('close', function(code) {
+        console.log('closing code: ' + code);
+        if (err) return deferred.reject(err);
+        deferred.resolve(auth);
+    });
+    
+    return deferred.promise;
+}
+
+function hhasAuthorization(auth) {
+    var deferred = Q.defer();
+    var options = {
+        url: util.format('https://api.github.com/?access_token=%s', auth.token),
+        headers: {
+            'User-Agent': config.userAgent
+        }
+    };
+    request(options, function(err, response, body) {
+        if (!err && response.statusCode == 200) {
+            deferred.resolve(_auth);
+        } else {
+            deferred.reject(err);
+        }
+    });
+    return deferred.promise;
 }

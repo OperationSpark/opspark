@@ -13,8 +13,9 @@ var
     projects = require('./projects'),
     _session;
 
+// TODO : Promisify
 module.exports.up = function(complete) {
-    view.promptForInput(config.msg.enterPartnerName, 
+    view.inquireForInput(config.msg.enterPartnerName, 
         function(err, username) {
             if (err) return complete(err);
             github.user(username, function(err, user) {
@@ -24,7 +25,7 @@ module.exports.up = function(complete) {
                     projects.selectProject(list, function(err, project) {
                         if (err) return console.log(err + ''.red);
                         projects.installProject(project, username, function () {
-                            console.log('You\'ve paired up with %s', username);
+                            console.log('You\'ve paired up with %s'.blue, username);
                             complete(null);
                         });
                     });
@@ -43,13 +44,13 @@ function down() {
         .then(listPartneredProjects)
         .then(projects.download)
         .then(function() {
-            projects.appendProjectEntry(_session.pairedProject, _session.partner, function() {
-                console.log('Sweet! The project you paired on, %s, is now installed!'.green, _session.pairedProject.title);
+            projects.appendProjectEntry(_session.pairedProject, _session.partnerName, function() {
+                console.log('Sweet! The project you paired on with %s, %s, is now installed!'.green, _session.partnerName, _session.pairedProject.title);
             });
         })
         .fail(function(err) {
             if (err.message === 'GitHub user not found') {
-                console.log(util.format('Hmm, we couldn\'t a GitHub user with the name %s!\nPlease check the spelling of your partner\'s GitHub username and try again.', _session.partner));
+                console.log(util.format('Hmm, we couldn\'t a GitHub user with the name %s!\nPlease check the spelling of your partner\'s GitHub username and try again.', _session.partnerName));
                 return down();
             } else {
                 throw err;
@@ -95,12 +96,10 @@ function getUserForSession() {
 }
 
 function getPartnerName() {
-    var deferred = Q.defer();
-    view.promptForInput(config.msg.enterPartnerName, function (err, input) {
-        _session.partner = input;
-        _session.partnerRepo = util.format('https://github.com/%s/%s.github.io', input, input);
-        if (err) deferred.reject(err);
-        else deferred.resolve(input);
-    });
-    return deferred.promise;
+    return view.promptForInput(config.msg.enterPartnerName)
+        .then(function(partnerName){
+            _session.partnerName = partnerName;
+            _session.partnerRepo = util.format('https://github.com/%s/%s.github.io', partnerName, partnerName);
+            return partnerName;
+        });
 }

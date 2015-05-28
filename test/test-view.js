@@ -4,38 +4,31 @@ var
     chai = require('./helpers/chai'),
     sinon = require('sinon'),
     mocha = require('mocha'),
-    stdin = require('mock-stdin').stdin(),
-    view = require('../view');
+    child = require('../controller/child');
     
 // TODO : figure out why these tests pass individually, but fail when running suite.
-describe.skip('view', function() {
+describe('child', function() {
     afterEach(function(){
-        stdin.restore();
+        
     });
     
-    describe('#promptForInput()', function() {
-        this.timeout(15000);
-        var message = config.github.msg.enterUsername;
-        it('returns requested input from stdin', function(done) {
-            view.promptForInput(message, function(err, username){
-                expect(err).to.be.null;
-                expect(username).to.equal('jfraboni');
-                done();
+    after(function(){
+        
+    });
+    
+    describe('#execute()', function() {
+        it('returns successfully after successfully executing a command', function() {
+            return child.execute('ls').then(function(result) {
+                console.log('Result is', result);
+                expect(result).to.contain('package.json');
             });
-            stdin.send("jfraboni\n", "ascii");
-            stdin.send("Y\n", "ascii");
         });
         
-        it('recursively allows user to re-enter input from stdin', function(done) {
-            view.promptForInput(message, function(err, username){
-                expect(err).to.be.null;
-                expect(username).to.equal('jfraboni');
-                done();
+        it('returns unsuccessfully after unsuccessfully executing a command', function() {
+            return child.execute('lssssss').catch(function(result) {
+                console.log('Result is', result);
+                expect(result).to.contain('lssssss: not found');
             });
-            stdin.send("jbaloni\n", "ascii");
-            stdin.send("n\n", "ascii");
-            stdin.send("jfraboni\n", "ascii");
-            stdin.send("Y\n", "ascii");
         });
     });
 });

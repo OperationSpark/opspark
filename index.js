@@ -3,6 +3,8 @@
 'use strict';
 
 var 
+    publish = require('./controller/publish'),
+
     config = require('./config.json'),
     appRoot = require('app-root-path'),
     init = require('./controller/init'),
@@ -12,7 +14,11 @@ var
     program = require('commander');
 
 program    
-    .version('0.0.1');
+    .version('1.1.5');
+    
+program.command('pub').action(function() { publish.publish('opspark').then(function (result) {
+    console.log(result);
+}); });
 
 program    
     .command('init-pf')

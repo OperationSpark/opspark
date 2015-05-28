@@ -10,16 +10,24 @@ var
     stdin = require('mock-stdin').stdin(),
     projects = require('../controller/projects');
     
+var mockProjects = [
+    {id: 29655824, name: 'line-crawler'}, 
+    {id: 29925564, name: 'circularity'}, 
+    {id: 30997229, name: 'worm-hole'}];
+    
 describe('projects', function() {
     after(function(){
         stdin.restore();
     });
     
+    // TODO : mock //
     describe('#listProjectsOf()', function() {
         this.timeout(3000);
         it('returns valid projects.json for user', function() {
-            projects.listProjectsOf('jfraboni').then(function(projects) {
-                expect(projects).to.have.property('projects');
+            return projects.listProjectsOf('jfraboni').then(function(projects) {
+                console.log(projects);
+                var names = _.pluck(projects, 'name');
+                expect(names).to.include('circularity', 'frabonacci', 'line-crawler');
             });
         });
     });
@@ -41,8 +49,6 @@ describe('projects', function() {
         this.timeout(15000);
         
         it('should download a project or any directory', function(done) {
-            // https://raw.githubusercontent.com/jfraboni/jfraboni.github.io/tree/master/frabonacci
-            //https://api.github.com/repos/#{sql_repo_owner}/#{sql_repo_name}/contents#{sql_path}"
             projects.download('https://github.com/jfraboni/jfraboni.github.io/trunk/frabonacci', function(err) {
                 // test files exist //
                 // expect(project.id).to.equal(29655824);
@@ -58,11 +64,6 @@ describe('projects', function() {
     describe.skip('#selectProject()', function() {
         this.timeout(15000);
         
-        var mockProjects = [
-            {id: 29655824, name: 'line-crawler'}, 
-            {id: 29925564, name: 'circularity'}, 
-            {id: 30997229, name: 'worm-hole'}];
-            
         it('allows user to select a project', function(done) {
             projects.selectProject(mockProjects, function(err, project) {
                 expect(project.id).to.equal(29655824);
