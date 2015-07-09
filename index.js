@@ -4,21 +4,17 @@
 
 var 
     publish = require('./controller/publish'),
-
     config = require('./config.json'),
-    appRoot = require('app-root-path'),
     init = require('./controller/init'),
+    github = require('./controller/github'),
     projects = require('./controller/projects'),
     janitor = require('./controller/janitor'),
     pair = require('./controller/pair'),
+    appRoot = require('app-root-path'),
     program = require('commander');
 
 program    
-    .version('1.1.5');
-    
-program.command('pub').action(function() { publish.publish('opspark', 'fix child stderr').then(function (result) {
-    console.log(result);
-}); });
+    .version('1.1.6');
 
 program    
     .command('init-pf')
@@ -48,9 +44,24 @@ program
     .action(pairdown);
     
 program
+    .command('logout')
+    .description('Will clear any local authorizations from the user\'s workspace. The user will be asked to authorize next time they trip the need.')
+    .action(github.deauthorize);
+    
+program
     .command('fix')
     .description('Reads the projects directory, reconciles the installed projects with the projects.json file, and removes any git or svn cruft from installed projects.')
     .action(fix);
+    
+program
+    .command('publish [message]')
+    .action(function(message) {
+        message = message ? message : 'update website';
+        publish.all(message)
+            .then(function (result) {
+                console.log(result);
+            });
+    });
 
 program.parse(process.argv);
 

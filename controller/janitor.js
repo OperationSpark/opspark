@@ -12,7 +12,7 @@ module.exports.fix = function (complete) {
         fs.readdir(projectsDirectory, function (err, files) {
             if (err) return complete(err);
     
-            // For every file in the list
+            // For every file in the list //
             files.forEach(function (file) {
                 console.log('Checking project %s, please wait...'.green, file);
                 var path = projectsDirectory + "/" + file;

@@ -1,5 +1,7 @@
 'use strict';
 
+// TODO : re-write using decorator or chain of command (connect?), and use bluebird //
+
 var 
     config = require('../config'),
     Promise = require("bluebird"),
@@ -126,7 +128,8 @@ function getOrObtainAuth(complete) {
             } else {
                 console.log('Hmm, something\'s not right!'.green);
                 console.log('Let\'s try to login to GitHub again:'.green);
-                fs.unlinkSync(authFilePath);
+                if (fs.existsSync(authFilePath)) fs.unlinkSync(authFilePath);
+                if (fs.existsSync(userFilePath)) fs.unlinkSync(userFilePath);
                 obtainAuthorization(complete);
             }
         });
@@ -195,7 +198,7 @@ module.exports.getOrObtainUser = getOrObtainUser;
 
 function obtainUser() {
     /*
-     * First, check if we have auth, get or obtain auth.
+     * First, check if we have auth: getOrObtainAuth() will obtain the user
      * 
      * 1. If we have auth and no user, it's cause the env was authed before 
      *    we were storing the user, so just get the user.
@@ -239,3 +242,21 @@ function writeUser(user) {
 function ensureApplicationDirectory() {
     if (!fs.existsSync(applicationDirectory)) mkdirp.sync(applicationDirectory);
 }
+
+function deauthorize() {
+    var getAuth = Promise.promisify(getOrObtainAuth);
+    
+    return getAuth()
+        .then(function (auth) {
+            var cmd = 'curl -X "DELETE" -A "' + config.userAgent + '" -H "Accept: application/json" https://api.github.com/authorizations/' + auth.id + ' --user "jfraboni"';
+            return child.execute(cmd).then(function (result) {
+                if (result.code === 0) {
+                    if (fs.existsSync(authFilePath)) fs.unlinkSync(authFilePath);
+                    if (fs.existsSync(userFilePath)) fs.unlinkSync(userFilePath);
+                } else {
+                    console.log('Hmm, something went wrong trying to logout, please try again or ask for help.');
+                }
+            });
+        });
+}
+module.exports.deauthorize = deauthorize;

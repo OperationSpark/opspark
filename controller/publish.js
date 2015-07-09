@@ -6,10 +6,10 @@ var
     Promise = require('bluebird'),
     getOrObtainAuth = Promise.promisify(github.getOrObtainAuth, github);
 
-module.exports.publish = function (repository, commitMessage) {
+module.exports.all = function (commitMessage) {
         return addAll()
             .then(commit(commitMessage))
-            .then(push(repository));
+            .then(push());
 };
 
 function addAll() {
@@ -20,7 +20,7 @@ function commit(commitMessage) {
     return child.execute('git commit -m" ' + commitMessage + ' "');
 }
 
-function push(repository) {
+function push() {
     var session = {};
     return getOrObtainAuth()
         .then(function (auth) {
@@ -28,6 +28,7 @@ function push(repository) {
         })
         .then(github.getOrObtainUser())
         .then(function (user) {
-            child.execute('git push https://' + session.token + '@github.com/' + 'OperationSpark' + '/' + repository + '.git');
+            var repository = user.login + '.github.io';
+            child.execute('git push https://' + session.token + '@github.com/' + user.login + '/' + repository + '.git');
         });
 }
