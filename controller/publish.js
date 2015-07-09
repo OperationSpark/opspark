@@ -26,9 +26,10 @@ function push() {
         .then(function (auth) {
             session.token = auth.token;
         })
-        .then(github.getOrObtainUser())
-        .then(function (user) {
-            var repository = user.login + '.github.io';
-            child.execute('git push https://' + session.token + '@github.com/' + user.login + '/' + repository + '.git');
-        });
+        .then(github.getOrObtainUser()
+            .then(function (user) {
+                var repository = user.login + '.github.io';
+                child.execute('git push https://' + session.token + '@github.com/' + user.login + '/' + repository + '.git');
+            })
+        );
 }

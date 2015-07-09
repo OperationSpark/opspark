@@ -14,7 +14,7 @@ var
     program = require('commander');
 
 program    
-    .version('1.2.0');
+    .version('1.2.1');
 
 program    
     .command('init-pf')
