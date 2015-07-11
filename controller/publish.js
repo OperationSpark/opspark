@@ -27,7 +27,6 @@ function push() {
     return getOrObtainAuth()
         .then(function (auth) {
             session.token = auth.token;
-            console.log(session.token);
         })
         .then(github.getOrObtainUser)
         .then(function (user) {
