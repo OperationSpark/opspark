@@ -14,7 +14,7 @@ var
     program = require('commander');
 
 program    
-    .version('1.2.1');
+    .version('1.2.2');
 
 program    
     .command('init-pf')
@@ -55,6 +55,7 @@ program
     
 program
     .command('publish [message]')
+    .description('Pushes to the users GitHub pages repository at <username>.github.io by serially invoking: git add -A\ngit commit -m"update website"\ngit push"\nOptional commit message defaults to "update website".')
     .action(function(message) {
         message = message ? message : 'update website';
         publish.all(message)

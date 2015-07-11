@@ -8,8 +8,10 @@ var
 
 module.exports.all = function (commitMessage) {
         return addAll()
-            .then(commit(commitMessage))
-            .then(push());
+            .then(function () {
+                commit(commitMessage);
+            })
+            .then(push);
 };
 
 function addAll() {
@@ -25,11 +27,13 @@ function push() {
     return getOrObtainAuth()
         .then(function (auth) {
             session.token = auth.token;
+            console.log(session.token);
         })
-        .then(github.getOrObtainUser()
-            .then(function (user) {
-                var repository = user.login + '.github.io';
-                child.execute('git push https://' + session.token + '@github.com/' + user.login + '/' + repository + '.git');
-            })
-        );
+        .then(github.getOrObtainUser)
+        .then(function (user) {
+            var repository = user.login + '.github.io';
+            var cmd = 'git push https://' + session.token + '@github.com/' + user.login + '/' + repository + '.git';
+            child.execute(cmd);
+        });
 }
+module.exports.push = push;
