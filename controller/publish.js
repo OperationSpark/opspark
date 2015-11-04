@@ -22,6 +22,7 @@ function commit(commitMessage) {
     return child.execute('git commit -m" ' + commitMessage + ' "');
 }
 
+// TODO : Fix no user case - github needs to be debugged with bluebird to ensure user is returned //
 function push() {
     var session = {};
     return getOrObtainAuth()
@@ -32,6 +33,8 @@ function push() {
         .then(function (user) {
             var repository = user.login + '.github.io';
             var cmd = 'git push https://' + session.token + '@github.com/' + user.login + '/' + repository + '.git';
+            console.log(user);
+            return;
             child.execute(cmd);
         });
 }

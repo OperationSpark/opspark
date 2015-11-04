@@ -55,7 +55,7 @@ program
     
 program
     .command('publish [message]')
-    .description('Pushes all branches to the users GitHub pages repository at <username>.github.io by serially invoking: git add -A\ngit commit -m"update website"\ngit push"\nOptional commit message defaults to "update website".')
+    .description('Pushes all branches to the users GitHub pages repository at <username>.github.io by serially invoking:\ngit add -A\ngit commit -m"update website"\ngit push"\nOptional commit message defaults to "update website".')
     .action(function(message) {
         message = message ? message : 'update website';
         publish.all(message)
