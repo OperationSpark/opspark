@@ -11,7 +11,7 @@ var list = [
     {id: 29925564, name: 'circularity'}, 
     {id: 30997229, name: 'worm-hole'}];
     
-// TODO : FIX This test relies on promptForInput, which isn't mocking properly for a test.
+// TODO : FIX This test relies on promptForInput, which isn't mocking properly for tests within suites, whereas they pass individually.
 describe.skip('pair', function() {
     describe('#up()', function() {
         afterEach(function() {
