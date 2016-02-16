@@ -75,7 +75,7 @@ module.exports.limit = function (complete) {
  */
 function authorize(username, complete) {
     var note = getNoteForHost();
-    var cmd = 'curl https://api.github.com/authorizations --user "' + username + '" --data \'{"scopes":["public_repo", "gist"],"note":"' + note + '","note_url":"https://www.npmjs.com/package/opspark"}\'';
+    var cmd = 'curl https://api.github.com/authorizations --user "' + username + '" --data \'{"scopes":["public_repo", "repo", "gist"],"note":"' + note + '","note_url":"https://www.npmjs.com/package/opspark"}\'';
     var child = exec(cmd);
     child.stdout.on('data', function(data) {
         console.log('stdout: ', data);
