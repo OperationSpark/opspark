@@ -4,7 +4,10 @@
   "description": "A node utility supporting installation and configuration of operation spark projects",
   "main": "index.js",
   "scripts": {
-    "test": "mocha"
+		"postinstall": "bower i -G bower",
+		"handshake": "",
+		"joincode": "",
+    "test": "mocha",
   },
   "repository": {
     "type": "git",
