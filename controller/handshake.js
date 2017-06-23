@@ -12,6 +12,7 @@ var
     program = require('commander'),
     inquirer = require('inquirer'),
     colors = require('colors'),
+    view = require('../view'),
     fs = require('fs'),
     url = require('url'),
     exec = require('child_process').exec,
@@ -20,13 +21,15 @@ var
     rimraf = require('rimraf'),
     cancelOption = '[cancel]',
     rootDirectory = './',
-    projectEntriesPath = 'projects/projects.json';
+    projectEntriesPath = 'projects/projects.json',
+    applicationDirectory = env.home() + '/opspark',
+    authFilePath = applicationDirectory + '/github',
+    userFilePath = applicationDirectory + '/user';
 
 
 module.exports.handshake = function() {
 
 }
-
 
 module.exports.install = function() {
     list(function (err, projects) {
@@ -40,13 +43,28 @@ module.exports.install = function() {
     });
 };
 
-function greenlightRequest(hash) {
-		var url: 'https://greenlight.operationspark.org/api/os/verify';
+function getInput() {
+    view.inquireForInput('Enter the hash', function (err, input) {
+        if (err) {
+            console.log('There was an error!');
+        }
+        greenlightRequest(input, function(){
+            complete(null, _auth);
+        });
+    }
+});
 
-		request.post({url: url, formData: hash}, function optionalCallback(err, httpResponse, body) {
-		  if (err) {
-		    return console.error('upload failed:', err);
-		  }
-		  console.log('Upload successful!  Server responded with:', body);
-		});
+function greenlightRequest(hash) {
+	var url: 'https://greenlight.operationspark.org/api/os/verify';
+
+	request.post({url: url, formData: hash}, function(err, res, body) {
+	  if (err) {
+	    return console.error('upload failed:', err);
+	  }
+	  console.log('Upload successful!  Server responded with:', body);
+	});
+}
+
+function storeCreds() {
+
 }
