@@ -18,7 +18,7 @@ program
     .version('1.2.3');
 
 program
-    .handshake('init-hs')
+    .command('init-hs')
     .description('Connect workspace with Greenlight to provide the neccessary projects for whichever class the student is taking.')
     .action(handshake)
 
