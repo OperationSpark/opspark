@@ -7,7 +7,7 @@
 		"postinstall": "bower i -G bower",
 		"handshake": "",
 		"joincode": "",
-    "test": "mocha",
+    "test": "mocha"
   },
   "repository": {
     "type": "git",
