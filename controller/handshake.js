@@ -1,6 +1,6 @@
 var
   view = require('../view'),
-  request = require('request');
+  request = require('request'),
 	// config = require('../config'),
   // _ = require('lodash'),
   // util = require('util'),
@@ -12,39 +12,65 @@ var
   // program = require('commander'),
   // inquirer = require('inquirer'),
   // colors = require('colors'),
-  // fs = require('fs'),
+  fs = require('fs'),
   // url = require('url'),
   // exec = require('child_process').exec,
-  // mkdirp = require('mkdirp'),
+  mkdirp = require('mkdirp'),
   // rimraf = require('rimraf'),
   // cancelOption = '[cancel]',
   // rootDirectory = './',
   // projectEntriesPath = 'projects/projects.json',
-  // applicationDirectory = env.home() + '/opspark',
-  // authFilePath = applicationDirectory + '/github',
-  // userFilePath = applicationDirectory + '/user';
+  colors = require('colors'),
+  env = require('./env'),
+  applicationDirectory = `${env.home()}/opspark`,
+  authFilePath = `${applicationDirectory}/github`,
+  userFilePath = `${applicationDirectory}/user`;
 
-  // function storeCreds() {}
+function storeCreds(body) {
+  const path = `${userFilePath}/user.json`;
+  console.log(body);
+  if (!fs.existsSync(applicationDirectory)) {
+    console.log(colors.bold.red('Creating new app directory'));
+    mkdirp.sync(applicationDirectory);
+  }
+
+  if (!fs.existsSync(userFilePath)) {
+    console.log(colors.bold.red('Creating new user directory'));
+    mkdirp.sync(userFilePath);
+  }
+
+  if (fs.existsSync(path)) {
+    console.log(colors.bold.red('Hey, it\'s already there!'));
+  } else {
+    fs.writeFileSync(path, body);
+  }
+}
 
 function greenlightRequest(hash) {
-  request.post({
+  const options = {
     url: 'https://greenlight.operationspark.org/api/os/verify',
     formData: hash,
-  }, (err, res, body) => {
+  };
+  request.post(options, (err, res, body) => {
     if (err) {
       return console.error('upload failed:', err);
     }
-    return console.log('Upload successful!  Server responded with:', body);
+    return storeCreds(body);
   });
 }
 
 function getInput() {
+  console.warn(applicationDirectory);
+  console.warn(authFilePath);
+  console.warn(userFilePath);
   view.inquireForInput('Enter the hash', (err, input) => {
     if (err) {
-      console.log('There was an error!');
+      console.warn('There was an error!');
     }
     return greenlightRequest(input);
   });
 }
 
 module.exports = getInput;
+
+getInput();
