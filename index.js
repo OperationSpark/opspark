@@ -18,6 +18,11 @@ program
     .version('1.2.3');
 
 program
+    .handshake('init-hs')
+    .description('Connect workspace with Greenlight to provide the neccessary projects for whichever class the student is taking.')
+    .action(handshake)
+
+program
     .command('init-pf')
     .description('Initialize your portfolio.html with the JavaScript necessary to dynamically add portfolio projects as list items to the unordered-list with the id of portfolio.')
     .action(initPortfolio);
