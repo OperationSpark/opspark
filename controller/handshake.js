@@ -28,21 +28,33 @@ var
 
 function storeCreds(body) {
   const path = `${userFilePath}/user.json`;
-  console.log(body);
+
   if (!fs.existsSync(applicationDirectory)) {
-    console.log(colors.green('Creating new app directory'));
+    console.log(colors.yellow('Creating new app directory'));
     mkdirp.sync(applicationDirectory);
   }
 
   if (!fs.existsSync(userFilePath)) {
-    console.log(colors.green('Creating new user directory'));
+    console.log(colors.yellow('Creating new user directory'));
     mkdirp.sync(userFilePath);
   }
 
   if (fs.existsSync(path)) {
-    console.log(colors.red('Hey, it\'s already there!'));
+    console.log(colors.red('Hey, this file already there!'));
+    view.inquireForInput('Overwrite file?', (err, input) => {
+      console.log(input);
+      if (err) {
+        console.warn(colors.red('Something went wrong! Run that code again.'));
+      } else if (input.toLowerCase()[0] === 'y') {
+        console.warn(colors.yellow('Rewriting. . .'));
+        fs.writeFileSync(path, body);
+      } else {
+        console.warn(colors.green('All done!'));
+      }
+    });
   } else {
     fs.writeFileSync(path, body);
+    console.warn(colors.green('All done!'));
   }
 }
 
