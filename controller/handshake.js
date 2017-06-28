@@ -1,80 +1,83 @@
 var
   view = require('../view'),
   request = require('request'),
-	// config = require('../config'),
-  // _ = require('lodash'),
-  // util = require('util'),
-  // Q = require('q'),
-  // fsJson = require('fs-json')(),
-  // changeCase = require('change-case'),
-  // async = require('async'),
-  // github = require('./github'),
-  // program = require('commander'),
-  // inquirer = require('inquirer'),
-  // colors = require('colors'),
+  rp = require('request-promise'),
   fs = require('fs'),
-  // url = require('url'),
-  // exec = require('child_process').exec,
   mkdirp = require('mkdirp'),
-  // rimraf = require('rimraf'),
-  // cancelOption = '[cancel]',
-  // rootDirectory = './',
-  // projectEntriesPath = 'projects/projects.json',
   colors = require('colors'),
   env = require('./env'),
   applicationDirectory = `${env.home()}/opspark`,
-  authFilePath = `${applicationDirectory}/github`,
   userFilePath = `${applicationDirectory}/user`;
 
-function storeCreds(body) {
+// Checks if directory exists and creates if not
+function checkForDirectory(path) {
+  if (!fs.existsSync(path)) {
+    console.log(colors.yellow('Creating new directory'));
+    mkdirp.sync(path);
+  }
+}
+
+// Checks if status was 200 or 400
+// If 400, ends function and says to retry
+// If 200, function continues
+// Runs 'checkForDirectory' func for applicationDirectoryand userFilePath
+// Checks if file exists
+// If it exists, prompts for if user wants file to be overwritten
+// If it doesn't exist, creates file
+function storeCreds(body, hash) {
   const path = `${userFilePath}/user.json`;
+  const userInfo = {};
+  userInfo.until = body.until;
+  userInfo.hash = hash;
 
-  if (!fs.existsSync(applicationDirectory)) {
-    console.log(colors.yellow('Creating new app directory'));
-    mkdirp.sync(applicationDirectory);
+  if (body.status === 400) {
+    console.warn('Incorrect hash, please try again.');
+    return null;
   }
 
-  if (!fs.existsSync(userFilePath)) {
-    console.log(colors.yellow('Creating new user directory'));
-    mkdirp.sync(userFilePath);
-  }
+  checkForDirectory(applicationDirectory);
+  checkForDirectory(userFilePath);
 
   if (fs.existsSync(path)) {
-    console.log(colors.red('Hey, this file already there!'));
-    view.inquireForInput('Overwrite file?', (err, input) => {
+    console.log(colors.red('Hey, this file is already there!'));
+    view.inquireForInput('Overwrite file? (y/n)', (err, input) => {
       console.log(input);
       if (err) {
         console.warn(colors.red('Something went wrong! Run that code again.'));
       } else if (input.toLowerCase()[0] === 'y') {
         console.warn(colors.yellow('Rewriting. . .'));
-        fs.writeFileSync(path, body);
-      } else {
+        fs.writeFileSync(path, JSON.stringify(userInfo));
         console.warn(colors.green('All done!'));
+      } else {
+        console.warn(colors.green('Exiting without overwrite.'));
       }
     });
   } else {
-    fs.writeFileSync(path, body);
+    console.warn('Writing file. . .');
+    fs.writeFileSync(path, JSON.stringify(userInfo));
     console.warn(colors.green('All done!'));
   }
 }
 
+// POST request to Greenlight, runs storeCreds with response object
 function greenlightRequest(hash) {
   const options = {
-    url: 'https://greenlight.operationspark.org/api/os/verify',
-    formData: hash,
+    method: 'POST',
+    // uri: 'https://greenlight.operationspark.org/api/os/verify',
+    uri: 'http://localhost:3000/',
+    body: {
+      hash,
+    },
+    json: true,
   };
-  request.post(options, (err, res, body) => {
-    if (err) {
-      return console.error('upload failed:', err);
-    }
-    return storeCreds(body);
-  });
+  rp(options)
+    .then(res => storeCreds(res, hash))
+    .catch(err => console.error('upload failed:', err));
 }
 
+// Asks for hash from user
+// Runs greenlightRequest with input hash
 function getInput() {
-  console.warn(applicationDirectory);
-  console.warn(authFilePath);
-  console.warn(userFilePath);
   view.inquireForInput('Enter the hash', (err, input) => {
     if (err) {
       console.warn('There was an error!');
