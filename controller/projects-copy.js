@@ -1,6 +1,6 @@
 'use strict';
 
-var 
+var
     config = require('../config'),
     _ = require('lodash'),
     util = require('util'),
@@ -22,6 +22,21 @@ var
     rootDirectory = './',
     projectEntriesPath = 'projects/projects.json';
 
+function greenlightRequest(hash) {
+  const options = {
+    method: 'GET',
+    // uri: 'https://greenlight.operationspark.org/api/os/install',
+    uri: 'http://localhost:3000/',
+    body: {
+      hash,
+    },
+    json: true,
+  };
+  rp(options)
+    .then(res => storeCreds(res, hash))
+    .catch(err => console.error('upload failed:', err));
+}
+
 module.exports.install = function() {
     list(function (err, projects) {
         if (err) return console.log(err + ''.red);
@@ -38,7 +53,7 @@ function listProjectsOf(username) {
     var deferred = Q.defer();
     var userRepo = username + '/' + username + '.github.io';
     var url = 'https://raw.githubusercontent.com/' + userRepo + '/master/projects/projects.json';
-    
+
     var options = {
         url: url,
         headers: {
@@ -74,7 +89,7 @@ function selectProject(projects, complete) {
                 type: "list",
                 name: "project",
                 message: "Select the project you wish to install",
-                choices: _.pluck(projects, 'name').concat(cancelOption)}], 
+                choices: _.pluck(projects, 'name').concat(cancelOption)}],
                 function(response) {
                     if(response.project === cancelOption) {
                         console.log('Installation cancelled, bye bye!'.green);
@@ -105,11 +120,11 @@ function installProject(project, pairedWith, complete) {
     if (!fs.existsSync(projectsDirectory)) mkdirp.sync(projectsDirectory);
     var projectDirectory = projectsDirectory + '/' + projectName;
     if (fs.existsSync(projectDirectory)) return console.log('Project %s already installed! Please delete manually before reinstalling, or install another project.', projectName);
-    
+
     console.log('Installing project %s, please wait...'.green, projectName);
     var uri = 'https://github.com/OperationSpark/' + projectName;
     console.log('Cloning %s, please wait...'.green, uri);
-    
+
     var cmd = 'git clone ' + uri + ' ' + projectDirectory;
     var child = exec(cmd, function(err, stdout, stderr) {
         if (err) return complete(err);
@@ -154,9 +169,9 @@ function appendProjectEntry(project, pairedWith, complete) {
         return complete();
     }
     var entry = {
-        name: project.name, 
+        name: project.name,
         title: changeCase.titleCase(project.name),
-        description: project.description.replace('PROJECT:: ', ''), 
+        description: project.description.replace('PROJECT:: ', ''),
         date: new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'})
     };
     if (pairedWith) entry.pairedWith = [pairedWith];
@@ -216,15 +231,15 @@ function download(uri, complete) {
     var deferred = Q.defer();
     var projectsDirectory = rootDirectory + 'projects';
     if (!fs.existsSync(projectsDirectory)) mkdirp.sync(projectsDirectory);
-    
+
     var project = url.parse(uri).pathname.split('/').pop();
     var projectDirectory = projectsDirectory + '/' + project;
-    
+
     if (fs.existsSync(projectDirectory)) { throw new Error(util.format('Project already exists: Hmm, looks like this project is already installed, you can verify this by checking your projects directory for %s. If you want to re-install this project, run the command "os delete %s"', project, project)); }
-    
+
     var message = 'Downloading ' + project + ', please wait...';
     console.log(message.green);
-    
+
     var cmd = 'svn checkout ' + uri + ' ' + projectDirectory;
     var child = exec(cmd, function(err, stdout, stderr) {
         if (err) return deferred.reject(err);
