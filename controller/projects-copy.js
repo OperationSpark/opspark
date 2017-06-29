@@ -1,52 +1,52 @@
 'use strict';
 
 var
-    config = require('../config'),
-    _ = require('lodash'),
-    util = require('util'),
-    Q = require('q'),
-    fsJson = require('fs-json')(),
-    changeCase = require('change-case'),
-    async = require('async'),
-    github = require('./github'),
-    program = require('commander'),
-    inquirer = require('inquirer'),
-    colors = require('colors'),
-    fs = require('fs'),
-    url = require('url'),
-    exec = require('child_process').exec,
-    request = require('request'),
-    mkdirp = require('mkdirp'),
-    rimraf = require('rimraf'),
-    cancelOption = '[cancel]',
-    rootDirectory = './',
-    projectEntriesPath = 'projects/projects.json';
+  config = require('../config'),
+  _ = require('lodash'),
+  util = require('util'),
+  Q = require('q'),
+  fsJson = require('fs-json')(),
+  changeCase = require('change-case'),
+  async = require('async'),
+  github = require('./github'),
+  program = require('commander'),
+  inquirer = require('inquirer'),
+  colors = require('colors'),
+  fs = require('fs'),
+  url = require('url'),
+  exec = require('child_process').exec,
+  request = require('request'),
+  rp = require('request-promise'),
+  mkdirp = require('mkdirp'),
+  rimraf = require('rimraf'),
+  cancelOption = '[cancel]',
+  rootDirectory = './',
+  projectEntriesPath = 'projects/projects.json';
 
-function greenlightRequest(hash) {
+function greenlightRequest() {
   const options = {
     method: 'GET',
     // uri: 'https://greenlight.operationspark.org/api/os/install',
     uri: 'http://localhost:3000/',
-    body: {
-      hash,
-    },
     json: true,
   };
   rp(options)
-    .then(res => storeCreds(res, hash))
+    .then(res => console.log(res))
     .catch(err => console.error('upload failed:', err));
 }
 
+greenlightRequest();
+
 module.exports.install = function() {
-    list(function (err, projects) {
-        if (err) return console.log(err + ''.red);
-        selectProject(projects, function(err, project) {
-            if (err) return console.log(err + ''.red);
-            installProject(project, null, function () {
-                console.log('Have fun!!!'.green);
-            });
-        });
+  list(function (err, projects) {
+    if (err) return console.log(err + ''.red);
+    selectProject(projects, function(err, project) {
+      if (err) return console.log(err + ''.red);
+      installProject(project, null, function () {
+        console.log('Have fun!!!'.green);
+      });
     });
+  });
 };
 
 function listProjectsOf(username) {
@@ -83,81 +83,81 @@ function list(complete) {
 module.exports.list = list;
 
 function selectProject(projects, complete) {
-    async.waterfall([
-        function(next) {
-            inquirer.prompt([{
-                type: "list",
-                name: "project",
-                message: "Select the project you wish to install",
-                choices: _.pluck(projects, 'name').concat(cancelOption)}],
-                function(response) {
-                    if(response.project === cancelOption) {
-                        console.log('Installation cancelled, bye bye!'.green);
-                        process.exit();
-                    }
-                    next(null, _.where(projects, {'name': response.project})[0]);
-            });
-        },
-        function(project, next) {
-            inquirer.prompt([{
-                        type: "confirm",
-                        name: "install",
-                        message: "You selected " + project.name + ": Go ahead and install?",
-                        default: true
-                }],
-                function(confirm) {
-                    if (confirm.install) return complete(null, project);
-                    selectProject(projects, complete);
-                });
-        }
-    ]);
+  async.waterfall([
+    function(next) {
+      inquirer.prompt([{
+        type: "list",
+        name: "project",
+        message: "Select the project you wish to install",
+        choices: _.pluck(projects, 'name').concat(cancelOption)}],
+        function(response) {
+          if(response.project === cancelOption) {
+            console.log('Installation cancelled, bye bye!'.green);
+            process.exit();
+          }
+          next(null, _.where(projects, {'name': response.project})[0]);
+      });
+    },
+    function(project, next) {
+      inquirer.prompt([{
+              type: "confirm",
+              name: "install",
+              message: "You selected " + project.name + ": Go ahead and install?",
+              default: true
+        }],
+        function(confirm) {
+          if (confirm.install) return complete(null, project);
+          selectProject(projects, complete);
+        });
+    }
+  ]);
 }
 module.exports.selectProject = selectProject;
 
 function installProject(project, pairedWith, complete) {
-    var projectName = project.name;
-    var projectsDirectory = rootDirectory + 'projects';
-    if (!fs.existsSync(projectsDirectory)) mkdirp.sync(projectsDirectory);
-    var projectDirectory = projectsDirectory + '/' + projectName;
-    if (fs.existsSync(projectDirectory)) return console.log('Project %s already installed! Please delete manually before reinstalling, or install another project.', projectName);
+  var projectName = project.name;
+  var projectsDirectory = rootDirectory + 'projects';
+  if (!fs.existsSync(projectsDirectory)) mkdirp.sync(projectsDirectory);
+  var projectDirectory = projectsDirectory + '/' + projectName;
+  if (fs.existsSync(projectDirectory)) return console.log('Project %s already installed! Please delete manually before reinstalling, or install another project.', projectName);
 
-    console.log('Installing project %s, please wait...'.green, projectName);
-    var uri = 'https://github.com/OperationSpark/' + projectName;
-    console.log('Cloning %s, please wait...'.green, uri);
+  console.log('Installing project %s, please wait...'.green, projectName);
+  var uri = 'https://github.com/OperationSpark/' + projectName;
+  console.log('Cloning %s, please wait...'.green, uri);
 
-    var cmd = 'git clone ' + uri + ' ' + projectDirectory;
-    var child = exec(cmd, function(err, stdout, stderr) {
-        if (err) return complete(err);
-        console.log('Successfully cloned project!'.green);
-        initializeProject(project, pairedWith, projectDirectory, complete);
-    });
+  var cmd = 'git clone ' + uri + ' ' + projectDirectory;
+  var child = exec(cmd, function(err, stdout, stderr) {
+    if (err) return complete(err);
+    console.log('Successfully cloned project!'.green);
+    initializeProject(project, pairedWith, projectDirectory, complete);
+  });
 }
 module.exports.installProject = installProject;
 
 function initializeProject(project, pairedWith, projectDirectory, complete) {
-    async.series(
-        [
-            // add revision number and remote //
-            function (next) {
-                removeGitRemnants(projectDirectory, next);
-            },
-            function (next) {
-                if (program.master) return next();
-                removeMaster(projectDirectory, next);
-            },
-            function (next) {
-                installBower(projectDirectory, next);
-            },
-            function (next) {
-                appendProjectEntry(project, pairedWith, next);
-            }
-        ],
-        function(err, result){
-            if (err) return console.log(err + ''.red);
-            console.log('Installation of project %s complete!'.blue, project.name);
-            complete();
-        }
-    );
+  async.series(
+    [
+      // add revision number and remote //
+      function (next) {
+        removeGitRemnants(projectDirectory, next);
+      },
+      function (next) {
+        if (program.master) return next();
+        removeMaster(projectDirectory, next);
+      },
+      function (next) {
+        installBower(projectDirectory, next);
+      },
+      function (next) {
+        appendProjectEntry(project, pairedWith, next);
+      }
+    ],
+    function(err, result){
+      if (err) return console.log(err + ''.red);
+      console.log('Installation of project %s complete!'.blue, project.name);
+      complete();
+    }
+  );
 }
 module.exports.initializeProject = initializeProject;
 
