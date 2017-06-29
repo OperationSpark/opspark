@@ -17,4 +17,26 @@ app.post('/', (req, res) => {
   }
 });
 
+app.get('/', (req, res) => {
+  const data = req.body.hash;
+  console.log('this is data:', data);
+  const response = {
+    status: 200,
+    sessions: {
+      'session._id': {
+        _id: 'session-id',
+        name: 'session-name',
+        cohort: 'session-cohort',
+        submittable: {
+          PROJECT: [
+            { _id: 'abc', name: 'project-name', },
+          ],
+        },
+      },
+    },
+  };
+  console.log(response);
+  res.send(response);
+});
+
 app.listen(3000, () => console.log('http://localhost:3000'));
