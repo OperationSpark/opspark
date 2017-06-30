@@ -33,6 +33,7 @@ program
   .action(init.website);
 
 program
+  .option('-t, --test', 'Keep test files')
   .option('-m, --master', 'Keep master files')
   .command('install')
   .description('List installable projects.')

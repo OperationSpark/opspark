@@ -85,5 +85,3 @@ function getInput() {
 }
 
 module.exports = getInput;
-
-getInput();

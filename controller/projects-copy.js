@@ -35,8 +35,6 @@ function greenlightRequest() {
     .catch(err => console.error('upload failed:', err));
 }
 
-greenlightRequest();
-
 module.exports.install = function () {
   // get list of all projects
   list(function (err, projects) {
@@ -128,7 +126,9 @@ function installProject(project, pairedWith, complete) {
   if (fs.existsSync(projectDirectory)) return console.log('Project %s already installed! Please delete manually before reinstalling, or install another project.', projectName);
 
   console.log('Installing project %s, please wait...'.green, projectName);
-  const uri = `https://github.com/OperationSpark/${projectName}`;
+  // TODO: change uri back to opspark github
+  // TODO: change /branches/test to /trunk
+  const uri = `https://github.com/livrush/${projectName}/branches/test`;
   console.log('Cloning %s, please wait...'.green, uri);
 
   const cmd = `svn co ${uri} ${projectDirectory}`;
@@ -148,11 +148,14 @@ function initializeProject(project, pairedWith, projectDirectory, complete) {
         removeGitRemnants(projectDirectory, next);
       },
       function (next) {
+        removeSvnRemnants(projectDirectory, next);
+      },
+      function (next) {
         if (program.master) return next();
         removeMaster(projectDirectory, next);
       },
       function (next) {
-        if (program.master) return next();
+        if (program.test) return next();
         removeTest(projectDirectory, next);
       },
       function (next) {
