@@ -258,8 +258,8 @@ function download(uri, complete) {
 
   var message = 'Downloading ' + project + ', please wait...';
   console.log(message.green);
-
-  var cmd = `svn checkout ${uri}/tree/test ${projectDirectory}`;
+  // TODO: remove '/branches/test' for future
+  var cmd = `svn checkout ${uri}/branches/test ${projectDirectory}`;
   var child = exec(cmd, function (err, stdout, stderr) {
     if (err) return deferred.reject(err);
     message = project + ' downloaded to ' + projectDirectory;
