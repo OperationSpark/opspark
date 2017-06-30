@@ -225,7 +225,7 @@ function removeSvnRemnants(projectDirectory, complete) {
 module.exports.removeSvnRemnants = removeSvnRemnants;
 
 function removeTest(projectDirectory, complete) {
-  rimraf(projectDirectory + '/.test', function (err) {
+  rimraf(projectDirectory + '/test', function (err) {
     if (err) return console.log(err);
     console.log('tests successfully removed from project %s'.green, projectDirectory);
     complete();
