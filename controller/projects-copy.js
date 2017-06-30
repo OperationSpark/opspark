@@ -205,6 +205,17 @@ function removeGitRemnants(projectDirectory, complete) {
 }
 module.exports.removeGitRemnants = removeGitRemnants;
 
+function removeTestRemnants(projectDirectory, complete) {
+    var gitignore = projectDirectory + '/.gitignore';
+    if (fs.existsSync(gitignore)) { fs.unlinkSync(gitignore); }
+    rimraf(projectDirectory + '/.git', function (err) {
+        if (err) return console.log(err);
+        console.log('git remnants successfully removed from project %s'.green, projectDirectory);
+        complete();
+    });
+}
+module.exports.removeTestRemnants = removeTestRemnants;
+
 function removeSvnRemnants(projectDirectory, complete) {
     rimraf(projectDirectory + '/.svn', function (err) {
         if (err) return console.log(err);

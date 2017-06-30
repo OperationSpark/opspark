@@ -6,8 +6,7 @@ var
   mkdirp = require('mkdirp'),
   colors = require('colors'),
   env = require('./env'),
-  applicationDirectory = `${env.home()}/opspark`,
-  userFilePath = `${applicationDirectory}/user`;
+  filePath = `${env.home()}/opspark`;
 
 // Checks if directory exists and creates if not
 function checkForDirectory(path) {
@@ -20,12 +19,12 @@ function checkForDirectory(path) {
 // Checks if status was 200 or 400
 // If 400, ends function and says to retry
 // If 200, function continues
-// Runs 'checkForDirectory' func for applicationDirectoryand userFilePath
+// Runs 'checkForDirectory' func for filePath and userFilePath
 // Checks if file exists
 // If it exists, prompts for if user wants file to be overwritten
 // If it doesn't exist, creates file
 function storeCreds(body, hash) {
-  const path = `${userFilePath}/user.json`;
+  const path = `${filePath}/handshake`;
   const userInfo = {};
   userInfo.until = body.until;
   userInfo.hash = hash;
@@ -35,8 +34,7 @@ function storeCreds(body, hash) {
     return null;
   }
 
-  checkForDirectory(applicationDirectory);
-  checkForDirectory(userFilePath);
+  checkForDirectory(filePath);
 
   if (fs.existsSync(path)) {
     console.log(colors.red('Hey, this file is already there!'));

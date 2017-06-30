@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "postinstall": "bower i -G bower",
+    "dev": "nodemon test-server.js",
     "handshake": "",
     "joincode": "",
     "test": "mocha"
