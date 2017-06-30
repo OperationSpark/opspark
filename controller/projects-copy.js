@@ -97,11 +97,11 @@ function selectProject(projects, complete) {
         choices: _.pluck(projects, 'name').concat(cancelOption),
       }],
       function (response) {
-        if(response.project === cancelOption) {
+        if (response.project === cancelOption) {
           console.log('Installation cancelled, bye bye!'.green);
           process.exit();
         }
-        next(null, _.where(projects, {'name': response.project})[0]);
+        next(null, _.where(projects, { name: response.project, })[0]);
       });
     },
     function (project, next) {
@@ -121,18 +121,18 @@ function selectProject(projects, complete) {
 module.exports.selectProject = selectProject;
 
 function installProject(project, pairedWith, complete) {
-  var projectName = project.name;
-  var projectsDirectory = rootDirectory + 'projects';
+  const projectName = project.name;
+  const projectsDirectory = `${rootDirectory}projects`;
   if (!fs.existsSync(projectsDirectory)) mkdirp.sync(projectsDirectory);
-  var projectDirectory = projectsDirectory + '/' + projectName;
+  const projectDirectory = `${projectsDirectory}/${projectName}`;
   if (fs.existsSync(projectDirectory)) return console.log('Project %s already installed! Please delete manually before reinstalling, or install another project.', projectName);
 
   console.log('Installing project %s, please wait...'.green, projectName);
-  var uri = 'https://github.com/OperationSpark/' + projectName;
+  const uri = `https://github.com/OperationSpark/${projectName}`;
   console.log('Cloning %s, please wait...'.green, uri);
 
-  var cmd = `svn co ${uri} ${projectDirectory}`;
-  var child = exec(cmd, function (err, stdout, stderr) {
+  const cmd = `svn co ${uri} ${projectDirectory}`;
+  const child = exec(cmd, function (err, stdout, stderr) {
     if (err) return complete(err);
     console.log('Successfully cloned project!'.green);
     initializeProject(project, pairedWith, projectDirectory, complete);
@@ -160,7 +160,7 @@ function initializeProject(project, pairedWith, projectDirectory, complete) {
       },
       function (next) {
         appendProjectEntry(project, pairedWith, next);
-      }
+      },
     ],
     function (err, result){
       if (err) return console.log(err + ''.red);
@@ -182,7 +182,7 @@ function appendProjectEntry(project, pairedWith, complete) {
     name: project.name,
     title: changeCase.titleCase(project.name),
     description: project.description.replace('PROJECT:: ', ''),
-    date: new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'})
+    date: new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', }),
   };
   if (pairedWith) entry.pairedWith = [pairedWith];
   projectEntries.projects.push(entry);
@@ -193,10 +193,10 @@ function appendProjectEntry(project, pairedWith, complete) {
 module.exports.appendProjectEntry = appendProjectEntry;
 
 function installBower(projectDirectory, complete) {
-  if (!fs.existsSync(projectDirectory + '/bower.json')) return complete();
+  if (!fs.existsSync(`${projectDirectory}/bower.json`)) return complete();
   console.log('Installing bower components, please wait...'.green);
   var exec = require('child_process').exec;
-  var child = exec('cd ' + projectDirectory + ' && bower install -F', function (err, stdout, stderr) {
+  var child = exec(`cd ${projectDirectory} && bower install -F`, function (err, stdout, stderr) {
     if (err) throw err;
     console.log(stdout);
     console.log('Bower components installed for project %s!'.green, projectDirectory);
@@ -205,9 +205,9 @@ function installBower(projectDirectory, complete) {
 }
 module.exports.installBower = installBower;
 function removeGitRemnants(projectDirectory, complete) {
-  var gitignore = projectDirectory + '/.gitignore';
+  const gitignore = `${projectDirectory}/.gitignore`
   if (fs.existsSync(gitignore)) { fs.unlinkSync(gitignore); }
-  rimraf(projectDirectory + '/.git', function (err) {
+  rimraf(`${projectDirectory}/.git`, function (err) {
     if (err) return console.log(err);
     console.log('git remnants successfully removed from project %s'.green, projectDirectory);
     complete();
@@ -216,7 +216,7 @@ function removeGitRemnants(projectDirectory, complete) {
 module.exports.removeGitRemnants = removeGitRemnants;
 
 function removeSvnRemnants(projectDirectory, complete) {
-  rimraf(projectDirectory + '/.svn', function (err) {
+  rimraf(`${projectDirectory}/.svn`, function (err) {
     if (err) return console.log(err);
     console.log('svn remnants successfully removed from project %s'.green, projectDirectory);
     complete();
@@ -225,7 +225,7 @@ function removeSvnRemnants(projectDirectory, complete) {
 module.exports.removeSvnRemnants = removeSvnRemnants;
 
 function removeTest(projectDirectory, complete) {
-  rimraf(projectDirectory + '/test', function (err) {
+  rimraf(`${projectDirectory}/test`, function (err) {
     if (err) return console.log(err);
     console.log('tests successfully removed from project %s'.green, projectDirectory);
     complete();
@@ -234,7 +234,7 @@ function removeTest(projectDirectory, complete) {
 module.exports.removeTest = removeTest;
 
 function removeMaster(projectDirectory, complete) {
-  rimraf(projectDirectory + '/.master', function (err) {
+  rimraf(`${projectDirectory}/.master`, function (err) {
     if (err) return console.log(err);
     console.log('master successfully removed from project %s'.green, projectDirectory);
     complete();

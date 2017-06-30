@@ -13,5 +13,9 @@ module.exports = {
 
         // disable rules from base configurations
         "no-console": "off",
+        "no-use-before-define": "off",
+        "func-names": "off",
+        "consistent-return": "off",
+        "prefer-arrow-callback": "off",
     }
 };
