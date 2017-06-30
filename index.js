@@ -7,7 +7,7 @@ var
   config = require('./config.json'),
   init = require('./controller/init'),
   github = require('./controller/github'),
-  projects = require('./controller/projects'),
+  projects = require('./controller/projects-copy'),
   janitor = require('./controller/janitor'),
   pair = require('./controller/pair'),
   handshake = require('./controller/handshake'),
