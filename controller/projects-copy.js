@@ -247,32 +247,32 @@ module.exports.removeMaster = removeMaster;
  *      'https://github.com/jfraboni/jfraboni.github.io/trunk/projects/worm-hole'
  */
 function download(uri, complete) {
-    var deferred = Q.defer();
-    var projectsDirectory = rootDirectory + 'projects';
-    if (!fs.existsSync(projectsDirectory)) mkdirp.sync(projectsDirectory);
+  var deferred = Q.defer();
+  var projectsDirectory = rootDirectory + 'projects';
+  if (!fs.existsSync(projectsDirectory)) mkdirp.sync(projectsDirectory);
 
-    var project = url.parse(uri).pathname.split('/').pop();
-    var projectDirectory = projectsDirectory + '/' + project;
+  var project = url.parse(uri).pathname.split('/').pop();
+  var projectDirectory = `${projectsDirectory}/${project}`;
 
-    if (fs.existsSync(projectDirectory)) { throw new Error(util.format('Project already exists: Hmm, looks like this project is already installed, you can verify this by checking your projects directory for %s. If you want to re-install this project, run the command "os delete %s"', project, project)); }
+  if (fs.existsSync(projectDirectory)) { throw new Error(util.format('Project already exists: Hmm, looks like this project is already installed, you can verify this by checking your projects directory for %s. If you want to re-install this project, run the command "os delete %s"', project, project)); }
 
-    var message = 'Downloading ' + project + ', please wait...';
+  var message = 'Downloading ' + project + ', please wait...';
+  console.log(message.green);
+
+  var cmd = `svn checkout ${uri}/tree/test ${projectDirectory}`;
+  var child = exec(cmd, function (err, stdout, stderr) {
+    if (err) return deferred.reject(err);
+    message = project + ' downloaded to ' + projectDirectory;
     console.log(message.green);
-
-    var cmd = 'svn checkout ' + uri + ' ' + projectDirectory;
-    var child = exec(cmd, function (err, stdout, stderr) {
-        if (err) return deferred.reject(err);
-        message = project + ' downloaded to ' + projectDirectory;
-        console.log(message.green);
-        removeSvnRemnants(projectDirectory, function () {
-            deferred.resolve();
-        });
+    removeSvnRemnants(projectDirectory, function () {
+      deferred.resolve();
     });
-    return deferred.promise.nodeify(complete);
+  });
+  return deferred.promise.nodeify(complete);
 }
 module.exports.download = download;
 
 function loadOrCreateEntries() {
-    return fsJson.loadSync(projectEntriesPath) || {projects: []};
+  return fsJson.loadSync(projectEntriesPath) || {projects: []};
 }
 module.exports.loadOrCreateEntries = loadOrCreateEntries;
