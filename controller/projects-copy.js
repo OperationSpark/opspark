@@ -71,7 +71,6 @@ function listProjectsOf(username) {
 }
 module.exports.listProjectsOf = listProjectsOf;
 
-//
 function list(complete) {
   console.log('Retrieving list of projects, please wait...'.green);
   github.repos(function (err, repos) {

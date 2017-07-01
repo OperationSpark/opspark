@@ -21,14 +21,30 @@ var
   rimraf = require('rimraf'),
   cancelOption = '[cancel]',
   rootDirectory = './',
+  projectsDirectory = 'projects';
   projectEntriesPath = 'projects/projects.json';
 
 module.exports.test = function() {
   const username = github.grabLocalLogin();
   console.log(username);
-  const installedProjects = projects.listProjectsOf(username);
-  console.log(installedProjects);
-  projects.selectProject(installedProjects, null, 'test');
+  // const installedProjects = projects.listProjectsOf(username);
+  projects.listProjectsOf(username)
+    .then(function (installedProjects) {
+      projects.selectProject(installedProjects, grabTests, 'test');
+    });
 };
 
-module.exports.test();
+function grabTests(err, project) {
+  console.log(`Downloading tests for ${project}. . .`);
+  // TODO: swap livrush to opspark
+  const uri = `https://github.com/livrush/${project}`;
+  // const uri = `https://github.com/OperationSpark/${project}`;
+  const token = projects.grabLocalToken();
+  // TODO: swap branches/test to trunk
+  const cmd = `svn export ${uri} ${projectsDirectory}/${project}/branches/test/test --password ${token}`;
+  // const cmd = `svn export ${uri} ${projectsDirectory}/${project}/trunk/test --password ${token}`
+  exec(cmd, function (err, stdout, stderr) {
+    if (err) return console.log(`There was an error. ${err}`);
+    console.log('Successfully downloaded tests!'.green);
+  });
+}
