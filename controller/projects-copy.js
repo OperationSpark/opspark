@@ -113,7 +113,7 @@ function selectProject(projects, complete) {
         if (confirm.install) return complete(null, project);
         selectProject(projects, complete);
       });
-    }
+    },
   ]);
 }
 module.exports.selectProject = selectProject;
@@ -179,6 +179,9 @@ function initializeProject(project, pairedWith, projectDirectory, complete) {
 }
 module.exports.initializeProject = initializeProject;
 
+// TODO: 4. update the method appendProjectEntry to
+// include the project's _id property.
+// Update the check for already installed to search for this _id.
 function appendProjectEntry(project, pairedWith, complete) {
   var projectEntries = loadOrCreateEntries();
   var e = _.where(projectEntries.projects, { 'name': project.name})[0];

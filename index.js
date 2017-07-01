@@ -8,6 +8,7 @@ var
   init = require('./controller/init'),
   github = require('./controller/github'),
   projects = require('./controller/projects-copy'),
+  test = require('./controller/test'),
   janitor = require('./controller/janitor'),
   pair = require('./controller/pair'),
   handshake = require('./controller/handshake'),
@@ -49,6 +50,11 @@ program
   .command('pairdown')
   .description('Downloads and installs a project from the GitHub Pages repository of the student with whom the using student paired. Will fail if project is already installed.')
   .action(pairdown);
+
+program
+  .command('test')
+  .description('Downloads tests for selected project and presents student with current results.')
+  .action(test);
 
 program
   .command('logout')
