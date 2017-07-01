@@ -54,7 +54,7 @@ program
 program
   .command('test')
   .description('Downloads tests for selected project and presents student with current results.')
-  .action(test);
+  .action(test.test);
 
 program
   .command('logout')
