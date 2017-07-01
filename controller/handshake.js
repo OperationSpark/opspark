@@ -9,6 +9,14 @@ var
   env = require('./env'),
   filePath = `${env.home()}/opspark`;
 
+function readHandshake() {
+  const path = `${filePath}/handshake`;
+  if (!fs.existsSync(path)) {
+    return console.log('No handshake stored, run "os init-hs" to create');
+  }
+  return fsJson.loadSync(path);
+}
+
 // Checks if directory exists and creates if not
 function checkForDirectory(path) {
   if (!fs.existsSync(path)) {

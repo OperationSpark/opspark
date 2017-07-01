@@ -148,14 +148,15 @@ function obtainAuthorization(complete) {
   });
 }
 
-function readToken() {
-  const git = fsJson.loadSync(authFilePath);
-  console.log(git, typeof git);
+function grabLocalToken() {
+  if (!fs.existsSync(authFilePath)) {
+    return console.log(`There is no file at ${authFilePath}.`);
+  }
+  const git = fsJson.loadSync(authFilePath).token;
+  return git;
 }
 
-readToken();
-
-module.exports.readToken = readToken;
+module.exports.grabLocalToken = grabLocalToken;
 
 function hasAuthorization(token, complete) {
   var options = {

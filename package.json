@@ -1,6 +1,6 @@
 {
   "name": "faux-opspark",
-  "version": "1.0.27",
+  "version": "1.0.28",
   "description": "A node utility supporting installation and configuration of operation spark projects",
   "main": "index.js",
   "scripts": {

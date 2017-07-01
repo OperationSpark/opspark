@@ -120,7 +120,7 @@ module.exports.selectProject = selectProject;
 
 function installProject(project, pairedWith, complete) {
   const projectName = project.name;
-  const authToken = github.getToken();
+  const authToken = github.grabLocalToken();
   const projectsDirectory = `${rootDirectory}projects`;
   if (!fs.existsSync(projectsDirectory)) mkdirp.sync(projectsDirectory);
   const projectDirectory = `${projectsDirectory}/${projectName}`;
@@ -128,10 +128,10 @@ function installProject(project, pairedWith, complete) {
 
   console.log('Installing project %s, please wait...'.green, projectName);
   // TODO: change uri back to opspark github
-  // TODO: change /branches/test to /trunk
   let uri = `https://github.com/livrush/${projectName}`;
   console.log('Cloning %s, please wait...'.green, uri);
 
+  // TODO: change /branches/test to /trunk
   uri = `${uri}/branches/test --password ${authToken}`;
 
   const cmd = `svn co ${uri} ${projectDirectory}`;
