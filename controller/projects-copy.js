@@ -45,7 +45,7 @@ module.exports.install = function () {
       installProject(project, null, function () {
         console.log('Have fun!!!'.green);
       });
-    });
+    }, 'install');
   });
 };
 
@@ -85,13 +85,13 @@ function list(complete) {
 }
 module.exports.list = list;
 
-function selectProject(projects, complete) {
+function selectProject(projects, complete, action) {
   async.waterfall([
     function (next) {
       inquirer.prompt([{
         type: 'list',
         name: 'project',
-        message: 'Select the project you wish to install',
+        message: `Select the project you wish to ${action}`,
         choices: _.pluck(projects, 'name').concat(cancelOption),
       }],
       function (response) {
@@ -106,12 +106,12 @@ function selectProject(projects, complete) {
       inquirer.prompt([{
         type: 'confirm',
         name: 'install',
-        message: `You selected ${project.name}: Go ahead and install?`,
+        message: `You selected ${project.name}: Go ahead and ${action}?`,
         default: true
       }],
       function (confirm) {
         if (confirm.install) return complete(null, project);
-        selectProject(projects, complete);
+        selectProject(projects, complete, action);
       });
     },
   ]);

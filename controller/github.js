@@ -149,14 +149,24 @@ function obtainAuthorization(complete) {
 }
 
 function grabLocalToken() {
-  if (!fs.existsSync(authFilePath)) {
+  const git = fsJson.loadSync(authFilePath);
+  if (!git) {
     return console.log(`There is no file at ${authFilePath}.`);
   }
-  const git = fsJson.loadSync(authFilePath).token;
-  return git;
+  return git.token;
 }
 
 module.exports.grabLocalToken = grabLocalToken;
+
+function grabLocalLogin() {
+  const git = fsJson.loadSync(userFilePath);
+  if (!git) {
+    return console.log(`There is no file at ${authFilePath}.`);
+  }
+  return git.login;
+}
+
+module.exports.grabLocalLogin = grabLocalLogin;
 
 function hasAuthorization(token, complete) {
   var options = {
