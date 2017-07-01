@@ -3,6 +3,7 @@ var
   request = require('request'),
   rp = require('request-promise'),
   fs = require('fs'),
+  fsJson = require('fs-json')(),
   mkdirp = require('mkdirp'),
   colors = require('colors'),
   env = require('./env'),
@@ -52,7 +53,7 @@ function storeCreds(body, hash) {
     });
   } else {
     console.warn('Writing file. . .');
-    fs.writeFileSync(path, JSON.stringify(userInfo));
+    fsJson.saveSync(path, JSON.stringify(userInfo));
     console.warn(colors.green('All done!'));
   }
 }
