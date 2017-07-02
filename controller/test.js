@@ -64,10 +64,10 @@ function runTests(project) {
 }
 
 function postTestCleanup(project) {
-  rimraf(`/workspace/projects/${project}/test`, function() {
+  rimraf(`/workspace/projects/${project}/test`, function () {
     console.log('Test directory removed!'.green);
-    rimraf(`/workspace/projects/${project}/node_modules`, function() {
+    rimraf(`/workspace/projects/${project}/node_modules`, function () {
       console.log('Node Modules removed!'.green);
-    }
+    });
   });
 }
