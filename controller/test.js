@@ -21,7 +21,7 @@ var
   rimraf = require('rimraf'),
   cancelOption = '[cancel]',
   rootDirectory = './',
-  projectsDirectory = 'projects';
+  projectsDirectory = 'projects',
   projectEntriesPath = 'projects/projects.json';
 
 module.exports.test = function() {
@@ -35,11 +35,11 @@ module.exports.test = function() {
 };
 
 function grabTests(err, project) {
-  console.log(`Downloading tests for ${project}. . .`);
+  console.log(`Downloading tests for ${project.name}. . .`);
   // TODO: swap livrush to opspark
-  const uri = `https://github.com/livrush/${project}`;
+  const uri = `https://github.com/livrush/${project.name}`;
   // const uri = `https://github.com/OperationSpark/${project}`;
-  const token = projects.grabLocalToken();
+  const token = github.grabLocalToken();
   // TODO: swap branches/test to trunk
   const cmd = `svn export ${uri} ${projectsDirectory}/${project}/branches/test/test --password ${token}`;
   // const cmd = `svn export ${uri} ${projectsDirectory}/${project}/trunk/test --password ${token}`
