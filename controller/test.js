@@ -51,12 +51,23 @@ function grabTests(err, project) {
 }
 
 function runTests(project) {
-  const enterDirectory = `cd ~/workplace/${project}/`;
-  const runProjectTests = 'npm run dev';
-  const leaveDirectory = 'cd ~/workplace/';
-  const cmd = `${enterDirectory} && ${runProjectTests} && ${leaveDirectory}`;
+  const enterDirectory = `cd ~/workspace/projects/${project}/`;
+  const installDependencies = 'npm i';
+  const runProjectTests = 'npm run test';
+  const leaveDirectory = 'cd ~/workspace/';
+  const cmd = `${enterDirectory} && ${installDependencies} && ${runProjectTests} && ${leaveDirectory}`;
   exec(cmd, function (err, stdout, stderr) {
     if (err) return console.log(`There was an error. ${err}`);
     console.log('Successfully ran tests!'.green);
+    postTestCleanup(project);
+  });
+}
+
+function postTestCleanup(project) {
+  rimraf(`/workspace/projects/${project}/test`, function() {
+    console.log('Test directory removed!'.green);
+    rimraf(`/workspace/projects/${project}/node_modules`, function() {
+      console.log('Node Modules removed!'.green);
+    }
   });
 }
