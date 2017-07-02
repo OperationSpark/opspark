@@ -35,7 +35,7 @@ module.exports.test = function() {
 };
 
 function grabTests(err, project) {
-  console.log(`Downloading tests for ${project.name}. . .`);
+  console.log(`Downloading tests for ${project.name}. . .`.green);
   // TODO: swap livrush to opspark
   const uri = `https://github.com/livrush/${project.name}`;
   // const uri = `https://github.com/OperationSpark/${project}`;
@@ -46,5 +46,17 @@ function grabTests(err, project) {
   exec(cmd, function (err, stdout, stderr) {
     if (err) return console.log(`There was an error. ${err}`);
     console.log('Successfully downloaded tests!'.green);
+    runTests(project.name);
+  });
+}
+
+function runTests(project) {
+  const enterDirectory = `cd ~/workplace/${project}/`;
+  const runProjectTests = 'npm run dev';
+  const leaveDirectory = 'cd ~/workplace/';
+  const cmd = `${enterDirectory} && ${runProjectTests} && ${leaveDirectory}`;
+  exec(cmd, function (err, stdout, stderr) {
+    if (err) return console.log(`There was an error. ${err}`);
+    console.log('Successfully ran tests!'.green);
   });
 }
