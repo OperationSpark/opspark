@@ -1,10 +1,10 @@
 {
   "name": "faux-opspark",
-  "version": "1.0.36",
+  "version": "1.0.37",
   "description": "A node utility supporting installation and configuration of operation spark projects",
   "main": "index.js",
   "scripts": {
-    "postinstall": "npm i -G bower",
+    "postinstall": "npm i -G bower express body-parser mocha chai underscore zombie",
     "dev": "nodemon test-server.js",
     "handshake": "",
     "joincode": "",
