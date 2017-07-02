@@ -41,8 +41,8 @@ function grabTests(err, project) {
   // const uri = `https://github.com/OperationSpark/${project}`;
   const token = github.grabLocalToken();
   // TODO: swap branches/test to trunk
-  const cmd = `svn export ${uri} ${projectsDirectory}/${project}/branches/test/test --password ${token}`;
-  // const cmd = `svn export ${uri} ${projectsDirectory}/${project}/trunk/test --password ${token}`
+  const cmd = `svn export ${uri}/branches/test/test ${projectsDirectory}/${project.name} --password ${token}`;
+  // const cmd = `svn export ${uri}/trunk/test ${projectsDirectory}/${project} --password ${token}`
   exec(cmd, function (err, stdout, stderr) {
     if (err) return console.log(`There was an error. ${err}`);
     console.log('Successfully downloaded tests!'.green);
