@@ -52,14 +52,15 @@ function grabTests(err, project) {
 }
 
 function setEnv(project) {
+  console.log('Installing dependencies. . .'.green);
   const enterDirectory = `cd ${projectsDirectory}/${project}/`;
-  const installDependencies = 'npm i';
-  // TODO: command breaks when running tests
+  const installDependencies = 'npm install';
+  // TODO: command breaks after installing dependencies
   // const cmd = `${enterDirectory} && ${installDependencies} && ${runProjectTests} && ${leaveDirectory}`;
   const cmd = `${enterDirectory} && ${installDependencies}`;
   execP(cmd).then(function (err, stdout, stderr) {
     if (err) {
-      console.log(err, 'this is my error in run test');
+      console.log('There was an error installing dependencies, show this to your teacher:'.red, err);
       return postTestCleanup(project);
     }
     console.log('Successfully installed dependencies!'.green);
@@ -68,6 +69,7 @@ function setEnv(project) {
 }
 
 function runTests(project) {
+  console.log('Running tests. . .'.green);
   const enterDirectory = `cd ${projectsDirectory}/${project}/`;
   const runProjectTests = `mocha -t ${projectsDirectory}/${project}/test/index.spec.js`;
   // const leaveDirectory = 'cd ~/workspace/';
@@ -76,7 +78,7 @@ function runTests(project) {
     console.log('stdout: ' + stdout);
     console.log('stderr: ' + stderr);
     if (err) {
-      console.log(err, 'this is my error in run test');
+      console.log('There was an error running tests, show this to your teacher:'.red, err);
       return postTestCleanup(project);
     }
     console.log('Successfully ran tests!'.green);
@@ -92,11 +94,4 @@ function postTestCleanup(project) {
     if (err) console.log(err);
     console.log('Tests and Node Modules removed!'.green);
   });
-  //
-  // rimraf(`${projectsDirectory}/${project}/test`, function () {
-  //   console.log('Test directory removed!'.green);
-  //   rimraf(`${projectsDirectory}/${project}/node_modules`, function () {
-  //     console.log('Node Modules removed!'.green);
-  //   });
-  // });
 }
