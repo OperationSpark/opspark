@@ -26,6 +26,9 @@ var
   projectsDirectory = '~/workspace/projects',
   projectEntriesPath = 'projects/projects.json';
 
+// Start of test command
+// Runs the listProjectsOf function from projects to select project
+// that user wants to be tested
 module.exports.test = function() {
   const username = github.grabLocalLogin();
   console.log(username);
@@ -36,6 +39,9 @@ module.exports.test = function() {
     });
 };
 
+// Runs svn export to download the tests for the specific project
+// and places them in the correct directory
+// Then calls setEnv
 function grabTests(err, project) {
   console.log(`Downloading tests for ${project.name}. . .`.green);
   // TODO: swap livrush to opspark
@@ -52,6 +58,14 @@ function grabTests(err, project) {
   });
 }
 
+// Originally a part of runTests
+// Combines project name to the project directory
+// Makes command to enter project directory
+// Makes command to install npm dependencies
+// Attempted to use node's process module to change directory, did not work
+// Attempts to run both commands together with promisified child_process
+// If error, runs postTestCleanup to delete new directories so students can't have them
+// If no error, calls runTests function
 function setEnv(project) {
   console.log('Installing dependencies. . .'.green);
   const directory = `${projectsDirectory}/${project}/`;
@@ -72,6 +86,14 @@ function setEnv(project) {
   });
 }
 
+// Creates command to enter project directory
+// Creates command to run tests
+  // Command has been everything from 'npm run test', to literally the
+  // script in 'npm run test', to this current version with absolute directory
+    // May need --use_strict tag, but that throws an error (exit with code 9, unknown argument)
+    // when used with other commands
+// If error, runs postTestCleanup to delete new directories so students can't have them
+// If no error, calls postTestCleanup function
 function runTests(project) {
   console.log('Running tests. . .'.green);
   const enterDirectory = `cd ${projectsDirectory}/${project}/`;
@@ -88,6 +110,8 @@ function runTests(project) {
   });
 }
 
+// Removes unnecessary test and node_modules directory
+// Attempted to use rimraf, but did not work
 function postTestCleanup(project) {
   const removeTests = `rm -rf ${projectsDirectory}/${project}/test`;
   const removeNodeModules = `rm -rf ${projectsDirectory}/${project}/node_modules`;
