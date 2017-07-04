@@ -16,6 +16,7 @@ var
   fs = require('fs'),
   url = require('url'),
   exec = require('child_process').exec,
+  process = require('process'),
   execP = require('./child').execute,
   request = require('request'),
   mkdirp = require('mkdirp'),
@@ -53,7 +54,10 @@ function grabTests(err, project) {
 
 function setEnv(project) {
   console.log('Installing dependencies. . .'.green);
+  const directory = `${projectsDirectory}/${project}/`;
   const enterDirectory = `cd ${projectsDirectory}/${project}/`;
+  // process.chdir(directory);
+  console.log(`New directory: ${process.cwd()}`);
   const installDependencies = 'npm install';
   // TODO: command breaks after installing dependencies
   // const cmd = `${enterDirectory} && ${installDependencies} && ${runProjectTests} && ${leaveDirectory}`;
@@ -75,8 +79,6 @@ function runTests(project) {
   // const leaveDirectory = 'cd ~/workspace/';
   const cmd = `${enterDirectory} && ${runProjectTests}`;
   execP(cmd).then(function (err, stdout, stderr) {
-    console.log('stdout: ' + stdout);
-    console.log('stderr: ' + stderr);
     if (err) {
       console.log('There was an error running tests, show this to your teacher:'.red, err);
       return postTestCleanup(project);
