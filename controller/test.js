@@ -31,7 +31,6 @@ var
 // that user wants to be tested
 module.exports.test = function() {
   const username = github.grabLocalLogin();
-  console.log(username);
   // const installedProjects = projects.listProjectsOf(username);
   projects.listProjectsOf(username)
     .then(function (installedProjects) {
@@ -71,18 +70,17 @@ function setEnv(project) {
   const directory = `${projectsDirectory}/${project}/`;
   const enterDirectory = `cd ${projectsDirectory}/${project}/`;
   // process.chdir(directory);
-  console.log(`New directory: ${process.cwd()}`);
   const installDependencies = 'npm install';
   // TODO: command breaks after installing dependencies
-  // const cmd = `${enterDirectory} && ${installDependencies} && ${runProjectTests} && ${leaveDirectory}`;
-  const cmd = `${enterDirectory} && ${installDependencies}`;
+  const cmd = `${enterDirectory} && ${installDependencies} && ${runProjectTests} && ${leaveDirectory}`;
+  // const cmd = `(${enterDirectory} && ${installDependencies})`;
   execP(cmd).then(function (err, stdout, stderr) {
     if (err) {
       console.log('There was an error installing dependencies, show this to your teacher:'.red, err);
       return postTestCleanup(project);
     }
     console.log('Successfully installed dependencies!'.green);
-    runTests(project);
+    // runTests(project);
   });
 }
 
@@ -99,7 +97,7 @@ function runTests(project) {
   const enterDirectory = `cd ${projectsDirectory}/${project}/`;
   const runProjectTests = `mocha -t ${projectsDirectory}/${project}/test/index.spec.js`;
   // const leaveDirectory = 'cd ~/workspace/';
-  const cmd = `${enterDirectory} && ${runProjectTests}`;
+  const cmd = `(${enterDirectory} && ${runProjectTests})`;
   execP(cmd).then(function (err, stdout, stderr) {
     if (err) {
       console.log('There was an error running tests, show this to your teacher:'.red, err);
