@@ -16,7 +16,6 @@ var
   fs = require('fs'),
   url = require('url'),
   exec = require('child_process').exec,
-  process = require('process'),
   execP = require('./child').execute,
   request = require('request'),
   mkdirp = require('mkdirp'),
@@ -69,18 +68,15 @@ function setEnv(project) {
   console.log('Installing dependencies. . .'.green);
   const directory = `${projectsDirectory}/${project}/`;
   const enterDirectory = `cd ${projectsDirectory}/${project}/`;
-  // process.chdir(directory);
   const installDependencies = 'npm install';
-  // TODO: command breaks after installing dependencies
-  const cmd = `${enterDirectory} && ${installDependencies} && ${runProjectTests} && ${leaveDirectory}`;
-  // const cmd = `(${enterDirectory} && ${installDependencies})`;
-  execP(cmd).then(function (err, stdout, stderr) {
+  const cmd = `${enterDirectory} && ${installDependencies}`;
+  exec(cmd, function (err) {
     if (err) {
       console.log('There was an error installing dependencies, show this to your teacher:'.red, err);
       return postTestCleanup(project);
     }
     console.log('Successfully installed dependencies!'.green);
-    // runTests(project);
+    runTests(project);
   });
 }
 
@@ -94,16 +90,35 @@ function setEnv(project) {
 // If no error, calls postTestCleanup function
 function runTests(project) {
   console.log('Running tests. . .'.green);
+  const directory = `${projectsDirectory}/${project}`;
   const enterDirectory = `cd ${projectsDirectory}/${project}/`;
-  const runProjectTests = `mocha -t ${projectsDirectory}/${project}/test/index.spec.js`;
-  // const leaveDirectory = 'cd ~/workspace/';
-  const cmd = `(${enterDirectory} && ${runProjectTests})`;
-  execP(cmd).then(function (err, stdout, stderr) {
-    if (err) {
+  const runProjectTests = 'npm test';
+  const cmd = `${enterDirectory} && ${runProjectTests}`;
+  exec(cmd, function (err, stdout, stderr) {
+    if (!!stderr) {
       console.log('There was an error running tests, show this to your teacher:'.red, err);
-      return postTestCleanup(project);
+    } else {
+      console.log('Successfully ran tests!'.green);
     }
-    console.log('Successfully ran tests!'.green);
+    const obj = JSON.parse(stdout.slice(stdout.indexOf(`{
+  "stats": {`)));
+    const stats = obj.stats;
+    console.log(` Total tests:    ${stats.tests}  `.bgBlack.white);
+    console.log(` Passing tests:  ${stats.passes}  `.bgGreen.white);
+    console.log(` Pending tests:  ${stats.pending}  `.bgBlue.white);
+    console.log(` Failures tests: ${stats.failures}  `.bgRed.white);
+    if (stats.failures > 0) {
+      const failures = obj.failures;
+      failures.forEach(function (test, i) {
+        const whichTest = test.fullTitle;
+        const stackLineOne = test.err.stack.split('\n')[0];
+        const errorInfo = stackLineOne.slice(stackLineOne.indexOf(':'));
+        console.log(`${i + 1}) ${whichTest}`.red.bold.underline);
+        console.log(`> > > ${errorInfo}`.grey);
+      });
+    } else {
+      console.log('You did it! 100% complete, now please run'.green, 'os submit'.red);
+    }
     postTestCleanup(project);
   });
 }
@@ -114,8 +129,5 @@ function postTestCleanup(project) {
   const removeTests = `rm -rf ${projectsDirectory}/${project}/test`;
   const removeNodeModules = `rm -rf ${projectsDirectory}/${project}/node_modules`;
   const cmd = `${removeTests} && ${removeNodeModules}`;
-  execP(cmd).then(function(err, stdout, stderr) {
-    if (err) console.log(err);
-    console.log('Tests and Node Modules removed!'.green);
-  });
+  exec(cmd, () => console.log('Tests and Node Modules removed!'.green));
 }
