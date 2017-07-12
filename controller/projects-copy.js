@@ -20,8 +20,9 @@ var
   mkdirp = require('mkdirp'),
   rimraf = require('rimraf'),
   cancelOption = '[cancel]',
-  rootDirectory = '~/workspace',
-  projectEntriesPath = '~/workspace/projects/projects.json';
+  env = require('./env'),
+  rootDirectory = `${env.home()}/workspace`,
+  projectEntriesPath = `${rootDirectory}/projects/projects.json`;
 
 function greenlightRequest() {
   const options = {
@@ -120,6 +121,7 @@ module.exports.selectProject = selectProject;
 function installProject(project, pairedWith, complete) {
   const projectName = project.name;
   const authToken = github.grabLocalToken();
+  console.log(env);
   const projectsDirectory = `${rootDirectory}/projects`;
   if (!fs.existsSync(projectsDirectory)) mkdirp.sync(projectsDirectory);
   const projectDirectory = `${projectsDirectory}/${projectName}`;

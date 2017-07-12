@@ -21,9 +21,10 @@ var
   mkdirp = require('mkdirp'),
   rimraf = require('rimraf'),
   cancelOption = '[cancel]',
-  rootDirectory = './',
-  projectsDirectory = '~/workspace/projects',
-  projectEntriesPath = 'projects/projects.json';
+  env = require('./env'),
+  rootDirectory = `${env.home()}/workspace`,
+  projectsDirectory = `${rootDirectory}/projects`,
+  projectEntriesPath = `${projectsDirectory}/projects.json`;
 
 // Start of test command
 // Runs the listProjectsOf function from projects to select project
