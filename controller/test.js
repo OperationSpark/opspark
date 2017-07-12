@@ -106,7 +106,7 @@ function runTests(project) {
     console.log(` Total tests:    ${stats.tests}  `.bgBlack.white);
     console.log(` Passing tests:  ${stats.passes}  `.bgGreen.white);
     console.log(` Pending tests:  ${stats.pending}  `.bgBlue.white);
-    console.log(` Failures tests: ${stats.failures}  `.bgRed.white);
+    console.log(` Failing tests: ${stats.failures}  `.bgRed.white);
     if (stats.failures > 0) {
       const failures = obj.failures;
       failures.forEach(function (test, i) {
