@@ -4,7 +4,7 @@
   "description": "A node utility supporting installation and configuration of operation spark projects",
   "main": "index.js",
   "scripts": {
-    "postinstall": "npm install --global bower browserify",
+    "postinstall": "npm install --global bower browserify && nvm install 6 && nvm alias default 6",
     "dev": "nodemon test-server.js",
     "handshake": "",
     "joincode": "",
