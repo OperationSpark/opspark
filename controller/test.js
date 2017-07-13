@@ -101,25 +101,26 @@ function runTests(project) {
     } else {
       console.log('Successfully ran tests!'.green);
     }
-    const obj = JSON.parse(stdout.slice(stdout.indexOf(`{
-  "stats": {`)));
-    const stats = obj.stats;
-    console.log(` Total tests:    ${stats.tests}  `.bgBlack.white);
-    console.log(` Passing tests:  ${stats.passes}  `.bgGreen.white);
-    console.log(` Pending tests:  ${stats.pending}  `.bgBlue.white);
-    console.log(` Failing tests: ${stats.failures}  `.bgRed.white);
-    if (stats.failures > 0) {
-      const failures = obj.failures;
-      failures.forEach(function (test, i) {
-        const whichTest = test.fullTitle;
-        const stackLineOne = test.err.stack.split('\n')[0];
-        const errorInfo = stackLineOne.slice(stackLineOne.indexOf(':'));
-        console.log(`${i + 1}) ${whichTest}`.red.bold.underline);
-        console.log(`> > > ${errorInfo}`.grey);
-      });
-    } else {
-      console.log('You did it! 100% complete, now please run'.green, 'os submit'.red);
-    }
+    console.log(stdout);
+  //   const obj = JSON.parse(stdout.slice(stdout.indexOf(`{
+  // "stats": {`)));
+  //   const stats = obj.stats;
+  //   console.log(` Total tests:    ${stats.tests}  `.bgBlack.white);
+  //   console.log(` Passing tests:  ${stats.passes}  `.bgBlue.white);
+  //   console.log(` Pending tests:  ${stats.pending}  `.bgYellow.white);
+  //   console.log(` Failing tests: ${stats.failures}  `.bgRed.white);
+  //   if (stats.failures > 0) {
+  //     const failures = obj.failures;
+  //     failures.forEach(function (test, i) {
+  //       const whichTest = test.fullTitle;
+  //       const stackLineOne = test.err.stack.split('\n')[0];
+  //       const errorInfo = stackLineOne.slice(stackLineOne.indexOf(':'));
+  //       console.log(`${i + 1}) ${whichTest}`.red.bold.underline);
+  //       console.log(`> > > ${errorInfo}`.grey);
+  //     });
+  //   } else {
+  //     console.log('You did it! 100% complete, now please run'.green, 'os submit'.red);
+  //   }
     postTestCleanup(project);
   });
 }

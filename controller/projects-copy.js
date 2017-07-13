@@ -121,7 +121,6 @@ module.exports.selectProject = selectProject;
 function installProject(project, pairedWith, complete) {
   const projectName = project.name;
   const authToken = github.grabLocalToken();
-  console.log(env);
   const projectsDirectory = `${rootDirectory}/projects`;
   if (!fs.existsSync(projectsDirectory)) mkdirp.sync(projectsDirectory);
   const projectDirectory = `${projectsDirectory}/${projectName}`;
@@ -237,7 +236,6 @@ function removeSvnRemnants(projectDirectory, complete) {
 module.exports.removeSvnRemnants = removeSvnRemnants;
 
 function removeTest(projectDirectory, complete) {
-  console.log(`${projectDirectory}/test`);
   rimraf(`${projectDirectory}/test`, function (err) {
     if (err) return console.log(err);
     console.log('tests successfully removed from project %s'.green, projectDirectory);
