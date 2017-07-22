@@ -10,6 +10,7 @@ var
   greenlight = require('./controller/greenlight'),
   projects = require('./controller/projects-copy'),
   test = require('./controller/test'),
+  submit = require('./controller/submit'),
   janitor = require('./controller/janitor'),
   pair = require('./controller/pair'),
   handshake = require('./controller/handshake'),
@@ -23,16 +24,6 @@ program
   .command('init-hs')
   .description('Connect workspace with Greenlight to provide the neccessary projects for whichever class the student is taking.')
   .action(handshake);
-
-program
-  .command('get')
-  .description('Test greenlightRequest.')
-  .action(greenlight.get);
-
-program
-  .command('is')
-  .description('Test installing projects')
-  .action(projects.install);
 
 program
   .command('init-pf')
@@ -66,6 +57,11 @@ program
   .command('test')
   .description('Downloads tests for selected project and presents student with current results.')
   .action(test.test);
+
+program
+  .command('submit')
+  .description('Submits test results to Greenlight as student\'s grade.')
+  .action(submit.submit);
 
 program
   .command('logout')
