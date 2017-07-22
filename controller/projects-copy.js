@@ -157,7 +157,7 @@ function selectProject(projects, complete, action) {
 }
 module.exports.selectProject = selectProject;
 
-function selectTestProject(projects, complete) {
+function selectTestProject(projects, complete, submitFlag) {
   async.waterfall([
     function (next) {
       inquirer.prompt([{
@@ -188,7 +188,7 @@ function selectTestProject(projects, complete) {
         default: true
       }],
       function (confirm) {
-        if (confirm.install) return complete(null, project);
+        if (confirm.install) return complete(null, project, submitFlag);
         selectTestProject(projects, complete);
       });
     },

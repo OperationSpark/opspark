@@ -10,6 +10,7 @@ var
   async = require('async'),
   github = require('./github'),
   projects = require('./projects-copy'),
+  submit = require('./submit'),
   program = require('commander'),
   inquirer = require('inquirer'),
   colors = require('colors'),
@@ -29,15 +30,17 @@ var
 // Start of test command
 // Runs the listProjectsOf function from projects to select project
 // that user wants to be tested
-module.exports.test = function () {
+function test(submitFlag) {
   const username = github.grabLocalLogin();
   // const installedProjects = projects.listProjectsOf(username);
-  projects.selectTestProject(findTestableProjects(), grabTests);
+  projects.selectTestProject(findTestableProjects(), grabTests, submitFlag);
   // projects.listProjectsOf(username)
   //   .then(function (installedProjects) {
   //     projects.selectTestProject(installedProjects, grabTests);
   //   });
-};
+}
+
+module.exports.test = test;
 
 function findTestableProjects() {
   const files = fs.readdirSync(projectsDirectory);
@@ -56,7 +59,7 @@ function findTestableProjects() {
 // Runs svn export to download the tests for the specific project
 // and places them in the correct directory
 // Then calls setEnv
-function grabTests(err, project) {
+function grabTests(err, project, submitFlag) {
   console.log(`Downloading tests for ${project.name}. . .`.green);
   // TODO: swap livrush to opspark
   const uri = `https://github.com/livrush/${project.name}`;
@@ -68,7 +71,7 @@ function grabTests(err, project) {
   exec(cmd, function (err, stdout, stderr) {
     if (err) return console.log(`There was an error. ${err}`);
     console.log('Successfully downloaded tests!'.green);
-    setEnv(project.name);
+    setEnv(project.name, submitFlag);
   });
 }
 
@@ -80,7 +83,7 @@ function grabTests(err, project) {
 // Attempts to run both commands together with promisified child_process
 // If error, runs postTestCleanup to delete new directories so students can't have them
 // If no error, calls runTests function
-function setEnv(project) {
+function setEnv(project, submitFlag) {
   console.log('Installing dependencies. . .'.green);
   const directory = `${projectsDirectory}/${project}/`;
   const enterDirectory = `cd ${projectsDirectory}/${project}/`;
@@ -92,7 +95,7 @@ function setEnv(project) {
       return postTestCleanup(project);
     }
     console.log('Successfully installed dependencies!'.green);
-    runTests(project);
+    runTests(project, submitFlag);
   });
 }
 
@@ -104,7 +107,7 @@ function setEnv(project) {
     // when used with other commands
 // If error, runs postTestCleanup to delete new directories so students can't have them
 // If no error, calls postTestCleanup function
-function runTests(project) {
+function runTests(project, submitFlag) {
   console.log('Running tests. . .'.green);
   const directory = `${projectsDirectory}/${project}`;
   const enterDirectory = `cd ${projectsDirectory}/${project}/`;
@@ -124,7 +127,9 @@ function runTests(project) {
     console.log(` Passing tests:  ${stats.passes}  `.bgBlue.white);
     console.log(` Pending tests:  ${stats.pending}  `.bgYellow.white);
     console.log(` Failing tests: ${stats.failures}  `.bgRed.white);
-    if (stats.failures > 0) {
+    if (submitFlag) {
+      submit.checkGrade(stats);
+    } else if (stats.failures > 0) {
       const failures = obj.failures;
       failures.forEach(function (test, i) {
         const whichTest = test.fullTitle;
