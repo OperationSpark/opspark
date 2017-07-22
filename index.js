@@ -32,7 +32,7 @@ program
 program
   .command('is')
   .description('Test installing projects')
-  .action(projects.getSessionsList);
+  .action(projects.install);
 
 program
   .command('init-pf')

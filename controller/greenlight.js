@@ -24,7 +24,7 @@ var
   rootDirectory = `${env.home()}/workspace`,
   projectEntriesPath = `${rootDirectory}/projects/projects.json`;
 
-function getProjects(auth, complete) {
+function getSessions(auth, complete) {
   const options = {
     method: 'GET',
     // TODO: Switch URI for live version
@@ -42,7 +42,7 @@ function getProjects(auth, complete) {
     .catch(err => console.error('upload failed:', err));
 }
 
-module.exports.getProjects = getProjects;
+module.exports.getSessions = getSessions;
 
 function listEnrolledClasses(classes, complete) {
   complete(_.map(classes, 'name'));

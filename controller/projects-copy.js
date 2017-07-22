@@ -25,8 +25,9 @@ var
   rootDirectory = `${env.home()}/workspace`,
   projectEntriesPath = `${rootDirectory}/projects/projects.json`;
 
-module.exports.getSessionsList = function () {
-  greenlight.getProjects(null, function (sessions) {
+
+module.exports.install = function () {
+  greenlight.getSessions(null, function (sessions) {
     greenlight.listEnrolledClasses(sessions, function (classes) {
       selectClass(classes, function (err, res) {
         const chosenClass = _.pickBy(sessions, function (obj) {
@@ -46,24 +47,6 @@ module.exports.getSessionsList = function () {
     // console.log(projects);
   });
 };
-
-module.exports.install = function () {
-  // get list of all projects
-  greenlight.getProjects(null, function (res) {
-    // if (err) return console.log(err + ''.red);
-    // choose which project
-    const session = 'v4jZiQxGe83FXr7p2';
-    console.log(x);
-    const projects = _.get(res, `${session}.PROJECT`);
-    selectProject(projects, function (err, project) {
-      if (err) return console.log(err + ''.red);
-      installProject(project, null, function () {
-        console.log('Have fun!!!'.green);
-      });
-    }, 'install');
-  });
-};
-
 
 // Gets list of projects currently installed
 function listProjectsOf(username) {
