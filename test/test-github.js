@@ -49,7 +49,7 @@ describe('github', function() {
     describe.skip('#repos()', function() {
         it('should obtain auth, then get all org repos', function(done) {
             github.repos(function (err, repos) {
-                var names = _.pluck(repos, 'name');
+                var names = _.map(repos, 'name');
                 expect(names).to.include('circularity', 'frabonacci', 'line-crawler');
                 done();
             });

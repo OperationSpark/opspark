@@ -153,7 +153,7 @@ function grabLocalToken() {
   if (!git) {
     return console.log(`There is no file at ${userFilePath}.`);
   }
-  return git.token;
+  return git.id;
 }
 
 module.exports.grabLocalToken = grabLocalToken;

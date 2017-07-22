@@ -74,13 +74,13 @@ function selectProject(projects, complete) {
                 type: "list",
                 name: "project",
                 message: "Select the project you wish to install",
-                choices: _.pluck(projects, 'name').concat(cancelOption)}],
+                choices: _.map(projects, 'name').concat(cancelOption)}],
                 function(response) {
                     if(response.project === cancelOption) {
                         console.log('Installation cancelled, bye bye!'.green);
                         process.exit();
                     }
-                    next(null, _.where(projects, {'name': response.project})[0]);
+                    next(null, _.filter(projects, {'name': response.project})[0]);
             });
         },
         function(project, next) {
@@ -148,7 +148,7 @@ module.exports.initializeProject = initializeProject;
 
 function appendProjectEntry(project, pairedWith, complete) {
     var projectEntries = loadOrCreateEntries();
-    var e = _.where(projectEntries.projects, { 'name': project.name})[0];
+    var e = _.filter(projectEntries.projects, { 'name': project.name})[0];
     if (e) {
         console.log('Project entry exists for %s, skipping entry...'.green, project.name);
         return complete();

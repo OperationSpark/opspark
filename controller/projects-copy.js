@@ -9,6 +9,7 @@ var
   changeCase = require('change-case'),
   async = require('async'),
   github = require('./github'),
+  greenlight = require('./greenlight'),
   program = require('commander'),
   inquirer = require('inquirer'),
   colors = require('colors'),
@@ -24,23 +25,36 @@ var
   rootDirectory = `${env.home()}/workspace`,
   projectEntriesPath = `${rootDirectory}/projects/projects.json`;
 
-function greenlightRequest() {
-  const options = {
-    method: 'GET',
-    // uri: 'https://greenlight.operationspark.org/api/os/install',
-    uri: 'http://localhost:3000/',
-    json: true,
-  };
-  rp(options)
-    .then(res => console.log(res))
-    .catch(err => console.error('upload failed:', err));
-}
+module.exports.getSessionsList = function () {
+  greenlight.getProjects(null, function (sessions) {
+    greenlight.listEnrolledClasses(sessions, function (classes) {
+      selectClass(classes, function (err, res) {
+        const chosenClass = _.pickBy(sessions, function (obj) {
+          return obj.name === res;
+        });
+        const session = Object.keys(chosenClass)[0];
+        const projects = chosenClass[session].PROJECT;
+        selectProject(projects, function (err, project) {
+          if (err) return console.log(err + ''.red);
+          installProject(project, null, function () {
+            console.log('Have fun!!!'.green);
+          });
+        }, 'install');
+      });
+    });
+    // const projects = _.get(res, `${session}.PROJECT`);
+    // console.log(projects);
+  });
+};
 
 module.exports.install = function () {
   // get list of all projects
-  list(function (err, projects) {
-    if (err) return console.log(err + ''.red);
+  greenlight.getProjects(null, function (res) {
+    // if (err) return console.log(err + ''.red);
     // choose which project
+    const session = 'v4jZiQxGe83FXr7p2';
+    console.log(x);
+    const projects = _.get(res, `${session}.PROJECT`);
     selectProject(projects, function (err, project) {
       if (err) return console.log(err + ''.red);
       installProject(project, null, function () {
@@ -85,6 +99,41 @@ function list(complete) {
 }
 module.exports.list = list;
 
+function selectClass(classes, complete) {
+  async.waterfall([
+    function (next) {
+      inquirer.prompt([{
+        type: 'list',
+        name: 'class',
+        message: 'Select the class to install a project from',
+        choices: classes.concat(cancelOption),
+      }],
+      function (response) {
+        console.log(response);
+        if (response.class === cancelOption) {
+          console.log('Installation cancelled, bye bye!'.green);
+          process.exit();
+        }
+        next(null, response);
+      });
+    },
+    function (response, next) {
+      inquirer.prompt([{
+        type: 'confirm',
+        name: 'install',
+        message: `You selected ${response.class}: Is that correct?`,
+        default: true
+      }],
+      function (confirm) {
+        if (confirm.install) return complete(null, response.class);
+        selectClass(classes, complete);
+      });
+    },
+  ]);
+}
+
+module.exports.selectClass = selectClass;
+
 function selectProject(projects, complete, action) {
   async.waterfall([
     function (next) {
@@ -92,14 +141,14 @@ function selectProject(projects, complete, action) {
         type: 'list',
         name: 'project',
         message: `Select the project you wish to ${action}`,
-        choices: _.pluck(projects, 'name').concat(cancelOption),
+        choices: _.map(projects, 'name').concat(cancelOption),
       }],
       function (response) {
         if (response.project === cancelOption) {
           console.log('Installation cancelled, bye bye!'.green);
           process.exit();
         }
-        next(null, _.where(projects, { name: response.project, })[0]);
+        next(null, _.filter(projects, { name: response.project, })[0]);
       });
     },
     function (project, next) {
@@ -184,7 +233,7 @@ module.exports.initializeProject = initializeProject;
 // Update the check for already installed to search for this _id.
 function appendProjectEntry(project, pairedWith, complete) {
   var projectEntries = loadOrCreateEntries();
-  var e = _.where(projectEntries.projects, { 'name': project.name})[0];
+  var e = _.filter(projectEntries.projects, { 'name': project.name})[0];
   if (e) {
     console.log('Project entry exists for %s, skipping entry...'.green, project.name);
     return complete();

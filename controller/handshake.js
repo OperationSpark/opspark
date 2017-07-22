@@ -71,9 +71,9 @@ function greenlightRequest(hash) {
   const options = {
     method: 'POST',
     // uri: 'https://greenlight.operationspark.org/api/os/verify',
-    uri: 'http://localhost:3000/',
+    uri: 'http://localhost:3000/api/os/verify',
     body: {
-      hash,
+      authorization: hash,
     },
     json: true,
   };

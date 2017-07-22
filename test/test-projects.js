@@ -26,7 +26,7 @@ describe('projects', function() {
         it('returns valid projects.json for user', function() {
             return projects.listProjectsOf('jfraboni').then(function(projects) {
                 console.log(projects);
-                var names = _.pluck(projects, 'name');
+                var names = _.map(projects, 'name');
                 expect(names).to.include('circularity', 'frabonacci', 'line-crawler');
             });
         });
@@ -38,7 +38,7 @@ describe('projects', function() {
         this.timeout(3000);
         it('returns loosely valid list of projects from github.com/OperationSpark', function(done) {
             projects.list(function(err, projects) {
-                var names = _.pluck(projects, 'name');
+                var names = _.map(projects, 'name');
                 expect(names).to.include('circularity', 'frabonacci', 'line-crawler');
                 done();
             });

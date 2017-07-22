@@ -7,6 +7,7 @@ var
   config = require('./config.json'),
   init = require('./controller/init'),
   github = require('./controller/github'),
+  greenlight = require('./controller/greenlight'),
   projects = require('./controller/projects-copy'),
   test = require('./controller/test'),
   janitor = require('./controller/janitor'),
@@ -22,6 +23,16 @@ program
   .command('init-hs')
   .description('Connect workspace with Greenlight to provide the neccessary projects for whichever class the student is taking.')
   .action(handshake);
+
+program
+  .command('get')
+  .description('Test greenlightRequest.')
+  .action(greenlight.get);
+
+program
+  .command('is')
+  .description('Test installing projects')
+  .action(projects.getSessionsList);
 
 program
   .command('init-pf')
