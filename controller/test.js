@@ -32,10 +32,11 @@ var
 module.exports.test = function () {
   const username = github.grabLocalLogin();
   // const installedProjects = projects.listProjectsOf(username);
-  projects.listProjectsOf(username)
-    .then(function (installedProjects) {
-      projects.selectProject(installedProjects, grabTests, 'test');
-    });
+  projects.selectTestProject(findTestableProjects(), grabTests);
+  // projects.listProjectsOf(username)
+  //   .then(function (installedProjects) {
+  //     projects.selectTestProject(installedProjects, grabTests);
+  //   });
 };
 
 function findTestableProjects() {
@@ -110,11 +111,11 @@ function runTests(project) {
   const runProjectTests = 'npm test';
   const cmd = `${enterDirectory} && ${runProjectTests}`;
   exec(cmd, function (err, stdout, stderr) {
-    if (!!stderr) {
-      console.log('There was an error running tests, show this to your teacher:'.red, err);
-    } else {
-      console.log('Successfully ran tests!'.green);
-    }
+    // if (!!stderr) {
+    //   console.log('There was an error running tests, show this to your teacher:'.red, err);
+    // } else {
+    //   console.log('Successfully ran tests!'.green);
+    // }
     // console.log(stdout);
     const obj = JSON.parse(stdout.slice(stdout.indexOf(`{
   "stats": {`)));

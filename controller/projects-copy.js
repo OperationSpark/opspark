@@ -157,6 +157,46 @@ function selectProject(projects, complete, action) {
 }
 module.exports.selectProject = selectProject;
 
+function selectTestProject(projects, complete) {
+  async.waterfall([
+    function (next) {
+      inquirer.prompt([{
+        type: 'list',
+        name: 'project',
+        message: 'Select the project you wish to test',
+        choices: _.map(projects, e => e
+          .replace(/-/g, ' ')
+          .replace(/\b\w/g, l => l.toUpperCase())
+        ).concat(cancelOption),
+      }],
+      function (response) {
+        if (response.project === cancelOption) {
+          console.log('Installation cancelled, bye bye!'.green);
+          process.exit();
+        }
+        next(null, response);
+      });
+    },
+    function (project, next) {
+      if (!project.name) {
+        project.name = project.project.toLowerCase().replace(/\s/g, '-');
+      }
+      inquirer.prompt([{
+        type: 'confirm',
+        name: 'install',
+        message: `You selected ${project.name}: Go ahead and test?`,
+        default: true
+      }],
+      function (confirm) {
+        if (confirm.install) return complete(null, project);
+        selectTestProject(projects, complete);
+      });
+    },
+  ]);
+}
+
+module.exports.selectTestProject = selectTestProject;
+
 function installProject(project, pairedWith, complete) {
   const projectName = project.name.toLowerCase().replace(/\s/g, '-');
   const authToken = github.grabLocalToken();
