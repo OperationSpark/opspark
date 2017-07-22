@@ -167,8 +167,7 @@ function selectProject(projects, complete, action) {
 module.exports.selectProject = selectProject;
 
 function installProject(project, pairedWith, complete) {
-  const projectName = project.name.toLowerCase().replace(' ', '-');
-  console.log(project);
+  const projectName = project.name.toLowerCase().replace(/\s/g, '-');
   const authToken = github.grabLocalToken();
   const projectsDirectory = `${rootDirectory}/projects`;
   if (!fs.existsSync(projectsDirectory)) mkdirp.sync(projectsDirectory);
