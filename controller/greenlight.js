@@ -45,7 +45,6 @@ function getProjects(auth, complete) {
 module.exports.getProjects = getProjects;
 
 function listEnrolledClasses(classes, complete) {
-  console.log(classes);
   complete(_.map(classes, 'name'));
 }
 

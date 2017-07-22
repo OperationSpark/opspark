@@ -109,7 +109,6 @@ function selectClass(classes, complete) {
         choices: classes.concat(cancelOption),
       }],
       function (response) {
-        console.log(response);
         if (response.class === cancelOption) {
           console.log('Installation cancelled, bye bye!'.green);
           process.exit();
@@ -168,7 +167,8 @@ function selectProject(projects, complete, action) {
 module.exports.selectProject = selectProject;
 
 function installProject(project, pairedWith, complete) {
-  const projectName = project.name;
+  const projectName = project.name.toLowerCase().replace(' ', '-');
+  console.log(project);
   const authToken = github.grabLocalToken();
   const projectsDirectory = `${rootDirectory}/projects`;
   if (!fs.existsSync(projectsDirectory)) mkdirp.sync(projectsDirectory);
@@ -241,7 +241,7 @@ function appendProjectEntry(project, pairedWith, complete) {
   var entry = {
     name: project.name,
     title: changeCase.titleCase(project.name),
-    description: project.description.replace('PROJECT:: ', ''),
+    description: project.desc,
     date: new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', }),
   };
   if (pairedWith) entry.pairedWith = [pairedWith];
