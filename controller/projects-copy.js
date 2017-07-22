@@ -25,6 +25,14 @@ var
   rootDirectory = `${env.home()}/workspace`,
   projectEntriesPath = `${rootDirectory}/projects/projects.json`;
 
+/**
+ * INSTALL
+ * Grabs all sessions a user is enrolled in
+ * Creates list of all enrolled classes
+ * User selects class to install project from
+ * User selects project to install
+ * Project is installed!
+ */
 
 module.exports.install = function () {
   greenlight.getSessions(null, function (sessions) {
