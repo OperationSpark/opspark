@@ -19,7 +19,7 @@ var
     octonode = require('octonode'),
     env = require('./env'),
     applicationDirectory = env.home() + '/opspark',
-    authFilePath = applicationDirectory + '/github',
+    githubFilePath = applicationDirectory + '/github',
     userFilePath = applicationDirectory + '/user',
     _auth,
     _user,
@@ -102,7 +102,7 @@ module.exports.authorize = authorize;
 
 function writeToken(token) {
   ensureApplicationDirectory();
-  fsJson.saveSync(authFilePath, token);
+  fsJson.saveSync(githubFilePath, token);
 }
 module.exports.writeToken = writeToken;
 
@@ -120,15 +120,15 @@ module.exports.repos = repos;
 
 function getOrObtainAuth(complete) {
   if (_auth) return complete(null, _auth);
-  if (fs.existsSync(authFilePath)) {
-    _auth = fsJson.loadSync(authFilePath);
+  if (fs.existsSync(githubFilePath)) {
+    _auth = fsJson.loadSync(githubFilePath);
     hasAuthorization(_auth.token, function(err, response, body) {
       if (!err && response.statusCode == 200) {
         return complete(null, _auth);
       } else {
         console.log('Hmm, something\'s not right!'.green);
         console.log('Let\'s try to login to GitHub again:'.green);
-        if (fs.existsSync(authFilePath)) fs.unlinkSync(authFilePath);
+        if (fs.existsSync(githubFilePath)) fs.unlinkSync(githubFilePath);
         if (fs.existsSync(userFilePath)) fs.unlinkSync(userFilePath);
         obtainAuthorization(complete);
       }
@@ -159,9 +159,9 @@ function grabLocalToken() {
 module.exports.grabLocalToken = grabLocalToken;
 
 function grabLocalID() {
-  const git = fsJson.loadSync(authFilePath);
+  const git = fsJson.loadSync(githubFilePath);
   if (!git) {
-    return console.log(`There is no file at ${authFilePath}.`);
+    return console.log(`There is no file at ${githubFilePath}.`);
   }
   return git.id;
 }
@@ -171,7 +171,7 @@ module.exports.grabLocalID = grabLocalID;
 function grabLocalLogin() {
   const git = fsJson.loadSync(userFilePath);
   if (!git) {
-    return console.log(`There is no file at ${authFilePath}.`);
+    return console.log(`There is no file at ${userFilePath}.`);
   }
   return git.login;
 }
@@ -281,7 +281,7 @@ function deauthorize() {
       var cmd = 'curl -X "DELETE" -A "' + config.userAgent + '" -H "Accept: application/json" https://api.github.com/authorizations/' + auth.id + ' --user "jfraboni"';
       return child.execute(cmd).then(function (result) {
         if (result.code === 0) {
-          if (fs.existsSync(authFilePath)) fs.unlinkSync(authFilePath);
+          if (fs.existsSync(githubFilePath)) fs.unlinkSync(githubFilePath);
           if (fs.existsSync(userFilePath)) fs.unlinkSync(userFilePath);
         } else {
           console.log('Hmm, something went wrong trying to logout, please try again or ask for help.');
