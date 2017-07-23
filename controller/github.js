@@ -148,7 +148,7 @@ function obtainAuthorization(complete) {
   });
 }
 
-function grabLocalToken() {
+function grabLocalID() {
   const git = fsJson.loadSync(userFilePath);
   if (!git) {
     return console.log(`There is no file at ${userFilePath}.`);
@@ -156,17 +156,17 @@ function grabLocalToken() {
   return git.id;
 }
 
-module.exports.grabLocalToken = grabLocalToken;
+module.exports.grabLocalID = grabLocalID;
 
-function grabLocalID() {
+function grabLocalToken() {
   const git = fsJson.loadSync(githubFilePath);
   if (!git) {
     return console.log(`There is no file at ${githubFilePath}.`);
   }
-  return git.id;
+  return git.token;
 }
 
-module.exports.grabLocalID = grabLocalID;
+module.exports.grabLocalToken = grabLocalToken;
 
 function grabLocalLogin() {
   const git = fsJson.loadSync(userFilePath);
