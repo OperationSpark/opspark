@@ -3,6 +3,7 @@
 var
   _ = require('lodash'),
   github = require('./github'),
+  greenlight = require('./greenlight'),
   test = require('./test'),
   projects = require('./projects-copy'),
   program = require('commander'),
@@ -31,47 +32,25 @@ module.exports.checkGrade = checkGrade;
 function createGist(stats) {
   const cmd = `curl -X POST -d '{"public":true,"files":{"grade.txt":{"content":"heyheyhey"}}}' -u ${github.grabLocalLogin()}:${github.grabLocalToken()} https://api.github.com/gists`;
 
-  console.log(cmd);
+  console.log('Creating gist. . .'.green);
 
   exec(cmd, function(err, stdout, stderr) {
     if (err) {
       console.log(err);
     }
-    console.log(stdout);
+    console.log(JSON.parse(stdout).id);
+    greenlight.submit(JSON.parse(stdout).id);
   });
-
-  // const body = {
-  //   description: 'the description for this gist',
-  //   public: true,
-  //   login: github.grabLocalLogin(),
-  //   files: {
-  //     'grade.txt': {
-  //       content: 'hi',
-  //     }
-  //   },
-  // };
-  // const options = {
-  //   method: 'POST',
-  //   uri: 'https://api.github.com/gists',
-  //   body: JSON.stringify(body),
-  //   headers: {
-  //     Authorization: github.grabLocalToken(),
-  //     'User-Agent': github.grabLocalLogin(),
-  //   }
-  // };
-  // rp(options)
-  //   .then(res => console.log(res))
-  //   .catch(err => console.error('upload failed:', err));
 }
 
 module.exports.createGist = createGist;
 
 function deleteGist(stats) {
-  const id = '6c2b7ea354a19c571b8f180949f4ecae'
+  const id = '00259dbf78e7a5489bbe36e465d40ec6'
 
   const cmd = `curl -X DELETE -u ${github.grabLocalLogin()}:${github.grabLocalToken()} https://api.github.com/gists/${id}`
 
-  console.log(cmd);
+  console.log('Deleting gist. . .');
 
   exec(cmd, function(err, stdout, stderr) {
     if (err) {
@@ -79,16 +58,6 @@ function deleteGist(stats) {
     }
     console.log(stdout);
   });
-  // const options = {
-  //   method: 'DELETE',
-  //   uri: `https://api.github.com/gists/1677e545fe1616b836480ca2bc74c8b7`,
-  //   headers: {
-  //     'User-Agent': github.grabLocalLogin(),
-  //   },
-  // };
-  // rp(options)
-  //   .then(res => console.log(res))
-  //   .catch(err => console.error('upload failed:', err));
 }
 
 module.exports.deleteGist = deleteGist;
