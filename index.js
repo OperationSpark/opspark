@@ -54,6 +54,11 @@ program
   .action(pairdown);
 
 program
+  .command('npm')
+  .description('Downloads tests for selected project and presents student with current results.')
+  .action(npm.install);
+
+program
   .command('test')
   .description('Downloads tests for selected project and presents student with current results.')
   .action(test.test);
