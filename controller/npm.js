@@ -23,8 +23,7 @@ var
   rimraf = require('rimraf'),
   cancelOption = '[cancel]',
   env = require('./env'),
-  rootDirectory = `${env.home()}/workspace`,
-  projectEntriesPath = `${rootDirectory}/projects/projects.json`;
+  projectsDirectory = `${rootDirectory}/projects`;
 
 /**
  * INSTALL
@@ -44,32 +43,59 @@ module.exports.install = function () {
         const projectsList = chosenClass[session].PROJECT;
         projects.selectProject(projectsList, function (err, project) {
           if (err) return console.log(err + ''.red);
-          getPackageName(project)
+          getPackageName(project);
         }, 'install');
       });
     });
   });
 };
 
-const getPackageName = function(project, complete) {
-  console.log(project);
+const getPackageName = function (project) {
   inquirer.prompt([{
     type: 'input',
-    name: 'package',
+    name: 'name',
     message: `What package would you like to install in ${project.name}?`,
   }], function (response) {
-    console.log(response);
+    confirmPackage(project, response);
   });
 };
+
+const confirmPackage = function (project, pkg) {
+  if (pkg.package === '') {
+    inquirer.prompt([{
+      type: 'confirm',
+      name: 'install',
+      message: `Install all packages in ${project.name}?`,
+      default: true
+    }], function (response) {
+      if (response.install) return installAllPackages(project);
+      getPackageName(project);
+    });
+  } else {
+    inquirer.prompt([{
+      type: 'confirm',
+      name: 'install',
+      message: `Install ${pkg.name} in ${project.name}?`,
+      default: true
+    }], function (response) {
+      if (response.install) return installPackage(project, pkg);
+      getPackageName(project);
+    });
+  }
+}
 
 const installPackage = function (project, pkg) {
   const name = changeCase.paramCase(project.name);
   const enterDirectory = `cd ${projectsDirectory}/${name}/`;
-  const installCmd = `npm install --save ${pkg.package}`;
-}
+  const installCmd = `npm install --save ${pkg.name}`;
+  const cmd = `${enterDirectory} && ${installCmd}`;
+  console.log(cmd);
+};
 
 const installAllPackages = function (project) {
   const name = changeCase.paramCase(project.name);
   const enterDirectory = `cd ${projectsDirectory}/${name}/`;
   const installCmd = 'npm install';
-}
+  const cmd = `${enterDirectory} && ${installCmd}`;
+  console.log(cmd);
+};
