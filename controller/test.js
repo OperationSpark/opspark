@@ -78,19 +78,25 @@ function checkEnvironment(err, project, submitFlag) {
 // Then calls setEnv
 function grabTests(err, project, submitFlag) {
   const name = changeCase.paramCase(project.name);
+  const directory = `${projectsDirectory}/${name}/test`;
   console.log(`Downloading tests for ${name}. . .`.green);
   // TODO: swap livrush to opspark
   const uri = `https://github.com/livrush/${name}`;
   // const uri = `https://github.com/OperationSpark/${project}`;
   const token = github.grabLocalToken();
   // TODO: swap branches/test to trunk
-  const cmd = `svn export ${uri}/branches/test/test ${projectsDirectory}/${name}/test --password ${token}`;
+  const cmd = `svn export ${uri}/branches/test/test ${directory} --password ${token}`;
   // const cmd = `svn export ${uri}/trunk/test ${projectsDirectory}/${project} --password ${token}`
-  exec(cmd, function (err, stdout, stderr) {
-    if (err) return console.log(`There was an error. ${err}`);
-    console.log('Successfully downloaded tests!'.green);
+  if (fs.readdirSync(directory)) {
+    console.log('Skipping tests.'.green);
     setEnv(project, submitFlag);
-  });
+  } else {
+    exec(cmd, function (err, stdout, stderr) {
+      if (err) return console.log(`There was an error. ${err}`);
+      console.log('Successfully downloaded tests!'.green);
+      setEnv(project, submitFlag);
+    });
+  }
 }
 
 // Originally a part of runTests
@@ -103,19 +109,25 @@ function grabTests(err, project, submitFlag) {
 // If no error, calls runTests function
 function setEnv(project, submitFlag) {
   const name = changeCase.paramCase(project.name);
+  const directory = `${projectsDirectory}/${name}/node_modules`;
   console.log('Installing dependencies. . .'.green);
   // const directory = `${projectsDirectory}/${name}/`;
   const enterDirectory = `cd ${projectsDirectory}/${name}/`;
   const installDependencies = 'npm install';
   const cmd = `${enterDirectory} && ${installDependencies}`;
-  exec(cmd, function (err) {
-    if (err) {
-      console.log('There was an error installing dependencies, show this to your teacher:'.red, err);
-      return postTestCleanup(project);
-    }
-    console.log('Successfully installed dependencies!'.green);
+  if (fs.readdirSync(directory)) {
+    console.log('Skipping dependencies.'.green);
     runTests(project, submitFlag);
-  });
+  } else {
+    exec(cmd, function (err) {
+      if (err) {
+        console.log('There was an error installing dependencies, show this to your teacher:'.red, err);
+        return postTestCleanup(project);
+      }
+      console.log('Successfully installed dependencies!'.green);
+      runTests(project, submitFlag);
+    });
+  }
 }
 
 // Creates command to enter project directory
@@ -134,12 +146,6 @@ function runTests(project, submitFlag) {
   const runProjectTests = 'npm test';
   const cmd = `${enterDirectory} && ${runProjectTests}`;
   exec(cmd, function (err, stdout, stderr) {
-    // if (!!stderr) {
-    //   console.log('There was an error running tests, show this to your teacher:'.red, err);
-    // } else {
-    //   console.log('Successfully ran tests!'.green);
-    // }
-    // console.log(stdout);
     const obj = JSON.parse(stdout.slice(stdout.indexOf(`{
   "stats": {`)));
     const stats = obj.stats;
