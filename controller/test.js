@@ -87,7 +87,7 @@ function grabTests(err, project, submitFlag) {
   // TODO: swap branches/test to trunk
   const cmd = `svn export ${uri}/branches/test/test ${directory} --password ${token}`;
   // const cmd = `svn export ${uri}/trunk/test ${projectsDirectory}/${project} --password ${token}`
-  if (fs.readdirSync(directory)) {
+  if (fs.existsSync(directory)) {
     console.log('Skipping tests.'.green);
     setEnv(project, submitFlag);
   } else {
@@ -115,7 +115,7 @@ function setEnv(project, submitFlag) {
   const enterDirectory = `cd ${projectsDirectory}/${name}/`;
   const installDependencies = 'npm install';
   const cmd = `${enterDirectory} && ${installDependencies}`;
-  if (fs.readdirSync(directory)) {
+  if (fs.existsSync(directory)) {
     console.log('Skipping dependencies.'.green);
     runTests(project, submitFlag);
   } else {
