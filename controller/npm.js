@@ -23,6 +23,7 @@ var
   rimraf = require('rimraf'),
   cancelOption = '[cancel]',
   env = require('./env'),
+  rootDirectory = `${env.home()}/workspace`,
   projectsDirectory = `${rootDirectory}/projects`;
 
 /**
@@ -61,14 +62,14 @@ const getPackageName = function (project) {
 };
 
 const confirmPackage = function (project, pkg) {
-  if (pkg.package === '') {
+  if (pkg.name === '') {
     inquirer.prompt([{
       type: 'confirm',
       name: 'install',
       message: `Install all packages in ${project.name}?`,
       default: true
     }], function (response) {
-      if (response.install) return installAllPackages(project);
+      if (response.install) return installPackages(true, project);
       getPackageName(project);
     });
   } else {
@@ -78,24 +79,33 @@ const confirmPackage = function (project, pkg) {
       message: `Install ${pkg.name} in ${project.name}?`,
       default: true
     }], function (response) {
-      if (response.install) return installPackage(project, pkg);
+      if (response.install) return installPackages(false, project, pkg);
       getPackageName(project);
     });
   }
-}
-
-const installPackage = function (project, pkg) {
-  const name = changeCase.paramCase(project.name);
-  const enterDirectory = `cd ${projectsDirectory}/${name}/`;
-  const installCmd = `npm install --save ${pkg.name}`;
-  const cmd = `${enterDirectory} && ${installCmd}`;
-  console.log(cmd);
 };
 
-const installAllPackages = function (project) {
+const installPackages = function (all, project, pkg) {
+  let installCmd;
   const name = changeCase.paramCase(project.name);
   const enterDirectory = `cd ${projectsDirectory}/${name}/`;
-  const installCmd = 'npm install';
+  if (all) {
+    installCmd = 'npm install';
+  } else {
+    installCmd = `npm install --save ${pkg.name}`;
+  }
   const cmd = `${enterDirectory} && ${installCmd}`;
   console.log(cmd);
+  exec(cmd, function (err, stdout, stderr) {
+    if (err) return console.log('error:'.red, err);
+    console.log('Successfully installed'.green);
+  });
 };
+
+// const installAllPackages = function (all, project) {
+//   const name = changeCase.paramCase(project.name);
+//   const enterDirectory = `cd ${projectsDirectory}/${name}/`;
+//   const installCmd = 'npm install';
+//   const cmd = `${enterDirectory} && ${installCmd}`;
+//   console.log(cmd);
+// };
