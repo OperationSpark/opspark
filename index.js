@@ -64,16 +64,6 @@ program
   .action(submit.submit);
 
 program
-  .command('s')
-  .description('Submits test results to Greenlight as student\'s grade.')
-  .action(submit.createGist);
-
-program
-  .command('d')
-  .description('Submits test results to Greenlight as student\'s grade.')
-  .action(submit.deleteGist);
-
-program
   .command('logout')
   .description('Will clear any local authorizations from the user\'s workspace. The user will be asked to authorize next time they trip the need.')
   .action(github.deauthorize);

@@ -9,6 +9,7 @@ var
   changeCase = require('change-case'),
   async = require('async'),
   github = require('./github'),
+  submit = require('./submit'),
   program = require('commander'),
   inquirer = require('inquirer'),
   colors = require('colors'),
@@ -33,9 +34,6 @@ function getSessions(auth, complete) {
     qs: {
       id: github.grabLocalID(),
     },
-    headers: {
-      authorization: 'cb829798-b86e-496a-b311-6b37628e8116',
-    },
   };
   rp(options)
     .then(res => complete(JSON.parse(res)))
@@ -45,7 +43,14 @@ function getSessions(auth, complete) {
 module.exports.getSessions = getSessions;
 
 function listEnrolledClasses(classes, complete) {
-  complete(_.map(classes, 'name'));
+  const names = _.map(classes, 'name');
+  const cohorts = _.map(classes, 'cohort');
+  const namesWithCohorts = _.map(classes, function (e) {
+    return `${e.name}: ${e.cohort.split('-').slice(1).join(' ')}`;
+  });
+  if (complete) {
+    complete(names);
+  }
 }
 
 module.exports.listEnrolledClasses = listEnrolledClasses;
@@ -58,10 +63,6 @@ function get() {
     uri: 'http://localhost:3000/api/os/install',
     qs: {
       id: github.grabLocalID(),
-    },
-    headers: {
-      // TODO: swap authorization value for dynamic, user entered value
-      authorization: 'cb829798-b86e-496a-b311-6b37628e8116',
     },
   };
   rp(options)
@@ -76,12 +77,13 @@ function get() {
 
 module.exports.get = get;
 
-function submit(gistID) {
+function grade(project, gistUrl) {
   const body = {
     id: github.grabLocalID(),
-    requirementId: 'v4sZfMFaanbqaWeNS',
-    sessionId: 'EJYqdYzGv8ZuprrC2',
-    url: `https://api.github.com/gists/${gistID}`,
+    requirementId: project._id,
+    sessionId: project._session,
+    type: 'PROJECT',
+    url: gistUrl,
   };
   const options = {
     method: 'POST',
@@ -89,16 +91,16 @@ function submit(gistID) {
     // uri: 'https://greenlight.operationspark.org/api/os/install',
     uri: 'http://localhost:3000/api/os/grade',
     body: JSON.stringify(body),
-    headers: {
-      // TODO: swap authorization value for dynamic, user entered value
-      authorization: 'cb829798-b86e-496a-b311-6b37628e8116',
-    },
   };
   rp(options)
     .then(res => {
       console.log(res);
+      submit.deleteGist(gistUrl);
     })
-    .catch(err => console.error('upload failed:', err));
+    .catch(err => {
+      console.error('upload failed:'.red, err);
+      submit.deleteGist(gistUrl);
+    });
 }
 
-module.exports.submit = submit;
+module.exports.grade = grade;

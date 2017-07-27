@@ -12,25 +12,55 @@ var
   exec = require('child_process').exec,
   rp = require('request-promise');
 
-function submit() {
-  test.test(true);
+function submit(options) {
+  test.test(options, true);
 }
 
 module.exports.submit = submit;
 
-function checkGrade(stats) {
+function checkGrade(project, stats) {
   if (stats.tests !== stats.passes) {
-    console.log('You have not passed all tests! Canceling submit.'.red);
+    console.log(`You have not passed all tests for ${project.name}! Canceling submit.`.red);
   } else {
     console.log('Great! Beginning the upload process. . .'.green);
-    createGist();
+    createGist(project, stats);
   }
 }
 
 module.exports.checkGrade = checkGrade;
 
-function createGist(stats) {
-  const cmd = `curl -X POST -d '{"public":true,"files":{"grade.txt":{"content":"heyheyhey"}}}' -u ${github.grabLocalLogin()}:${github.grabLocalToken()} https://api.github.com/gists`;
+function createGist(project, stats) {
+  const dummyFiles = {
+    id: github.grabLocalID(),
+    requirementId: 'asfd',
+    sessionId: 'asdf',
+    type: 'PROJECT',
+    tests: 16,
+    passes: 16,
+    failures: 0,
+  };
+
+  const files = {
+    id: github.grabLocalID(),
+    requirementId: project._id,
+    sessionId: project._session,
+    type: 'PROJECT',
+    tests: stats.total,
+    passes: stats.passes,
+    failures: stats.failures,
+  };
+
+  const content = {
+    public: true,
+    description: 'Project results',
+    files: {
+      'grade.txt': {
+        content: JSON.stringify(files),
+      }
+    }
+  };
+
+  const cmd = `curl -X POST -d '${JSON.stringify(content)}' -u ${github.grabLocalLogin()}:${github.grabLocalToken()} https://api.github.com/gists`;
 
   console.log('Creating gist. . .'.green);
 
@@ -38,25 +68,23 @@ function createGist(stats) {
     if (err) {
       console.log(err);
     }
-    console.log(JSON.parse(stdout).id);
-    greenlight.submit(JSON.parse(stdout).id);
+    greenlight.grade(project, JSON.parse(stdout).url);
   });
 }
 
 module.exports.createGist = createGist;
 
-function deleteGist(stats) {
-  const id = '00259dbf78e7a5489bbe36e465d40ec6'
+function deleteGist(url) {
+  const cmd = `curl -X DELETE -u ${github.grabLocalLogin()}:${github.grabLocalToken()} ${url}`;
 
-  const cmd = `curl -X DELETE -u ${github.grabLocalLogin()}:${github.grabLocalToken()} https://api.github.com/gists/${id}`
-
-  console.log('Deleting gist. . .');
+  console.log('Deleting gist. . .'.green);
 
   exec(cmd, function(err, stdout, stderr) {
     if (err) {
       console.log(err);
     }
-    console.log(stdout);
+    console.log('Congrats on a job well done!'.blue);
+    // console.log(stdout);
   });
 }
 

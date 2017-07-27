@@ -34,6 +34,7 @@ bower_components
 /projects
 portfolio.html
 index.html
+.DS_Store
 
 .dev
 files.json

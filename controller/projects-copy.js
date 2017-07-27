@@ -37,10 +37,8 @@ var
 module.exports.install = function () {
   greenlight.getSessions(null, function (sessions) {
     greenlight.listEnrolledClasses(sessions, function (classes) {
-      selectClass(classes, function (err, res) {
-        const chosenClass = _.pickBy(sessions, function (obj) {
-          return obj.name === res;
-        });
+      selectClass(classes, 'install', function (err, className) {
+        const chosenClass = _.pickBy(sessions, obj => obj.name === className);
         const session = Object.keys(chosenClass)[0];
         const projects = chosenClass[session].PROJECT;
         selectProject(projects, function (err, project) {
@@ -51,8 +49,6 @@ module.exports.install = function () {
         }, 'install');
       });
     });
-    // const projects = _.get(res, `${session}.PROJECT`);
-    // console.log(projects);
   });
 };
 
@@ -90,13 +86,13 @@ function list(complete) {
 }
 module.exports.list = list;
 
-function selectClass(classes, complete) {
+function selectClass(classes, action, complete) {
   async.waterfall([
     function (next) {
       inquirer.prompt([{
         type: 'list',
         name: 'class',
-        message: 'Select the class to install a project from',
+        message: `Select the class to ${action} a project from`,
         choices: classes.concat(cancelOption),
       }],
       function (response) {
@@ -124,7 +120,7 @@ function selectClass(classes, complete) {
 
 module.exports.selectClass = selectClass;
 
-function selectProject(projects, complete, action) {
+function selectProject(projects, complete, action, flag) {
   async.waterfall([
     function (next) {
       inquirer.prompt([{
@@ -149,53 +145,13 @@ function selectProject(projects, complete, action) {
         default: true
       }],
       function (confirm) {
-        if (confirm.install) return complete(null, project);
-        selectProject(projects, complete, action);
+        if (confirm.install) return complete(null, project, flag);
+        selectProject(projects, complete, action, flag);
       });
     },
   ]);
 }
 module.exports.selectProject = selectProject;
-
-function selectTestProject(projects, complete, submitFlag) {
-  async.waterfall([
-    function (next) {
-      inquirer.prompt([{
-        type: 'list',
-        name: 'project',
-        message: 'Select the project you wish to test',
-        choices: _.map(projects, e => e
-          .replace(/-/g, ' ')
-          .replace(/\b\w/g, l => l.toUpperCase())
-        ).concat(cancelOption),
-      }],
-      function (response) {
-        if (response.project === cancelOption) {
-          console.log('Installation cancelled, bye bye!'.green);
-          process.exit();
-        }
-        next(null, response);
-      });
-    },
-    function (project, next) {
-      if (!project.name) {
-        project.name = project.project.toLowerCase().replace(/\s/g, '-');
-      }
-      inquirer.prompt([{
-        type: 'confirm',
-        name: 'install',
-        message: `You selected ${project.name}: Go ahead and test?`,
-        default: true
-      }],
-      function (confirm) {
-        if (confirm.install) return complete(null, project, submitFlag);
-        selectTestProject(projects, complete);
-      });
-    },
-  ]);
-}
-
-module.exports.selectTestProject = selectTestProject;
 
 function installProject(project, pairedWith, complete) {
   const projectName = project.name.toLowerCase().replace(/\s/g, '-');
