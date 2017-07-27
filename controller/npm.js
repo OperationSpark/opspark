@@ -61,3 +61,15 @@ const getPackageName = function(project, complete) {
     console.log(response);
   });
 };
+
+const installPackage = function (project, pkg) {
+  const name = changeCase.paramCase(project.name);
+  const enterDirectory = `cd ${projectsDirectory}/${name}/`;
+  const installCmd = `npm install --save ${pkg.package}`;
+}
+
+const installAllPackages = function (project) {
+  const name = changeCase.paramCase(project.name);
+  const enterDirectory = `cd ${projectsDirectory}/${name}/`;
+  const installCmd = 'npm install';
+}
