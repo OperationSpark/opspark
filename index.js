@@ -8,6 +8,7 @@ var
   init = require('./controller/init'),
   github = require('./controller/github'),
   greenlight = require('./controller/greenlight'),
+  npm = require('./controller/npm'),
   projects = require('./controller/projects-copy'),
   test = require('./controller/test'),
   submit = require('./controller/submit'),

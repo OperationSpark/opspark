@@ -10,7 +10,7 @@ var
   async = require('async'),
   github = require('./github'),
   greenlight = require('./greenlight'),
-  projects = require('./projects'),
+  projects = require('./projects-copy'),
   program = require('commander'),
   inquirer = require('inquirer'),
   colors = require('colors'),
@@ -38,15 +38,26 @@ var
 module.exports.install = function () {
   greenlight.getSessions(null, function (sessions) {
     greenlight.listEnrolledClasses(sessions, function (classes) {
-      selectClass(classes, 'install', function (err, className) {
+      projects.selectClass(classes, 'install', function (err, className) {
         const chosenClass = _.pickBy(sessions, obj => obj.name === className);
         const session = Object.keys(chosenClass)[0];
-        const projects = chosenClass[session].PROJECT;
-        selectProject(projects, function (err, project) {
+        const projectsList = chosenClass[session].PROJECT;
+        projects.selectProject(projectsList, function (err, project) {
           if (err) return console.log(err + ''.red);
-
+          getPackageName(project)
         }, 'install');
       });
     });
+  });
+};
+
+const getPackageName = function(project, complete) {
+  console.log(project);
+  inquirer.prompt([{
+    type: 'input',
+    name: 'package',
+    message: `What package would you like to install in ${project.name}?`,
+  }], function (response) {
+    console.log(response);
   });
 };
