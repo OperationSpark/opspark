@@ -95,17 +95,8 @@ const installPackages = function (all, project, pkg) {
     installCmd = `npm install --save ${pkg.name}`;
   }
   const cmd = `${enterDirectory} && ${installCmd}`;
-  console.log(cmd);
   exec(cmd, function (err, stdout, stderr) {
     if (err) return console.log('error:'.red, err);
     console.log('Successfully installed'.green);
   });
 };
-
-// const installAllPackages = function (all, project) {
-//   const name = changeCase.paramCase(project.name);
-//   const enterDirectory = `cd ${projectsDirectory}/${name}/`;
-//   const installCmd = 'npm install';
-//   const cmd = `${enterDirectory} && ${installCmd}`;
-//   console.log(cmd);
-// };
