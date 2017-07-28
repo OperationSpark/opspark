@@ -1,32 +1,15 @@
-'use strict';
+const _ = require('lodash');
+const changeCase = require('change-case');
+const github = require('./github');
+const greenlight = require('./greenlight');
+const projects = require('./projects-copy');
+const submit = require('./submit');
+const fs = require('fs');
+const exec = require('child_process').exec;
+const env = require('./env');
 
-var
-  config = require('../config'),
-  _ = require('lodash'),
-  util = require('util'),
-  Q = require('q'),
-  fsJson = require('fs-json')(),
-  changeCase = require('change-case'),
-  async = require('async'),
-  github = require('./github'),
-  greenlight = require('./greenlight'),
-  projects = require('./projects-copy'),
-  submit = require('./submit'),
-  program = require('commander'),
-  inquirer = require('inquirer'),
-  colors = require('colors'),
-  fs = require('fs'),
-  url = require('url'),
-  exec = require('child_process').exec,
-  execP = require('./child').execute,
-  request = require('request'),
-  mkdirp = require('mkdirp'),
-  rimraf = require('rimraf'),
-  cancelOption = '[cancel]',
-  env = require('./env'),
-  rootDirectory = `${env.home()}/workspace`,
-  projectsDirectory = `${rootDirectory}/projects`,
-  projectEntriesPath = `${projectsDirectory}/projects.json`;
+const rootDirectory = `${env.home()}/workspace`;
+const projectsDirectory = `${rootDirectory}/projects`;
 
 // Start of test command
 // Runs the listProjectsOf function from projects to select project
@@ -67,12 +50,6 @@ function findTestableProjects(projectsArray) {
   return _.intersection(mappedProjects, files);
 }
 
-function checkEnvironment(err, project, submitFlag) {
-  const name = changeCase.paramCase(project.name);
-  const testDirectory = `${projectsDirectory}/${name}/test`;
-  const nodeModulesDirectory = `${projectsDirectory}/${name}/node_modules`;
-}
-
 // Runs svn export to download the tests for the specific project
 // and places them in the correct directory
 // Then calls setEnv
@@ -91,8 +68,8 @@ function grabTests(err, project, submitFlag) {
     console.log('Skipping tests.'.green);
     setEnv(project, submitFlag);
   } else {
-    exec(cmd, function (err, stdout, stderr) {
-      if (err) return console.log(`There was an error. ${err}`);
+    exec(cmd, function (error) {
+      if (error) return console.log(`There was an error. ${error}`);
       console.log('Successfully downloaded tests!'.green);
       setEnv(project, submitFlag);
     });
@@ -132,10 +109,10 @@ function setEnv(project, submitFlag) {
 
 // Creates command to enter project directory
 // Creates command to run tests
-  // Command has been everything from 'npm run test', to literally the
-  // script in 'npm run test', to this current version with absolute directory
-    // May need --use_strict tag, but that throws an error (exit with code 9, unknown argument)
-    // when used with other commands
+// Command has been everything from 'npm run test', to literally the
+// script in 'npm run test', to this current version with absolute directory
+// May need --use_strict tag, but that throws an error (exit with code 9, unknown argument)
+// when used with other commands
 // If error, runs postTestCleanup to delete new directories so students can't have them
 // If no error, calls postTestCleanup function
 function runTests(project, submitFlag) {
@@ -145,7 +122,7 @@ function runTests(project, submitFlag) {
   const enterDirectory = `cd ${projectsDirectory}/${name}/`;
   const runProjectTests = 'npm test';
   const cmd = `${enterDirectory} && ${runProjectTests}`;
-  exec(cmd, function (err, stdout, stderr) {
+  exec(cmd, function (err, stdout) {
     const obj = JSON.parse(stdout.slice(stdout.indexOf(`{
   "stats": {`)));
     const stats = obj.stats;
@@ -157,9 +134,9 @@ function runTests(project, submitFlag) {
       submit.checkGrade(project, stats);
     } else if (stats.failures > 0) {
       const failures = obj.failures;
-      failures.forEach(function (test, i) {
-        const whichTest = test.fullTitle;
-        const stackLineOne = test.err.stack.split('\n')[0];
+      failures.forEach(function (currentTest, i) {
+        const whichTest = currentTest.fullTitle;
+        const stackLineOne = currentTest.err.stack.split('\n')[0];
         const errorInfo = stackLineOne.slice(stackLineOne.indexOf(':'));
         console.log(`${i + 1}) ${whichTest}`.red.bold.underline);
         console.log(`> > > ${errorInfo}`.grey);
