@@ -97,7 +97,12 @@ function grade(project, gist) {
   };
   rp(options)
     .then(res => {
-      console.log(res);
+      if (res.status === 200) {
+        console.log(res.message.blue);
+      } else {
+        console.log(res.reason.red);
+        console.log(res.details.red);
+      }
       submit.deleteGist(gist.url);
     })
     .catch(err => {

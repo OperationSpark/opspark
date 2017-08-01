@@ -19,12 +19,12 @@ function submit(options) {
 module.exports.submit = submit;
 
 function checkGrade(project, stats) {
-  if (stats.tests !== stats.passes) {
-    console.log(`You have not passed all tests for ${project.name}! Canceling submit.`.red);
+  if (stats.passes < (stats.tests / 2)) {
+    console.log(`You have not passed all tests for ${project.name}! Must be have finished at least 50% to submit. Canceling submit.`.red);
   } else {
     console.log('Great! Beginning the upload process. . .'.green);
+    createGist(project, stats);
   }
-  createGist(project, stats);
 }
 
 module.exports.checkGrade = checkGrade;
@@ -39,8 +39,6 @@ function createGist(project, stats) {
     passes: stats.passes,
     failures: stats.failures,
   };
-
-  console.log(files);
 
   const content = {
     public: true,
@@ -75,7 +73,7 @@ function deleteGist(url) {
     if (err) {
       console.log(err);
     }
-    console.log('Congrats on a job well done!'.blue);
+    console.log('Gist deleted!'.green);
     // console.log(stdout);
   });
 }
