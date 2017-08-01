@@ -29,6 +29,15 @@ var
 // TODO : consider the "module level" vars, like _client in this implementation, are they necessary.
 
 
+function filesExist() {
+  if (!fs.existsSync(githubFilePath) || !fs.existsSync(userFilePath)) {
+    return false;
+  }
+  return true;
+}
+
+module.exports.filesExist = filesExist;
+
 function user(username, complete) {
     var deferred = Q.defer();
     getOrCreateClient(function (err, client) {
@@ -64,6 +73,13 @@ module.exports.limit = function (complete) {
     });
 };
 
+module.exports.login = function () {
+  inquirer.prompt({
+    type: 'input',
+    name: 'username',
+    message: ''
+  })
+}
 
 /*
  * TODO :
@@ -74,6 +90,7 @@ module.exports.limit = function (complete) {
  *      a. add a timestamp to the hostname.
  */
 function authorize(username, complete) {
+  console.log(username.green);
     var note = getNoteForHost();
     var cmd = 'curl https://api.github.com/authorizations --user "' + username + '" --data \'{"scopes":["public_repo", "repo", "gist"],"note":"' + note + '","note_url":"https://www.npmjs.com/package/opspark"}\'';
     var child = exec(cmd);
@@ -143,10 +160,13 @@ function obtainAuthorization(complete) {
   view.inquireForInput('Enter your GitHub username', function (err, input) {
     if (err) return complete(err);
     authorize(input, function () {
+      console.log('Okay, let\'s try installing again!'.green);
       complete(null, _auth);
     });
   });
 }
+
+module.exports.obtainAuthorization = obtainAuthorization;
 
 function grabLocalID() {
   const git = fsJson.loadSync(userFilePath);

@@ -34,23 +34,33 @@ var
  * Project is installed!
  */
 
-module.exports.install = function () {
-  greenlight.getSessions(null, function (sessions) {
-    greenlight.listEnrolledClasses(sessions, function (classes) {
-      selectClass(classes, 'install', function (err, className) {
-        const chosenClass = _.pickBy(sessions, obj => obj.name === className);
-        const session = Object.keys(chosenClass)[0];
-        const projects = chosenClass[session].PROJECT;
-        selectProject(projects, function (err, project) {
-          if (err) return console.log(err + ''.red);
-          installProject(project, null, function () {
-            console.log('Have fun!!!'.green);
-          });
-        }, 'install');
+const install = function () {
+  if (!github.filesExist()) {
+    console.log('We need some info, let\'s log into Github:');
+    github.obtainAuthorization(install);
+  } else {
+    greenlight.getSessions(null, function (sessions) {
+      greenlight.listEnrolledClasses(sessions, function (classes) {
+        selectClass(classes, 'install', function (err, className) {
+          const chosenClass = _.pickBy(sessions, obj => obj.name === className);
+          const session = Object.keys(chosenClass)[0];
+          const projects = chosenClass[session].PROJECT;
+          projects.push({
+            name: 'Lets Get Functional',
+          })
+          selectProject(projects, function (err, project) {
+            if (err) return console.log(err + ''.red);
+            installProject(project, null, function () {
+              console.log('Have fun!!!'.green);
+            });
+          }, 'install');
+        });
       });
     });
-  });
+  }
 };
+
+module.exports.install = install;
 
 // Gets list of projects currently installed
 function listProjectsOf(username) {

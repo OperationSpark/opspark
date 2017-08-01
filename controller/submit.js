@@ -23,32 +23,24 @@ function checkGrade(project, stats) {
     console.log(`You have not passed all tests for ${project.name}! Canceling submit.`.red);
   } else {
     console.log('Great! Beginning the upload process. . .'.green);
-    createGist(project, stats);
   }
+  createGist(project, stats);
 }
 
 module.exports.checkGrade = checkGrade;
 
 function createGist(project, stats) {
-  const dummyFiles = {
-    id: github.grabLocalID(),
-    requirementId: 'asfd',
-    sessionId: 'asdf',
-    type: 'PROJECT',
-    tests: 16,
-    passes: 16,
-    failures: 0,
-  };
-
   const files = {
     id: github.grabLocalID(),
     requirementId: project._id,
     sessionId: project._session,
     type: 'PROJECT',
-    tests: stats.total,
+    tests: stats.tests,
     passes: stats.passes,
     failures: stats.failures,
   };
+
+  console.log(files);
 
   const content = {
     public: true,
@@ -68,7 +60,7 @@ function createGist(project, stats) {
     if (err) {
       console.log(err);
     }
-    greenlight.grade(project, JSON.parse(stdout).url);
+    greenlight.grade(project, JSON.parse(stdout));
   });
 }
 

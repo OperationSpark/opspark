@@ -77,29 +77,32 @@ function get() {
 
 module.exports.get = get;
 
-function grade(project, gistUrl) {
+function grade(project, gist) {
+
   const body = {
-    id: github.grabLocalID(),
+    id: github.grabLocalID().toString(),
     requirementId: project._id,
     sessionId: project._session,
-    type: 'PROJECT',
-    url: gistUrl,
+    url: gist.files['grade.txt'].raw_url,
   };
+//   [{"key":"Accept","value":"application/json","description":""}]
+// [{"key":"Content-Type","value":"application/x-www-form-urlencoded","description":""}]
   const options = {
     method: 'POST',
     // TODO: Switch URI for live version
     // uri: 'https://greenlight.operationspark.org/api/os/install',
     uri: 'http://localhost:3000/api/os/grade',
-    body: JSON.stringify(body),
+    body: body,
+    json: true,
   };
   rp(options)
     .then(res => {
       console.log(res);
-      submit.deleteGist(gistUrl);
+      submit.deleteGist(gist.url);
     })
     .catch(err => {
       console.error('upload failed:'.red, err);
-      submit.deleteGist(gistUrl);
+      submit.deleteGist(gist.url);
     });
 }
 

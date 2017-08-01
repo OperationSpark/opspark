@@ -25,6 +25,9 @@ function test(options, submitFlag) {
         const chosenClass = _.pickBy(sessions, obj => obj.name === className);
         const session = Object.keys(chosenClass)[0];
         let projectsList = chosenClass[session].PROJECT;
+        projectsList.push({
+          name: 'Lets Get Functional',
+        })
         const testableProjects = findTestableProjects(projectsList);
         projectsList = projectsList.reduce(function (seed, project) {
           // const name = project.name.toLowerCase().replace(/\s/g, '-');
@@ -123,6 +126,7 @@ function runTests(project, submitFlag) {
   const runProjectTests = 'npm test';
   const cmd = `${enterDirectory} && ${runProjectTests}`;
   exec(cmd, function (err, stdout) {
+    // console.log(stdout);
     const obj = JSON.parse(stdout.slice(stdout.indexOf(`{
   "stats": {`)));
     const stats = obj.stats;

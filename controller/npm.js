@@ -25,6 +25,9 @@ module.exports.install = function () {
         const chosenClass = _.pickBy(sessions, obj => obj.name === className);
         const session = Object.keys(chosenClass)[0];
         const projectsList = chosenClass[session].PROJECT;
+        projectsList.push({
+          name: 'Lets Get Functional',
+        })
         projects.selectProject(projectsList, function (error, project) {
           if (err) return console.log(err + ''.red);
           getPackageName(project);
