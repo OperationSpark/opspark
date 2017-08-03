@@ -1,3 +1,5 @@
+'use strict';
+
 var
   view = require('../view'),
   request = require('request'),

@@ -1,3 +1,5 @@
+'use strict';
+
 const _ = require('lodash');
 const changeCase = require('change-case');
 const github = require('./github');
