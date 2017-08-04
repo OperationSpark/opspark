@@ -20,20 +20,30 @@ const projectsDirectory = `${rootDirectory}/projects`;
  * Project is installed!
  */
 
-module.exports.install = function () {
+const chooseProject = function(action, complete) {
   greenlight.getSessions(null, function (sessions) {
     greenlight.listEnrolledClasses(sessions, function (classes) {
-      projects.selectClass(classes, 'install', function (err, className) {
+      projects.selectClass(classes, action, function (err, className) {
         const chosenClass = _.pickBy(sessions, obj => obj.name === className);
         const session = Object.keys(chosenClass)[0];
         const projectsList = chosenClass[session].PROJECT;
         projectsList.push({
           name: 'Lets Get Functional',
         })
-        projects.selectProject(projectsList, getPackageName, 'install');
+        projects.selectProject(projectsList, complete, action);
       });
     });
   });
+}
+
+// Install all or one npm package to a specific project
+module.exports.install = function () {
+  chooseProject('install', getPackageName);
+};
+
+// Run npm start script in specific project
+module.exports.start = function () {
+  chooseProject('start', startProject);
 };
 
 const getPackageName = function (project) {
@@ -83,5 +93,15 @@ const installPackages = function (all, project, pkg) {
   exec(cmd, function (err) {
     if (err) return console.log('error:'.red, err);
     console.log('Successfully installed'.green);
+  });
+};
+
+const startProject = function (project) {
+  const name = changeCase.paramCase(project.name);
+  const enterDirectory = `cd ${projectsDirectory}/${name}/`;
+  const cmd = `${enterDirectory} && npm start`;
+  exec(cmd, function (err) {
+    if (err) return console.log('error:'.red, err);
+    console.log('Going going going. . .'.green);
   });
 };

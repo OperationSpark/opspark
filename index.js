@@ -56,8 +56,13 @@ program
 
 program
   .command('npm')
-  .description('Downloads tests for selected project and presents student with current results.')
+  .description('Selects a project to install npm packages to, then specifies whether one or all packages should be installed.')
   .action(npm.install);
+
+program
+  .command('start')
+  .description('Runs npm start script of selected project.')
+  .action(npm.start);
 
 program
   .command('test')
