@@ -7,6 +7,7 @@ var
     url = require('url'),
     exec = require('child_process').exec,
     cheerio = require('cheerio'),
+    github = require('./github'),
     colors = require('colors'),
     jQueryCdnScript = "    <script src=\"https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js\"></script>\n",
     portfolioScript = "        <script id=\"portfolioScript\">$(document).ready(function() {$.getJSON('projects/projects.json').then(function(data) { data.projects.forEach(function(project){ $('#portfolio').append('<li><a href=\"projects/' + project.name + '/\">' + project.title + ' : ' + project.description + '</a></li>'); }); }); });</script>\n    </body>";
@@ -14,6 +15,12 @@ var
 module.exports.jQueryCdnScript = jQueryCdnScript;
 module.exports.portfolioScript = portfolioScript;
 
+function login() {
+  github.obtainAuthorization(function() {
+    console.log('Have fun!'.blue);
+  });
+}
+module.exports.login = login;
 
 function portfolio(filepath) {
     filepath = (filepath ? filepath : configPortfolio.filepath);
@@ -36,8 +43,8 @@ module.exports.portfolio = portfolio;
 
 // TODO : Consider changing invocation routes from index.js to a switch, by this, we can intercept the commander program object instead of having to test for typeof function for async callbacks //
 /*
- * Will download all files required to kickstart the Operation Spark 
- * website project, and initialize the portfolio.html file so teachers 
+ * Will download all files required to kickstart the Operation Spark
+ * website project, and initialize the portfolio.html file so teachers
  * or developers can get up to speed quickly.
  */
 module.exports.website = function(next){

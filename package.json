@@ -4,7 +4,7 @@
   "description": "A node utility supporting installation and configuration of operation spark projects",
   "main": "index.js",
   "scripts": {
-    "postinstall": "npm install --global bower watchify n && sudo n 6.0.0",
+    "postinstall": "npm install --global bower watchify n && sudo n 6.0.0 && os login",
     "dev": "nodemon test-server.js",
     "handshake": "",
     "joincode": "",

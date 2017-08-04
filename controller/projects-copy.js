@@ -36,7 +36,7 @@ var
 
 const install = function () {
   if (!github.filesExist()) {
-    console.log('We need some info, let\'s log into Github:');
+    console.log('We need some info, let\'s log into Github:'.green);
     github.obtainAuthorization(install);
   } else {
     chooseClass('install', function (session, action) {
