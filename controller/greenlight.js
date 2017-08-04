@@ -78,7 +78,7 @@ function get() {
 module.exports.get = get;
 
 function grade(project, gist) {
-
+  console.log(gist.files);
   const body = {
     id: github.grabLocalID().toString(),
     requirementId: project._id,

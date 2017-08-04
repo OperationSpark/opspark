@@ -16,7 +16,12 @@ module.exports.jQueryCdnScript = jQueryCdnScript;
 module.exports.portfolioScript = portfolioScript;
 
 function login() {
-  github.obtainAuthorization(function() {
+  github.obtainAuthorization(function(err) {
+    console.log(err);
+    if (err) {
+      console.log('Let\'s try again.'.blue);
+      login();
+    }
     console.log('Have fun!'.blue);
   });
 }

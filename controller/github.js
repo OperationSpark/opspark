@@ -90,30 +90,33 @@ module.exports.login = function () {
  *      a. add a timestamp to the hostname.
  */
 function authorize(username, complete) {
-  console.log(username.green);
     var note = getNoteForHost();
     var cmd = 'curl https://api.github.com/authorizations --user "' + username + '" --data \'{"scopes":["public_repo", "repo", "gist"],"note":"' + note + '","note_url":"https://www.npmjs.com/package/opspark"}\'';
-    var child = exec(cmd);
-    child.stdout.on('data', function(data) {
-        console.log('stdout: ', data);
-        if (data.indexOf('token') > -1) {
-            try {
-                _auth = JSON.parse(data);
-            } catch (err) {
-                return complete(err);
-            }
-            console.log('GitHub login succeeded!'.green);
-            writeToken(_auth);
-            obtainAndWriteUser(username);
+    // var child = exec(cmd);
+    exec(cmd, function(err, stdout, stderr) {
+      console.log(stdout);
+      if (stdout.indexOf('token') > -1) {
+        console.log('win');
+        try {
+          _auth = JSON.parse(stdout);
+          console.log(_auth);
+        } catch (err) {
+          return complete(true);
         }
-    });
-    child.stderr.on('data', function(data) {
-        console.log(data);
-    });
-    child.on('close', function(code) {
-        console.log('closing code: ' + code);
-        complete(null, _auth);
-    });
+        console.log('GitHub login succeeded!'.green);
+        writeToken(_auth);
+        obtainAndWriteUser(username);
+      } else {
+        console.log('There was an error with your credentials.'.red);
+        return complete(true);
+      }
+      console.log('you suck')
+      complete(null, _auth);
+    })
+    // .on('close', function(code) {
+    //     console.log('closing code: ' + code);
+    //     complete(null, _auth);
+    // });
 }
 module.exports.authorize = authorize;
 
@@ -160,7 +163,6 @@ function obtainAuthorization(complete) {
   view.inquireForInput('Enter your GitHub username', function (err, input) {
     if (err) return complete(err);
     authorize(input, function () {
-      console.log('Okay, let\'s try installing again!'.green);
       complete(null, _auth);
     });
   });
