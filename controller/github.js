@@ -92,14 +92,10 @@ module.exports.login = function () {
 function authorize(username, complete) {
     var note = getNoteForHost();
     var cmd = 'curl https://api.github.com/authorizations --user "' + username + '" --data \'{"scopes":["public_repo", "repo", "gist"],"note":"' + note + '","note_url":"https://www.npmjs.com/package/opspark"}\'';
-    // var child = exec(cmd);
     exec(cmd, function(err, stdout, stderr) {
-      console.log(stdout);
       if (stdout.indexOf('token') > -1) {
-        console.log('win');
         try {
           _auth = JSON.parse(stdout);
-          console.log(_auth);
         } catch (err) {
           return complete(true);
         }
@@ -110,13 +106,8 @@ function authorize(username, complete) {
         console.log('There was an error with your credentials.'.red);
         return complete(true);
       }
-      console.log('you suck')
       complete(null, _auth);
-    })
-    // .on('close', function(code) {
-    //     console.log('closing code: ' + code);
-    //     complete(null, _auth);
-    // });
+    });
 }
 module.exports.authorize = authorize;
 
@@ -150,7 +141,7 @@ function getOrObtainAuth(complete) {
         console.log('Let\'s try to login to GitHub again:'.green);
         if (fs.existsSync(githubFilePath)) fs.unlinkSync(githubFilePath);
         if (fs.existsSync(userFilePath)) fs.unlinkSync(userFilePath);
-        obtainAuthorization(complete);
+        obtainAuthorizationuthorization(complete);
       }
     });
   } else {
@@ -162,8 +153,8 @@ module.exports.getOrObtainAuth = getOrObtainAuth;
 function obtainAuthorization(complete) {
   view.inquireForInput('Enter your GitHub username', function (err, input) {
     if (err) return complete(err);
-    authorize(input, function () {
-      complete(null, _auth);
+    authorize(input, function (err) {
+      complete(err, _auth);
     });
   });
 }
