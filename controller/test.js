@@ -27,7 +27,7 @@ function test(options, submitFlag) {
     projectsList.push({
       name: 'Lets Get Functional',
     })
-    projectsList = findTestableProjects(projectsList, session.sessionId).sort(function(a,b) {
+    projectsList = findTestableProjects(projectsList, session.sessionId).sort(function(a, b) {
       if (a.name < b.name)
         return -1;
       if (a.name > b.name)

@@ -38,12 +38,40 @@ const chooseProject = function(action, complete) {
 
 // Install all or one npm package to a specific project
 module.exports.install = function () {
-  chooseProject('install', getPackageName);
+  projects.chooseClass('install package to', function (session, action) {
+    let projectsList = session.PROJECT;
+    projectsList.push({
+      name: 'Lets Get Functional',
+    })
+    projectsList = projectsList.sort(function(a, b) {
+      if (a.name < b.name)
+        return -1;
+      if (a.name > b.name)
+        return 1;
+      return 0;
+    });
+
+    projects.selectProject(projectsList, getPackageName, action);
+  });
 };
 
 // Run npm start script in specific project
 module.exports.start = function () {
-  chooseProject('start', startProject);
+  projects.chooseClass('install package to', function (session, action) {
+    let projectsList = session.PROJECT;
+    projectsList.push({
+      name: 'Lets Get Functional',
+    })
+    projectsList = projectsList.sort(function(a, b) {
+      if (a.name < b.name)
+        return -1;
+      if (a.name > b.name)
+        return 1;
+      return 0;
+    });
+
+    projects.selectProject(projectsList, startProject, action);
+  });
 };
 
 const getPackageName = function (project) {

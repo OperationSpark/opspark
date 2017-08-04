@@ -39,7 +39,6 @@ const install = function () {
     console.log('We need some info, let\'s log into Github:');
     github.obtainAuthorization(install);
   } else {
-
     chooseClass('install', function (session, action) {
       let projectsList = session.PROJECT;
       projectsList.push({
@@ -59,47 +58,10 @@ const install = function () {
         });
       }, action);
     });
-
-    // greenlight.getSessions(null, function (sessions) {
-    //   greenlight.listEnrolledClasses(sessions, function (classes) {
-    //     selectClass(classes, 'install', function (err, className) {
-    //       const chosenClass = _.pickBy(sessions, obj => obj.name === className);
-    //       const session = Object.keys(chosenClass)[0];
-    //       const projects = chosenClass[session].PROJECT;
-    //       projects.push({
-    //         name: 'Lets Get Functional',
-    //       })
-    //       selectProject(projects, function (err, project) {
-    //         if (err) return console.log(err + ''.red);
-    //         installProject(project, null, function () {
-    //           console.log('Have fun!!!'.green);
-    //         });
-    //       }, 'install');
-    //     });
-    //   });
-    // });
   }
 };
 
 module.exports.install = install;
-
-const chooseProject = function(action, submitFlag, complete) {
-  greenlight.getSessions(null, function (sessions) {
-    greenlight.listEnrolledClasses(sessions, function (classes) {
-      selectClass(classes, 'install', function (err, className) {
-        const chosenClass = _.pickBy(sessions, obj => obj.name === className);
-        const session = Object.keys(chosenClass)[0];
-        const projects = chosenClass[session].PROJECT;
-        projects.push({
-          name: 'Lets Get Functional',
-        })
-        selectProject(projects, complete, action, submitFlag);
-      });
-    });
-  });
-}
-
-module.exports.chooseProject = chooseProject;
 
 const chooseClass = function(action, complete) {
   greenlight.getSessions(null, function (sessions) {
@@ -115,19 +77,6 @@ const chooseClass = function(action, complete) {
 }
 
 module.exports.chooseClass = chooseClass;
-
-function list(complete) {
-  console.log('Retrieving list of projects, please wait...'.green);
-  github.repos(function (err, repos) {
-    if (err) return complete(err);
-    var projects = repos.filter(function (repo) {
-      //console.log(repo.description.blue);
-      return /PROJECT::/.test(repo.description);
-    });
-    complete(null, projects);
-  });
-}
-module.exports.list = list;
 
 function selectClass(classes, action, complete) {
   async.waterfall([
@@ -202,7 +151,7 @@ function installProject(project, pairedWith, complete) {
   const projectsDirectory = `${rootDirectory}/projects`;
   if (!fs.existsSync(projectsDirectory)) mkdirp.sync(projectsDirectory);
   const projectDirectory = `${projectsDirectory}/${projectName}`;
-  if (fs.existsSync(projectDirectory)) return console.log('Project %s already installed! Please delete manually before reinstalling, or install another project.', projectName);
+  if (fs.existsSync(projectDirectory)) return console.log('Project %s already installed! Please delete manually before reinstalling, or install another project.'.red, projectName);
 
   console.log('Installing project %s, please wait...'.green, projectName);
   // TODO: change uri back to opspark github
@@ -293,6 +242,7 @@ function installBower(projectDirectory, complete) {
   });
 }
 module.exports.installBower = installBower;
+
 function removeGitRemnants(projectDirectory, complete) {
   const gitignore = `${projectDirectory}/.gitignore`
   if (fs.existsSync(gitignore)) { fs.unlinkSync(gitignore); }
@@ -330,36 +280,6 @@ function removeMaster(projectDirectory, complete) {
   });
 }
 module.exports.removeMaster = removeMaster;
-
-/*
- * uri should be something like:
- *      'https://github.com/jfraboni/jfraboni.github.io/trunk/projects/worm-hole'
- */
-function download(uri, complete) {
-  var deferred = Q.defer();
-  var projectsDirectory = rootDirectory + 'projects';
-  if (!fs.existsSync(projectsDirectory)) mkdirp.sync(projectsDirectory);
-
-  var project = url.parse(uri).pathname.split('/').pop();
-  var projectDirectory = `${projectsDirectory}/${project}`;
-
-  if (fs.existsSync(projectDirectory)) { throw new Error(util.format('Project already exists: Hmm, looks like this project is already installed, you can verify this by checking your projects directory for %s. If you want to re-install this project, run the command "os delete %s"', project, project)); }
-
-  var message = 'Downloading ' + project + ', please wait...';
-  console.log(message.green);
-  // TODO: remove '/branches/test' for future
-  var cmd = `svn checkout ${uri}/branches/test ${projectDirectory}`;
-  var child = exec(cmd, function (err, stdout, stderr) {
-    if (err) return deferred.reject(err);
-    message = project + ' downloaded to ' + projectDirectory;
-    console.log(message.green);
-    removeSvnRemnants(projectDirectory, function () {
-      deferred.resolve();
-    });
-  });
-  return deferred.promise.nodeify(complete);
-}
-module.exports.download = download;
 
 function loadOrCreateEntries() {
   return fsJson.loadSync(projectEntriesPath) || {projects: []};
