@@ -83,15 +83,14 @@ const chooseProject = function(action, submitFlag, complete) {
 
 module.exports.chooseProject = chooseProject;
 
-const chooseClass = function(action, submitFlag, complete) {
+const chooseClass = function(action, complete) {
   greenlight.getSessions(null, function (sessions) {
     greenlight.listEnrolledClasses(sessions, function (classes) {
       selectClass(classes, action, function (err, className) {
         const chosenClass = _.pickBy(sessions, obj => obj.name === className);
-        console.log(chosenClass);
         let session = Object.keys(chosenClass)[0];
         session = chosenClass[session];
-        complete(session, action, submitFlag, complete);
+        complete(session, action);
       });
     });
   });

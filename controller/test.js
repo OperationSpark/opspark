@@ -21,40 +21,45 @@ function test(options, submitFlag) {
   if (submitFlag) {
     action = 'submit';
   }
-  projects.chooseProject(action, submitFlag, grabTests);
 
-  // greenlight.getSessions(null, function (sessions) {
-  //   greenlight.listEnrolledClasses(sessions, function (classes) {
-  //     projects.selectClass(classes, action, function (err, className) {
-  //       const chosenClass = _.pickBy(sessions, obj => obj.name === className);
-  //       const session = Object.keys(chosenClass)[0];
-  //       let projectsList = chosenClass[session].PROJECT;
-  //       projectsList.push({
-  //         name: 'Lets Get Functional',
-  //       })
-  //       const testableProjects = findTestableProjects(projectsList);
-  //       projectsList = projectsList.reduce(function (seed, project) {
-  //         // const name = project.name.toLowerCase().replace(/\s/g, '-');
-  //         if (testableProjects.indexOf(changeCase.paramCase(project.name)) > -1) {
-  //           project._session = session;
-  //           seed.push(project);
-  //         }
-  //         return seed;
-  //       }, []);
-  //       projects.selectProject(projectsList, grabTests, action, submitFlag);
-  //     });
-  //   });
-  // });
+  projects.chooseClass(action, function(session, action) {
+    let projectsList = session.PROJECT;
+    projectsList.push({
+      name: 'Lets Get Functional',
+    })
+    projectsList = findTestableProjects(projectsList, session.sessionId).sort(function(a,b) {
+      if (a.name < b.name)
+        return -1;
+      if (a.name > b.name)
+        return 1;
+      return 0;
+    });
+
+    projects.selectProject(projectsList, grabTests, action, submitFlag);
+  });
 }
 
 module.exports.test = test;
 
-function findTestableProjects(projectsArray) {
-  const mappedProjects = _.map(projectsArray, function (e) {
+
+// Takes in projectsList
+// Creates mappedProjects, which is array of project names
+// Creates files, which is list of currently installed project names
+// Creates testableProjects, intersection of mappedProjects and files
+// Reduces and returns original projectsList to be only those in intersection
+function findTestableProjects(projectsList, session) {
+  const mappedProjects = _.map(projectsList, function (e) {
     return changeCase.paramCase(e.name);
   });
   const files = fs.readdirSync(projectsDirectory);
-  return _.intersection(mappedProjects, files);
+  const testableProjects = _.intersection(mappedProjects, files);
+  return projectsList.reduce(function (seed, project) {
+    if (testableProjects.indexOf(changeCase.paramCase(project.name)) > -1) {
+      project._session = session;
+      seed.push(project);
+    }
+    return seed;
+  }, []);
 }
 
 // Runs svn export to download the tests for the specific project
