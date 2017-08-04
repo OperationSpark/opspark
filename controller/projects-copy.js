@@ -40,7 +40,25 @@ const install = function () {
     github.obtainAuthorization(install);
   } else {
 
-    chooseProject('install', false, installProject);
+    chooseClass('install', function (session, action) {
+      let projectsList = session.PROJECT;
+      projectsList.push({
+        name: 'Lets Get Functional',
+      })
+      projectsList = projectsList.sort(function(a, b) {
+        if (a.name < b.name)
+          return -1;
+        if (a.name > b.name)
+          return 1;
+        return 0;
+      });
+
+      selectProject(projectsList, function (project) {
+        installProject(project, null, function () {
+          console.log('Have fun!!!'.green);
+        });
+      }, action);
+    });
 
     // greenlight.getSessions(null, function (sessions) {
     //   greenlight.listEnrolledClasses(sessions, function (classes) {
