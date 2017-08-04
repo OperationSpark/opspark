@@ -39,49 +39,49 @@ const install = function () {
     console.log('We need some info, let\'s log into Github:');
     github.obtainAuthorization(install);
   } else {
-    greenlight.getSessions(null, function (sessions) {
-      greenlight.listEnrolledClasses(sessions, function (classes) {
-        selectClass(classes, 'install', function (err, className) {
-          const chosenClass = _.pickBy(sessions, obj => obj.name === className);
-          const session = Object.keys(chosenClass)[0];
-          const projects = chosenClass[session].PROJECT;
-          projects.push({
-            name: 'Lets Get Functional',
-          })
-          selectProject(projects, function (err, project) {
-            if (err) return console.log(err + ''.red);
-            installProject(project, null, function () {
-              console.log('Have fun!!!'.green);
-            });
-          }, 'install');
-        });
-      });
-    });
+
+    chooseProject('install', false, installProject);
+
+    // greenlight.getSessions(null, function (sessions) {
+    //   greenlight.listEnrolledClasses(sessions, function (classes) {
+    //     selectClass(classes, 'install', function (err, className) {
+    //       const chosenClass = _.pickBy(sessions, obj => obj.name === className);
+    //       const session = Object.keys(chosenClass)[0];
+    //       const projects = chosenClass[session].PROJECT;
+    //       projects.push({
+    //         name: 'Lets Get Functional',
+    //       })
+    //       selectProject(projects, function (err, project) {
+    //         if (err) return console.log(err + ''.red);
+    //         installProject(project, null, function () {
+    //           console.log('Have fun!!!'.green);
+    //         });
+    //       }, 'install');
+    //     });
+    //   });
+    // });
   }
 };
 
 module.exports.install = install;
 
-// Gets list of projects currently installed
-function listProjectsOf(username) {
-  var deferred = Q.defer();
-  var userRepo = username + '/' + username + '.github.io';
-  var url = 'https://raw.githubusercontent.com/' + userRepo + '/master/projects/projects.json';
-
-  var options = {
-    url: url,
-    headers: {
-      'User-Agent': config.userAgent
-    }
-  };
-  var onResponse = function (err, response, body) {
-    if (err) deferred.reject(err);
-    else deferred.resolve(JSON.parse(body).projects);
-  };
-  request(options, onResponse);
-  return deferred.promise;
+const chooseProject = function(action, submitFlag, complete) {
+  greenlight.getSessions(null, function (sessions) {
+    greenlight.listEnrolledClasses(sessions, function (classes) {
+      selectClass(classes, 'install', function (err, className) {
+        const chosenClass = _.pickBy(sessions, obj => obj.name === className);
+        const session = Object.keys(chosenClass)[0];
+        const projects = chosenClass[session].PROJECT;
+        projects.push({
+          name: 'Lets Get Functional',
+        })
+        selectProject(projects, complete, action, submitFlag);
+      });
+    });
+  });
 }
-module.exports.listProjectsOf = listProjectsOf;
+
+module.exports.chooseProject = chooseProject;
 
 function list(complete) {
   console.log('Retrieving list of projects, please wait...'.green);
@@ -155,7 +155,7 @@ function selectProject(projects, complete, action, flag) {
         default: true
       }],
       function (confirm) {
-        if (confirm.install) return complete(null, project, flag);
+        if (confirm.install) return complete(project, flag);
         selectProject(projects, complete, action, flag);
       });
     },
@@ -218,7 +218,7 @@ function initializeProject(project, pairedWith, projectDirectory, complete) {
     function (err, result){
       if (err) return console.log(err + ''.red);
       console.log('Installation of project %s complete!'.blue, project.name);
-      complete();
+      // complete();
     }
   );
 }

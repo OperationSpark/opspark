@@ -21,28 +21,30 @@ function test(options, submitFlag) {
   if (submitFlag) {
     action = 'submit';
   }
-  greenlight.getSessions(null, function (sessions) {
-    greenlight.listEnrolledClasses(sessions, function (classes) {
-      projects.selectClass(classes, action, function (err, className) {
-        const chosenClass = _.pickBy(sessions, obj => obj.name === className);
-        const session = Object.keys(chosenClass)[0];
-        let projectsList = chosenClass[session].PROJECT;
-        projectsList.push({
-          name: 'Lets Get Functional',
-        })
-        const testableProjects = findTestableProjects(projectsList);
-        projectsList = projectsList.reduce(function (seed, project) {
-          // const name = project.name.toLowerCase().replace(/\s/g, '-');
-          if (testableProjects.indexOf(changeCase.paramCase(project.name)) > -1) {
-            project._session = session;
-            seed.push(project);
-          }
-          return seed;
-        }, []);
-        projects.selectProject(projectsList, grabTests, action, submitFlag);
-      });
-    });
-  });
+  projects.chooseProject(action, submitFlag, grabTests);
+
+  // greenlight.getSessions(null, function (sessions) {
+  //   greenlight.listEnrolledClasses(sessions, function (classes) {
+  //     projects.selectClass(classes, action, function (err, className) {
+  //       const chosenClass = _.pickBy(sessions, obj => obj.name === className);
+  //       const session = Object.keys(chosenClass)[0];
+  //       let projectsList = chosenClass[session].PROJECT;
+  //       projectsList.push({
+  //         name: 'Lets Get Functional',
+  //       })
+  //       const testableProjects = findTestableProjects(projectsList);
+  //       projectsList = projectsList.reduce(function (seed, project) {
+  //         // const name = project.name.toLowerCase().replace(/\s/g, '-');
+  //         if (testableProjects.indexOf(changeCase.paramCase(project.name)) > -1) {
+  //           project._session = session;
+  //           seed.push(project);
+  //         }
+  //         return seed;
+  //       }, []);
+  //       projects.selectProject(projectsList, grabTests, action, submitFlag);
+  //     });
+  //   });
+  // });
 }
 
 module.exports.test = test;
@@ -58,7 +60,7 @@ function findTestableProjects(projectsArray) {
 // Runs svn export to download the tests for the specific project
 // and places them in the correct directory
 // Then calls setEnv
-function grabTests(err, project, submitFlag) {
+function grabTests(project, submitFlag) {
   const name = changeCase.paramCase(project.name);
   const directory = `${projectsDirectory}/${name}/test`;
   console.log(`Downloading tests for ${name}. . .`.green);

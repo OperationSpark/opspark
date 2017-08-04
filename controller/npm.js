@@ -30,10 +30,7 @@ module.exports.install = function () {
         projectsList.push({
           name: 'Lets Get Functional',
         })
-        projects.selectProject(projectsList, function (error, project) {
-          if (err) return console.log(err + ''.red);
-          getPackageName(project);
-        }, 'install');
+        projects.selectProject(projectsList, getPackageName, 'install');
       });
     });
   });

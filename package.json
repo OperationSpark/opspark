@@ -1,6 +1,6 @@
 {
   "name": "fopspark",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "A node utility supporting installation and configuration of operation spark projects",
   "main": "index.js",
   "scripts": {
