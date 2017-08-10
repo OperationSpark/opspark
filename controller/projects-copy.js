@@ -1,10 +1,7 @@
 'use strict';
 
 var
-  config = require('../config'),
   _ = require('lodash'),
-  util = require('util'),
-  Q = require('q'),
   fsJson = require('fs-json')(),
   changeCase = require('change-case'),
   async = require('async'),
@@ -14,10 +11,7 @@ var
   inquirer = require('inquirer'),
   colors = require('colors'),
   fs = require('fs'),
-  url = require('url'),
   exec = require('child_process').exec,
-  request = require('request'),
-  rp = require('request-promise'),
   mkdirp = require('mkdirp'),
   rimraf = require('rimraf'),
   cancelOption = '[cancel]',
@@ -43,12 +37,14 @@ const install = function () {
       let projectsList = session.PROJECT;
       projectsList.push({
         name: 'Lets Get Functional',
-      })
-      projectsList = projectsList.sort(function(a, b) {
-        if (a.name < b.name)
+      });
+      projectsList = projectsList.sort(function (a, b) {
+        if (a.name < b.name) {
           return -1;
-        if (a.name > b.name)
+        }
+        if (a.name > b.name) {
           return 1;
+        }
         return 0;
       });
 
@@ -63,7 +59,7 @@ const install = function () {
 
 module.exports.install = install;
 
-const chooseClass = function(action, complete) {
+const chooseClass = function (action, complete) {
   greenlight.getSessions(null, function (sessions) {
     greenlight.listEnrolledClasses(sessions, function (classes) {
       selectClass(classes, action, function (err, className) {
@@ -74,7 +70,7 @@ const chooseClass = function(action, complete) {
       });
     });
   });
-}
+};
 
 module.exports.chooseClass = chooseClass;
 
@@ -164,7 +160,7 @@ function installProject(project, pairedWith, complete) {
   // uri = `${uri}/trunk --password ${authToken}`;
 
   const cmd = `svn co ${uri} ${projectDirectory}`;
-  const child = exec(cmd, function (err, stdout, stderr) {
+  exec(cmd, function (err) {
     if (err) return complete(err);
     console.log('Successfully cloned project!'.green);
     initializeProject(project, pairedWith, projectDirectory, complete);
@@ -197,10 +193,10 @@ function initializeProject(project, pairedWith, projectDirectory, complete) {
         appendProjectEntry(project, pairedWith, next);
       },
     ],
-    function (err, result){
+    function (err, result) {
       if (err) return console.log(err + ''.red);
       console.log('Installation of project %s complete!'.blue, project.name);
-      // complete();
+      complete();
     }
   );
 }
@@ -210,13 +206,13 @@ module.exports.initializeProject = initializeProject;
 // include the project's _id property.
 // Update the check for already installed to search for this _id.
 function appendProjectEntry(project, pairedWith, complete) {
-  var projectEntries = loadOrCreateEntries();
-  var e = _.filter(projectEntries.projects, { 'name': project.name})[0];
+  const projectEntries = loadOrCreateEntries();
+  const e = _.filter(projectEntries.projects, { name: project.name })[0];
   if (e) {
     console.log('Project entry exists for %s, skipping entry...'.green, project.name);
     return complete();
   }
-  var entry = {
+  const entry = {
     name: project.name,
     title: changeCase.titleCase(project.name),
     description: project.desc,
@@ -233,8 +229,7 @@ module.exports.appendProjectEntry = appendProjectEntry;
 function installBower(projectDirectory, complete) {
   if (!fs.existsSync(`${projectDirectory}/bower.json`)) return complete();
   console.log('Installing bower components, please wait...'.green);
-  var exec = require('child_process').exec;
-  var child = exec(`cd ${projectDirectory} && bower install -F`, function (err, stdout, stderr) {
+  exec(`cd ${projectDirectory} && bower install -F`, function (err, stdout) {
     if (err) throw err;
     console.log(stdout);
     console.log('Bower components installed for project %s!'.green, projectDirectory);
@@ -244,7 +239,7 @@ function installBower(projectDirectory, complete) {
 module.exports.installBower = installBower;
 
 function removeGitRemnants(projectDirectory, complete) {
-  const gitignore = `${projectDirectory}/.gitignore`
+  const gitignore = `${projectDirectory}/.gitignore`;
   if (fs.existsSync(gitignore)) { fs.unlinkSync(gitignore); }
   rimraf(`${projectDirectory}/.git`, function (err) {
     if (err) return console.log(err);
@@ -282,6 +277,6 @@ function removeMaster(projectDirectory, complete) {
 module.exports.removeMaster = removeMaster;
 
 function loadOrCreateEntries() {
-  return fsJson.loadSync(projectEntriesPath) || {projects: []};
+  return fsJson.loadSync(projectEntriesPath) || { projects: [] };
 }
 module.exports.loadOrCreateEntries = loadOrCreateEntries;

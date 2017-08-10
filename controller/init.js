@@ -17,7 +17,6 @@ module.exports.portfolioScript = portfolioScript;
 
 function login() {
   github.obtainAuthorization(function(err) {
-    console.log(err);
     if (err) {
       console.log('Let\'s try again.'.blue);
       login();

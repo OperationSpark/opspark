@@ -90,24 +90,24 @@ module.exports.login = function () {
  *      a. add a timestamp to the hostname.
  */
 function authorize(username, complete) {
-    var note = getNoteForHost();
-    var cmd = 'curl https://api.github.com/authorizations --user "' + username + '" --data \'{"scopes":["public_repo", "repo", "gist"],"note":"' + note + '","note_url":"https://www.npmjs.com/package/opspark"}\'';
-    exec(cmd, function(err, stdout, stderr) {
-      if (stdout.indexOf('token') > -1) {
-        try {
-          _auth = JSON.parse(stdout);
-        } catch (err) {
-          return complete(true);
-        }
-        console.log('GitHub login succeeded!'.green);
-        writeToken(_auth);
-        obtainAndWriteUser(username);
-      } else {
-        console.log('There was an error with your credentials.'.red);
+  var note = getNoteForHost();
+  var cmd = 'curl https://api.github.com/authorizations --user "' + username + '" --data \'{"scopes":["public_repo", "repo", "gist"],"note":"' + note + '","note_url":"https://www.npmjs.com/package/opspark"}\'';
+  exec(cmd, function(err, stdout, stderr) {
+    if (stdout.indexOf('token') > -1) {
+      try {
+        _auth = JSON.parse(stdout);
+      } catch (err) {
         return complete(true);
       }
-      complete(null, _auth);
-    });
+      console.log('GitHub login succeeded!'.green);
+      writeToken(_auth);
+      obtainAndWriteUser(username);
+    } else {
+      console.log('There was an error with your credentials.'.red);
+      return complete(true);
+    }
+    complete(null, _auth);
+  });
 }
 module.exports.authorize = authorize;
 
