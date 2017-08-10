@@ -339,3 +339,10 @@ function loadOrCreateEntries() {
   return fsJson.loadSync(projectEntriesPath) || { projects: [] };
 }
 module.exports.loadOrCreateEntries = loadOrCreateEntries;
+
+function shelve() {
+  console.log('Shelve a project');
+
+}
+
+module.exports.shelve = shelve;
