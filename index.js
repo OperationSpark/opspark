@@ -49,8 +49,13 @@ program
   .action(projects.install);
 
 program
+  .command('shelve')
+  .description('Save previous work in a project in order to begin anew.')
+  .action(projects.shelve);
+
+program
   .command('uninstall')
-  .description('List installable projects.')
+  .description('Remove an installed project.')
   .action(projects.uninstall);
 
 program
