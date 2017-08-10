@@ -59,6 +59,32 @@ const install = function () {
 
 module.exports.install = install;
 
+const uninstall = function () {
+  chooseClass('uninstall', function (session, action) {
+    let projectsList = session.PROJECT;
+    projectsList.push({
+      name: 'Lets Get Functional',
+    });
+    projectsList = projectsList.sort(function (a, b) {
+      if (a.name < b.name) {
+        return -1;
+      }
+      if (a.name > b.name) {
+        return 1;
+      }
+      return 0;
+    });
+
+    selectProject(projectsList, function (project) {
+      uninstallProject(project, null, function () {
+        console.log('Have fun!!!'.green);
+      });
+    }, action);
+  });
+};
+
+module.exports.uninstall = uninstall;
+
 const chooseClass = function (action, complete) {
   greenlight.getSessions(null, function (sessions) {
     greenlight.listEnrolledClasses(sessions, function (classes) {
@@ -167,6 +193,17 @@ function installProject(project, pairedWith, complete) {
   });
 }
 module.exports.installProject = installProject;
+
+function uninstallProject(project, pairedWith, complete) {
+  inquirer.prompt({
+    type: 'confirm',
+    name: 'delete',
+    message: `Are you sure you want to delete ${project.name}? This cannot be undone.`.bgRed,
+  }, function (confirm) {
+    console.log(confirm);
+  });
+}
+module.exports.uninstallProject = uninstallProject;
 
 function initializeProject(project, pairedWith, projectDirectory, complete) {
   async.series(
