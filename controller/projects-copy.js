@@ -66,17 +66,15 @@ const uninstall = function () {
     projectsList.push({
       name: 'Lets Get Functional',
     });
-    projectsList = test.findAvailableProjects(projectsList, session.sessionId).sort(function(a, b) {
-      if (a.name < b.name)
-        return -1;
-      if (a.name > b.name)
-        return 1;
+    projectsList = test.findAvailableProjects(projectsList, session.sessionId).sort(function (a, b) {
+      if (a.name < b.name) return -1;
+      if (a.name > b.name) return 1;
       return 0;
     });
 
     selectProject(projectsList, function (project) {
       uninstallProject(project, null, function () {
-        console.log('Have fun!!!'.green);
+        console.log('All done!'.green);
       });
     }, action);
   });
@@ -125,7 +123,7 @@ function selectClass(classes, action, complete) {
       }],
       function (confirm) {
         if (confirm.install) return complete(null, response.class);
-        selectClass(classes, complete);
+        selectClass(classes, action, complete);
       });
     },
   ]);
@@ -202,11 +200,14 @@ function uninstallProject(project, pairedWith, complete) {
     if (confirm.delete) {
       const name = changeCase.paramCase(project.name);
       const projectDirectory = `${rootDirectory}/projects/${name}`;
-      console.log(projectDirectory);
+      console.log('Removing entry from projects.json. . .'.red);
+      removeProjectEntry(project);
+      console.log('Successfully removed!'.red);
+      console.log('Removing project directory. . .'.red);
       exec(`rm -rf ${projectDirectory}`, function() {
-        console.log('great');
+        console.log('Successfully removed!'.red);
+        complete();
       })
-      complete();
     } else {
       console.log('Delete aborted'.blue);
     }
@@ -274,7 +275,14 @@ module.exports.appendProjectEntry = appendProjectEntry;
 
 function removeProjectEntry(project) {
   const projectEntries = loadOrCreateEntries();
-  console.log(projectEntries);
+  const index = projectEntries.projects.reduce(function (s, p, i) {
+    if (p.name === project.name) {
+      return i;
+    }
+    return s;
+  }, -1);
+  projectEntries.projects.splice(index, 1);
+  fsJson.saveSync(projectEntriesPath, projectEntries);
 }
 
 function installBower(projectDirectory, complete) {
