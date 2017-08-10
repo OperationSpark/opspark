@@ -141,7 +141,7 @@ function runTests(project, submitFlag) {
     const stats = obj.stats;
     console.log(` Total tests:    ${stats.tests}  `.bgBlack.white);
     console.log(` Passing tests:  ${stats.passes}  `.bgBlue.white);
-    console.log(` Pending tests:  ${stats.pending}  `.bgYellow.black);
+    console.log(` Pending tests:  ${stats.pending}  `.bgYellow.white);
     console.log(` Failing tests: ${stats.failures}  `.bgRed.white);
     if (submitFlag) {
       submit.checkGrade(project, stats);
