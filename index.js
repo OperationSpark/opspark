@@ -49,6 +49,11 @@ program
   .action(projects.install);
 
 program
+  .command('uninstall')
+  .description('List installable projects.')
+  .action(projects.uninstall);
+
+program
   .option('-m, --master', 'Keep master files')
   .command('pairup')
   .description('Installs a project for pair programming. The workspace owner will be asked to provide the GitHub username of their partner.')
