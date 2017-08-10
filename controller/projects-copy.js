@@ -7,6 +7,7 @@ var
   async = require('async'),
   github = require('./github'),
   greenlight = require('./greenlight'),
+  test = require('./test'),
   program = require('commander'),
   inquirer = require('inquirer'),
   colors = require('colors'),
@@ -65,13 +66,11 @@ const uninstall = function () {
     projectsList.push({
       name: 'Lets Get Functional',
     });
-    projectsList = projectsList.sort(function (a, b) {
-      if (a.name < b.name) {
+    projectsList = test.findAvailableProjects(projectsList, session.sessionId).sort(function(a, b) {
+      if (a.name < b.name)
         return -1;
-      }
-      if (a.name > b.name) {
+      if (a.name > b.name)
         return 1;
-      }
       return 0;
     });
 
@@ -200,7 +199,17 @@ function uninstallProject(project, pairedWith, complete) {
     name: 'delete',
     message: `Are you sure you want to delete ${project.name}? This cannot be undone.`.bgRed,
   }, function (confirm) {
-    console.log(confirm);
+    if (confirm.delete) {
+      const name = changeCase.paramCase(project.name);
+      const projectDirectory = `${rootDirectory}/projects/${name}`;
+      console.log(projectDirectory);
+      exec(`rm -rf ${projectDirectory}`, function() {
+        console.log('great');
+      })
+      complete();
+    } else {
+      console.log('Delete aborted'.blue);
+    }
   });
 }
 module.exports.uninstallProject = uninstallProject;
@@ -262,6 +271,11 @@ function appendProjectEntry(project, pairedWith, complete) {
   complete();
 }
 module.exports.appendProjectEntry = appendProjectEntry;
+
+function removeProjectEntry(project) {
+  const projectEntries = loadOrCreateEntries();
+  console.log(projectEntries);
+}
 
 function installBower(projectDirectory, complete) {
   if (!fs.existsSync(`${projectDirectory}/bower.json`)) return complete();
