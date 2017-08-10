@@ -27,7 +27,7 @@ function test(options, submitFlag) {
     projectsList.push({
       name: 'Lets Get Functional',
     })
-    projectsList = findTestableProjects(projectsList, session.sessionId).sort(function(a, b) {
+    projectsList = findAvailableProjects(projectsList, session.sessionId).sort(function(a, b) {
       if (a.name < b.name)
         return -1;
       if (a.name > b.name)
@@ -47,7 +47,7 @@ module.exports.test = test;
 // Creates files, which is list of currently installed project names
 // Creates testableProjects, intersection of mappedProjects and files
 // Reduces and returns original projectsList to be only those in intersection
-function findTestableProjects(projectsList, session) {
+function findAvailableProjects(projectsList, session) {
   const mappedProjects = _.map(projectsList, function (e) {
     return changeCase.paramCase(e.name);
   });
@@ -61,6 +61,8 @@ function findTestableProjects(projectsList, session) {
     return seed;
   }, []);
 }
+
+module.exports.findAvailableProjects = findAvailableProjects;
 
 // Runs svn export to download the tests for the specific project
 // and places them in the correct directory
