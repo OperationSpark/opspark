@@ -200,9 +200,7 @@ function uninstallProject(project, pairedWith, complete) {
     if (confirm.delete) {
       const name = changeCase.paramCase(project.name);
       const projectDirectory = `${rootDirectory}/projects/${name}`;
-      console.log('Removing entry from projects.json. . .'.red);
       removeProjectEntry(project);
-      console.log('Successfully removed!'.red);
       console.log('Removing project directory. . .'.red);
       exec(`rm -rf ${projectDirectory}`, function() {
         console.log('Successfully removed!'.red);
@@ -274,6 +272,7 @@ function appendProjectEntry(project, pairedWith, complete) {
 module.exports.appendProjectEntry = appendProjectEntry;
 
 function removeProjectEntry(project) {
+  console.log('Removing entry from projects.json. . .'.red);
   const projectEntries = loadOrCreateEntries();
   const index = projectEntries.projects.reduce(function (s, p, i) {
     if (p.name === project.name) {
@@ -283,6 +282,7 @@ function removeProjectEntry(project) {
   }, -1);
   projectEntries.projects.splice(index, 1);
   fsJson.saveSync(projectEntriesPath, projectEntries);
+  console.log('Successfully removed!'.red);
 }
 
 function installBower(projectDirectory, complete) {
@@ -342,7 +342,45 @@ module.exports.loadOrCreateEntries = loadOrCreateEntries;
 
 function shelve() {
   console.log('Shelve a project');
+  chooseClass('shelve', function (session, action) {
+    let projectsList = session.PROJECT;
 
+    projectsList.push({
+      name: 'Lets Get Functional',
+    });
+    projectsList = test.findAvailableProjects(projectsList, session.sessionId);
+    projectsList = projectsList.sort(function (a, b) {
+      if (a.name < b.name) return -1;
+      if (a.name > b.name) return 1;
+      return 0;
+    });
+
+    selectProject(projectsList, function (project) {
+      shelveProject(project, null, function (pwd) {
+        console.log('Successfully shelved project! Now available at:'.green);
+        console.log(pwd.blue);
+      });
+    }, action);
+  });
 }
 
 module.exports.shelve = shelve;
+
+function shelveProject(project, partner, complete) {
+  console.log('Fetching directory. . .'.yellow);
+  removeProjectEntry(project);
+  const name = changeCase.paramCase(project.name);
+  const path = `${rootDirectory}/projects`;
+  const underscores = fs.readdirSync(path).reduce((s, c) => {
+    if (c.indexOf(name) > -1) {
+      const u = c.replace(/(_)|[^]/g, '$1');
+      return u.length > s.length ? u : s;
+    }
+    return s;
+  }, '');
+  const cmd = `mv ${path}/${name} ${path}/${underscores}_${name}`;
+  console.log('Shelving project. . .'.yellow);
+  exec(cmd, function () {
+    complete(`${path}/${underscores}_${name}`);
+  });
+}
