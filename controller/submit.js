@@ -5,7 +5,7 @@ var
   github = require('./github'),
   greenlight = require('./greenlight'),
   test = require('./test'),
-  projects = require('./projects-copy'),
+  projects = require('./projects'),
   program = require('commander'),
   inquirer = require('inquirer'),
   colors = require('colors'),

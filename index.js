@@ -9,7 +9,7 @@ var
   github = require('./controller/github'),
   greenlight = require('./controller/greenlight'),
   npm = require('./controller/npm'),
-  projects = require('./controller/projects-copy'),
+  projects = require('./controller/projects'),
   test = require('./controller/test'),
   submit = require('./controller/submit'),
   janitor = require('./controller/janitor'),

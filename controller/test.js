@@ -4,7 +4,7 @@ const _ = require('lodash');
 const changeCase = require('change-case');
 const github = require('./github');
 const greenlight = require('./greenlight');
-const projects = require('./projects-copy');
+const projects = require('./projects');
 const submit = require('./submit');
 const fs = require('fs');
 const exec = require('child_process').exec;
@@ -151,10 +151,13 @@ function runTests(project, submitFlag) {
       const failures = obj.failures;
       failures.forEach(function (currentTest, i) {
         const whichTest = currentTest.fullTitle;
-        const stackLineOne = currentTest.err.stack.split('\n')[0];
+        const stack = currentTest.err.stack.split('\n');
+        const stackLineOne = stack[0];
+        const stackLineTwo = stack[1];
         const errorInfo = stackLineOne.slice(stackLineOne.indexOf(':'));
         console.log(`${i + 1}) ${whichTest}`.red.bold.underline);
         console.log(`> > > ${errorInfo}`.grey);
+        console.log(`> > > ${stackLineTwo}`.grey);
       });
     } else {
       console.log('You did it! 100% complete, now please run'.green, 'os submit'.red);
