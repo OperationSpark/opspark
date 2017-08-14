@@ -174,13 +174,13 @@ function installProject(project, pairedWith, complete) {
 
   console.log('Installing project %s, please wait...'.green, projectName);
   // TODO: change uri back to opspark github
-  let uri = `https://github.com/livrush/${projectName}`;
-  // let uri = `https://github.com/OperationSpark/${projectName}`;
+  // let uri = `https://github.com/livrush/${projectName}`;
+  let uri = `https://github.com/OperationSpark/${projectName}`;
   console.log('Cloning %s, please wait...'.green, uri);
 
   // TODO: change /branches/test to /trunk
-  uri = `${uri}/branches/test --password ${authToken}`;
-  // uri = `${uri}/trunk --password ${authToken}`;
+  // uri = `${uri}/branches/test --password ${authToken}`;
+  uri = `${uri}/trunk --password ${authToken}`;
 
   const cmd = `svn co ${uri} ${projectDirectory}`;
   exec(cmd, function (err) {
