@@ -258,7 +258,7 @@ function appendProjectEntry(project, pairedWith, complete) {
     return complete();
   }
   const entry = {
-    name: project.name,
+    name: changeCase.paramCase(project.name),
     title: changeCase.titleCase(project.name),
     description: project.desc,
     date: new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', }),
