@@ -63,19 +63,19 @@ module.exports.down = down;
 
 function listPartneredProjects(projects) {
     var deferred = Q.defer();
-    var pairedOnProjects = _.where(projects, { 'pairedWith': [_session.username] });
+    var pairedOnProjects = _.filter(projects, { 'pairedWith': [_session.username] });
     
     inquirer.prompt([{
         type: "list",
         name: "project",
         message: "Select from the projects you paired on, the one you wish to install",
-        choices: _.pluck(pairedOnProjects, 'title').concat(cancelOption)}], 
+        choices: _.map(pairedOnProjects, 'title').concat(cancelOption)}], 
         function(response) {
             if(response.project === cancelOption) {
                 console.log('Installation cancelled, bye bye!'.green);
                 process.exit();
             }
-            var pairedProject = _.where(pairedOnProjects, {'title': response.project})[0];
+            var pairedProject = _.filter(pairedOnProjects, {'title': response.project})[0];
             _session.pairedProject = pairedProject;
             deferred.resolve(_session.partnerRepo + '/trunk/projects/' + pairedProject.name);
     });

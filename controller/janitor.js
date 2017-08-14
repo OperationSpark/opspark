@@ -23,7 +23,7 @@ module.exports.fix = function (complete) {
                         if (!fs.existsSync(path + '/index.html')) {
                             return console.log('No index.html file found in %s, possibly not a valid Operation Spark project or somethings outta wack, check it out manually. Skipping...'.green, path);
                         }
-                        var project = _.where(list, { 'name': file})[0];
+                        var project = _.filter(list, { 'name': file})[0];
                         if (project) {
                             projects.initializeProject(project, null, path, function() {
                                 console.log('All done checking project %s!'.green, project.name);
