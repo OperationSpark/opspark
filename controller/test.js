@@ -72,11 +72,10 @@ function grabTests(project, submitFlag) {
   const directory = `${projectsDirectory}/${name}/test`;
   console.log(`Downloading tests for ${name}. . .`.green);
   // TODO: swap livrush to opspark
-  const uri = `https://github.com/livrush/${name}`;
-  // const uri = `https://github.com/OperationSpark/${project}`;
+  // const uri = `https://github.com/livrush/${name}`;
   const token = github.grabLocalToken();
   // TODO: swap branches/test to trunk
-  const cmd = `svn export ${uri}/branches/test/test ${directory} --password ${token}`;
+  const cmd = `svn export ${project.url}/trunk/test ${directory} --password ${token}`;
   // const cmd = `svn export ${uri}/trunk/test ${projectsDirectory}/${project} --password ${token}`
   if (fs.existsSync(directory)) {
     console.log('Skipping tests.'.green);
