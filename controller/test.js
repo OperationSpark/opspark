@@ -23,10 +23,8 @@ function test(options, submitFlag) {
   }
 
   projects.chooseClass(action, function(session, action) {
+    console.log('Here I am')
     let projectsList = session.PROJECT;
-    projectsList.push({
-      name: 'Lets Get Functional',
-    })
     projectsList = findAvailableProjects(projectsList, session.sessionId).sort(function(a, b) {
       if (a.name < b.name)
         return -1;
@@ -34,6 +32,30 @@ function test(options, submitFlag) {
         return 1;
       return 0;
     });
+
+    projectsList.push(
+      {
+        _id: 'H5jymW66LEvSQRo4Q',
+        _session: 'vJ3hbkCCwbei343Hz',
+        name: 'Let\'s Get Functional',
+        desc: 'An exercise in problem solving in the functional idiom',
+        url: 'https://github.com/OperationSpark/lets-get-functional',
+      },
+      {
+        _id: 'T5LMsegDbMaSr8Z9K',
+        _session: 'vJ3hbkCCwbei343Hz',
+        name: 'Portfolio Page',
+        desc: 'Add a portfolio page to your website project',
+        url: 'https://github.com/livrush/portfolio/branches/test/test'
+      },
+      {
+        _id: 'Xe7HfMW7P5YipdZMc',
+        _session: 'vJ3hbkCCwbei343Hz',
+        name: 'First Website',
+        desc: 'A client-side web project into which we\'ll install many projects',
+        url: 'https://github.com/livrush/first-website/branches/test/test',
+      }
+    );
 
     projects.selectProject(projectsList, grabTests, action, submitFlag);
   });
@@ -69,14 +91,11 @@ module.exports.findAvailableProjects = findAvailableProjects;
 // Then calls setEnv
 function grabTests(project, submitFlag) {
   const name = changeCase.paramCase(project.name);
+  const repo = `${project.url}/trunk/test`;
   const directory = `${projectsDirectory}/${name}/test`;
   console.log(`Downloading tests for ${name}. . .`.green);
-  // TODO: swap livrush to opspark
-  // const uri = `https://github.com/livrush/${name}`;
   const token = github.grabLocalToken();
-  // TODO: swap branches/test to trunk
-  const cmd = `svn export ${project.url}/trunk/test ${directory} --password ${token}`;
-  // const cmd = `svn export ${uri}/trunk/test ${projectsDirectory}/${project} --password ${token}`
+  const cmd = `svn export ${repo} ${directory} --password ${token}`;
   if (fs.existsSync(directory)) {
     console.log('Skipping tests.'.green);
     setEnv(project, submitFlag);
