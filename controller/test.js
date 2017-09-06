@@ -10,7 +10,6 @@ const fs = require('fs');
 const colors = require('colors');
 const exec = require('child_process').exec;
 const env = require('./env');
-
 const rootDirectory = `${env.home()}/workspace`;
 const projectsDirectory = `${rootDirectory}/projects`;
 
@@ -23,39 +22,37 @@ function test(options, submitFlag) {
     action = 'submit';
   }
 
-  projects.chooseClass(action, function(session, action) {
+  projects.chooseClass(action, function (session, action) {
     let projectsList = session.PROJECT;
-    projectsList = findAvailableProjects(projectsList, session.sessionId).sort(function(a, b) {
-      if (a.name < b.name)
-        return -1;
-      if (a.name > b.name)
-        return 1;
+    projectsList = findAvailableProjects(projectsList, session.sessionId).sort(function (a, b) {
+      if (a.name < b.name) return -1;
+      if (a.name > b.name) return 1;
       return 0;
     });
 
-    projectsList.push(
-      {
-        _id: 'H5jymW66LEvSQRo4Q',
-        _session: 'vJ3hbkCCwbei343Hz',
-        name: 'Let\'s Get Functional',
-        desc: 'An exercise in problem solving in the functional idiom',
-        url: 'https://github.com/OperationSpark/lets-get-functional',
-      },
-      {
-        _id: 'T5LMsegDbMaSr8Z9K',
-        _session: 'vJ3hbkCCwbei343Hz',
-        name: 'Portfolio Page',
-        desc: 'Add a portfolio page to your website project',
-        url: 'https://github.com/OperationSpark/portfolio'
-      },
-      {
-        _id: 'Xe7HfMW7P5YipdZMc',
-        _session: 'vJ3hbkCCwbei343Hz',
-        name: 'First Website',
-        desc: 'A client-side web project into which we\'ll install many projects',
-        url: 'https://github.com/OperationSpark/first-website',
-      }
-    );
+    // projectsList.push(
+    //   {
+    //     _id: 'H5jymW66LEvSQRo4Q',
+    //     _session: 'vJ3hbkCCwbei343Hz',
+    //     name: 'Let\'s Get Functional',
+    //     desc: 'An exercise in problem solving in the functional idiom',
+    //     url: 'https://github.com/OperationSpark/lets-get-functional',
+    //   },
+    //   {
+    //     _id: 'T5LMsegDbMaSr8Z9K',
+    //     _session: 'vJ3hbkCCwbei343Hz',
+    //     name: 'Portfolio Page',
+    //     desc: 'Add a portfolio page to your website project',
+    //     url: 'https://github.com/OperationSpark/portfolio'
+    //   },
+    //   {
+    //     _id: 'Xe7HfMW7P5YipdZMc',
+    //     _session: 'vJ3hbkCCwbei343Hz',
+    //     name: 'First Website',
+    //     desc: 'A client-side web project into which we\'ll install many projects',
+    //     url: 'https://github.com/OperationSpark/first-website',
+    //   }
+    // );
 
     projects.selectProject(projectsList, grabTests, action, submitFlag);
   });
@@ -117,37 +114,6 @@ function grabTests(project, submitFlag) {
   }
 }
 
-// Originally a part of runTests
-// Combines project name to the project directory
-// Makes command to enter project directory
-// Makes command to install npm dependencies
-// Attempted to use node's process module to change directory, did not work
-// Attempts to run both commands together with promisified child_process
-// If error, runs postTestCleanup to delete new directories so students can't have them
-// If no error, calls runTests function
-// function setEnv(project, submitFlag) {
-//   const name = changeCase.paramCase(project.name);
-//   const directory = `${projectsDirectory}/${name}/node_modules`;
-//   console.log('Installing dependencies. . .'.green);
-//   // const directory = `${projectsDirectory}/${name}/`;
-//   const enterDirectory = `cd ${projectsDirectory}/${name}/`;
-//   const installDependencies = 'npm install';
-//   const cmd = `${enterDirectory} && ${installDependencies}`;
-//   if (fs.existsSync(directory)) {
-//     console.log('Skipping dependencies.'.green);
-//     runTests(project, submitFlag);
-//   } else {
-//     exec(cmd, function (err) {
-//       if (err) {
-//         console.log('There was an error installing dependencies, show this to your teacher:'.red, err);
-//         return postTestCleanup(project);
-//       }
-//       console.log('Successfully installed dependencies!'.green);
-//       runTests(project, submitFlag);
-//     });
-//   }
-// }
-
 // Creates command to enter project directory
 // Creates command to run tests
 // Command has been everything from 'npm run test', to literally the
@@ -198,23 +164,6 @@ function runTests(project, submitFlag) {
       } else {
         console.log('You did it! 100% complete, now please run'.green, 'os submit'.red);
       }
-      // postTestCleanup(project);
     }
   });
 }
-
-// Removes unnecessary test and node_modules directory
-// Attempted to use rimraf, but did not work
-// function postTestCleanup(project) {
-//   const name = changeCase.paramCase(project.name);
-//   console.log('Running post test script. . .'.green);
-//   const enterDirectory = `cd ${projectsDirectory}/${name}/`;
-//   const runPostTest = 'npm run posttest';
-//   const cmd = `${enterDirectory} && ${runPostTest}`;
-//   console.log(cmd);
-//   // const name = changeCase.paramCase(project.name);
-//   // const removeTests = `rm -rf ${projectsDirectory}/${name}/test`;
-//   // const removeNodeModules = `rm -rf ${projectsDirectory}/${name}/node_modules`;
-//   // const cmd = `${removeTests} && ${removeNodeModules}`;
-//   exec(cmd, () => console.log('Tests and Node Modules removed!'.green));
-// }
