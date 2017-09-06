@@ -100,7 +100,7 @@ function grabTests(project, submitFlag) {
   const packageCmd = `svn export ${repo}/package.json ${packageName} --password ${token}`;
   if (fs.existsSync(directory)) {
     console.log('Skipping tests.'.green);
-    setEnv(project, submitFlag);
+    runTests(project, submitFlag);
   } else {
     exec(cmd, function (error) {
       if (error) return console.log(`There was an error. ${error}`);
@@ -108,10 +108,10 @@ function grabTests(project, submitFlag) {
       if (!fs.existsSync(packageName)) {
         exec(packageCmd, function () {
           console.log('Package.json successfully installed'.green);
-          setEnv(project, submitFlag);
+          runTests(project, submitFlag);
         });
       } else {
-        setEnv(project, submitFlag);
+        runTests(project, submitFlag);
       }
     });
   }
@@ -125,28 +125,28 @@ function grabTests(project, submitFlag) {
 // Attempts to run both commands together with promisified child_process
 // If error, runs postTestCleanup to delete new directories so students can't have them
 // If no error, calls runTests function
-function setEnv(project, submitFlag) {
-  const name = changeCase.paramCase(project.name);
-  const directory = `${projectsDirectory}/${name}/node_modules`;
-  console.log('Installing dependencies. . .'.green);
-  // const directory = `${projectsDirectory}/${name}/`;
-  const enterDirectory = `cd ${projectsDirectory}/${name}/`;
-  const installDependencies = 'npm install';
-  const cmd = `${enterDirectory} && ${installDependencies}`;
-  if (fs.existsSync(directory)) {
-    console.log('Skipping dependencies.'.green);
-    runTests(project, submitFlag);
-  } else {
-    exec(cmd, function (err) {
-      if (err) {
-        console.log('There was an error installing dependencies, show this to your teacher:'.red, err);
-        return postTestCleanup(project);
-      }
-      console.log('Successfully installed dependencies!'.green);
-      runTests(project, submitFlag);
-    });
-  }
-}
+// function setEnv(project, submitFlag) {
+//   const name = changeCase.paramCase(project.name);
+//   const directory = `${projectsDirectory}/${name}/node_modules`;
+//   console.log('Installing dependencies. . .'.green);
+//   // const directory = `${projectsDirectory}/${name}/`;
+//   const enterDirectory = `cd ${projectsDirectory}/${name}/`;
+//   const installDependencies = 'npm install';
+//   const cmd = `${enterDirectory} && ${installDependencies}`;
+//   if (fs.existsSync(directory)) {
+//     console.log('Skipping dependencies.'.green);
+//     runTests(project, submitFlag);
+//   } else {
+//     exec(cmd, function (err) {
+//       if (err) {
+//         console.log('There was an error installing dependencies, show this to your teacher:'.red, err);
+//         return postTestCleanup(project);
+//       }
+//       console.log('Successfully installed dependencies!'.green);
+//       runTests(project, submitFlag);
+//     });
+//   }
+// }
 
 // Creates command to enter project directory
 // Creates command to run tests
@@ -161,8 +161,6 @@ function runTests(project, submitFlag) {
   console.log('Running tests. . .'.green);
   const directory = `${projectsDirectory}/${name}/`;
   const cmd = `npm test --prefix ${directory}`;
-
-
   exec(cmd, function (err, stdout, stderr) {
     if (stderr) {
       return console.log(stderr);
@@ -182,7 +180,7 @@ function runTests(project, submitFlag) {
       console.log(` Total tests:    ${stats.tests}  `.bgBlack.white);
       console.log(` Passing tests:  ${stats.passes}  `.bgBlue.white);
       console.log(` Pending tests:  ${stats.pending}  `.bgYellow.black);
-      console.log(` Failing tests: ${stats.failures}  `.bgRed.white);
+      console.log(` Failing tests:  ${stats.failures}  `.bgRed.white);
       if (submitFlag) {
         submit.checkGrade(project, stats);
       } else if (stats.failures > 0) {
@@ -207,16 +205,16 @@ function runTests(project, submitFlag) {
 
 // Removes unnecessary test and node_modules directory
 // Attempted to use rimraf, but did not work
-function postTestCleanup(project) {
-  const name = changeCase.paramCase(project.name);
-  console.log('Running post test script. . .'.green);
-  const enterDirectory = `cd ${projectsDirectory}/${name}/`;
-  const runPostTest = 'npm run posttest';
-  const cmd = `${enterDirectory} && ${runPostTest}`;
-  console.log(cmd);
-  // const name = changeCase.paramCase(project.name);
-  // const removeTests = `rm -rf ${projectsDirectory}/${name}/test`;
-  // const removeNodeModules = `rm -rf ${projectsDirectory}/${name}/node_modules`;
-  // const cmd = `${removeTests} && ${removeNodeModules}`;
-  exec(cmd, () => console.log('Tests and Node Modules removed!'.green));
-}
+// function postTestCleanup(project) {
+//   const name = changeCase.paramCase(project.name);
+//   console.log('Running post test script. . .'.green);
+//   const enterDirectory = `cd ${projectsDirectory}/${name}/`;
+//   const runPostTest = 'npm run posttest';
+//   const cmd = `${enterDirectory} && ${runPostTest}`;
+//   console.log(cmd);
+//   // const name = changeCase.paramCase(project.name);
+//   // const removeTests = `rm -rf ${projectsDirectory}/${name}/test`;
+//   // const removeNodeModules = `rm -rf ${projectsDirectory}/${name}/node_modules`;
+//   // const cmd = `${removeTests} && ${removeNodeModules}`;
+//   exec(cmd, () => console.log('Tests and Node Modules removed!'.green));
+// }
