@@ -85,7 +85,6 @@ function grade(project, gist) {
     url: gist.files['grade.txt'].raw_url,
   };
 
-  console.log(body);
   const options = {
     method: 'POST',
     // TODO: Switch URI for live version
