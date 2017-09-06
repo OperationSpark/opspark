@@ -7,6 +7,7 @@ const greenlight = require('./greenlight');
 const projects = require('./projects');
 const submit = require('./submit');
 const fs = require('fs');
+const colors = require('colors');
 const exec = require('child_process').exec;
 const env = require('./env');
 
@@ -23,7 +24,6 @@ function test(options, submitFlag) {
   }
 
   projects.chooseClass(action, function(session, action) {
-    console.log('Here I am')
     let projectsList = session.PROJECT;
     projectsList = findAvailableProjects(projectsList, session.sessionId).sort(function(a, b) {
       if (a.name < b.name)
@@ -46,14 +46,14 @@ function test(options, submitFlag) {
         _session: 'vJ3hbkCCwbei343Hz',
         name: 'Portfolio Page',
         desc: 'Add a portfolio page to your website project',
-        url: 'https://github.com/livrush/portfolio/branches/test/test'
+        url: 'https://github.com/OperationSpark/portfolio'
       },
       {
         _id: 'Xe7HfMW7P5YipdZMc',
         _session: 'vJ3hbkCCwbei343Hz',
         name: 'First Website',
         desc: 'A client-side web project into which we\'ll install many projects',
-        url: 'https://github.com/livrush/first-website/branches/test/test',
+        url: 'https://github.com/OperationSpark/first-website',
       }
     );
 
@@ -91,11 +91,13 @@ module.exports.findAvailableProjects = findAvailableProjects;
 // Then calls setEnv
 function grabTests(project, submitFlag) {
   const name = changeCase.paramCase(project.name);
-  const repo = `${project.url}/trunk/test`;
+  const repo = `${project.url}/trunk`;
   const directory = `${projectsDirectory}/${name}/test`;
   console.log(`Downloading tests for ${name}. . .`.green);
   const token = github.grabLocalToken();
-  const cmd = `svn export ${repo} ${directory} --password ${token}`;
+  const cmd = `svn export ${repo}/test ${directory} --password ${token}`;
+  const packageName = `${projectsDirectory}/${name}/package.json`;
+  const packageCmd = `svn export ${repo}/package.json ${packageName} --password ${token}`;
   if (fs.existsSync(directory)) {
     console.log('Skipping tests.'.green);
     setEnv(project, submitFlag);
@@ -103,7 +105,14 @@ function grabTests(project, submitFlag) {
     exec(cmd, function (error) {
       if (error) return console.log(`There was an error. ${error}`);
       console.log('Successfully downloaded tests!'.green);
-      setEnv(project, submitFlag);
+      if (!fs.existsSync(packageName)) {
+        exec(packageCmd, function () {
+          console.log('Package.json successfully installed'.green);
+          setEnv(project, submitFlag);
+        });
+      } else {
+        setEnv(project, submitFlag);
+      }
     });
   }
 }
@@ -150,37 +159,49 @@ function setEnv(project, submitFlag) {
 function runTests(project, submitFlag) {
   const name = changeCase.paramCase(project.name);
   console.log('Running tests. . .'.green);
-  // const directory = `${projectsDirectory}/${project}`;
-  const enterDirectory = `cd ${projectsDirectory}/${name}/`;
-  const runProjectTests = 'npm test';
-  const cmd = `${enterDirectory} && ${runProjectTests}`;
-  exec(cmd, function (err, stdout) {
-    // console.log(stdout);
-    const obj = JSON.parse(stdout.slice(stdout.indexOf(`{
-  "stats": {`)));
-    const stats = obj.stats;
-    console.log(` Total tests:    ${stats.tests}  `.bgBlack.white);
-    console.log(` Passing tests:  ${stats.passes}  `.bgBlue.white);
-    console.log(` Pending tests:  ${stats.pending}  `.bgYellow.black);
-    console.log(` Failing tests: ${stats.failures}  `.bgRed.white);
-    if (submitFlag) {
-      submit.checkGrade(project, stats);
-    } else if (stats.failures > 0) {
-      const failures = obj.failures;
-      failures.forEach(function (currentTest, i) {
-        const whichTest = currentTest.fullTitle;
-        const stack = currentTest.err.stack.split('\n');
-        const stackLineOne = stack[0];
-        const stackLineTwo = stack[1];
-        const errorInfo = stackLineOne.slice(stackLineOne.indexOf(':'));
-        console.log(`${i + 1}) ${whichTest}`.red.bold.underline);
-        console.log(`> > > ${errorInfo}`.grey);
-        console.log(`> > > ${stackLineTwo}`.grey);
-      });
-    } else {
-      console.log('You did it! 100% complete, now please run'.green, 'os submit'.red);
+  const directory = `${projectsDirectory}/${name}/`;
+  const cmd = `npm test --prefix ${directory}`;
+
+
+  exec(cmd, function (err, stdout, stderr) {
+    if (stderr) {
+      return console.log(stderr);
     }
-    postTestCleanup(project);
+    const start = stdout.indexOf('OS-START') + 9;
+    const substr = stdout.slice(start);
+    const stop = substr.indexOf('OS-STOP') + start;
+    const slicedStdout = stdout.slice(start, stop);
+    const split = `{
+  "stats": {`;
+    const index = slicedStdout.indexOf(split);
+    if (index === -1) {
+      console.log('There was an error.'.red, err);
+    } else {
+      const parsedStdout = JSON.parse(slicedStdout.slice(index));
+      const stats = parsedStdout.stats;
+      console.log(` Total tests:    ${stats.tests}  `.bgBlack.white);
+      console.log(` Passing tests:  ${stats.passes}  `.bgBlue.white);
+      console.log(` Pending tests:  ${stats.pending}  `.bgYellow.black);
+      console.log(` Failing tests: ${stats.failures}  `.bgRed.white);
+      if (submitFlag) {
+        submit.checkGrade(project, stats);
+      } else if (stats.failures > 0) {
+        const failures = parsedStdout.failures;
+        failures.forEach(function (currentTest, i) {
+          const whichTest = currentTest.fullTitle;
+          const stack = currentTest.err.stack.split('\n');
+          const stackLineOne = stack[0];
+          const stackLineTwo = stack[1];
+          const errorInfo = stackLineOne.slice(stackLineOne.indexOf(':'));
+          console.log(`${i + 1}) ${whichTest}`.red.bold.underline);
+          console.log(`> > > ${errorInfo}`.grey);
+          console.log(`> > > ${stackLineTwo}`.grey);
+        });
+      } else {
+        console.log('You did it! 100% complete, now please run'.green, 'os submit'.red);
+      }
+      // postTestCleanup(project);
+    }
   });
 }
 
@@ -188,8 +209,14 @@ function runTests(project, submitFlag) {
 // Attempted to use rimraf, but did not work
 function postTestCleanup(project) {
   const name = changeCase.paramCase(project.name);
-  const removeTests = `rm -rf ${projectsDirectory}/${name}/test`;
-  const removeNodeModules = `rm -rf ${projectsDirectory}/${name}/node_modules`;
-  const cmd = `${removeTests} && ${removeNodeModules}`;
+  console.log('Running post test script. . .'.green);
+  const enterDirectory = `cd ${projectsDirectory}/${name}/`;
+  const runPostTest = 'npm run posttest';
+  const cmd = `${enterDirectory} && ${runPostTest}`;
+  console.log(cmd);
+  // const name = changeCase.paramCase(project.name);
+  // const removeTests = `rm -rf ${projectsDirectory}/${name}/test`;
+  // const removeNodeModules = `rm -rf ${projectsDirectory}/${name}/node_modules`;
+  // const cmd = `${removeTests} && ${removeNodeModules}`;
   exec(cmd, () => console.log('Tests and Node Modules removed!'.green));
 }

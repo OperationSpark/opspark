@@ -78,13 +78,14 @@ function get() {
 module.exports.get = get;
 
 function grade(project, gist) {
-  console.log(gist.files);
   const body = {
     id: github.grabLocalID().toString(),
     requirementId: project._id,
     sessionId: project._session,
     url: gist.files['grade.txt'].raw_url,
   };
+
+  console.log(body);
   const options = {
     method: 'POST',
     // TODO: Switch URI for live version

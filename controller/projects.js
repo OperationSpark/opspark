@@ -36,9 +36,26 @@ const install = function () {
   } else {
     chooseClass('install', function (session, action) {
       let projectsList = session.PROJECT;
-      projectsList.push({
-        name: 'Lets Get Functional',
-      });
+      projectsList.push(
+        {
+          _id: 'H5jymW66LEvSQRo4Q',
+          name: 'Let\'s Get Functional',
+          desc: 'An exercise in problem solving in the functional idiom',
+          url: 'https://github.com/OperationSpark/lets-get-functional',
+        }
+        // {
+        //   _id: 'T5LMsegDbMaSr8Z9K',
+        //   name: 'Portfolio Page',
+        //   desc: 'Add a portfolio page to your website project',
+        //   url: 'https://github.com/operationspark/portfolio'
+        // },
+        // {
+        //   _id: 'Xe7HfMW7P5YipdZMc',
+        //   name: 'First Website',
+        //   desc: 'A client-side web project into which we\'ll install many projects',
+        //   url: 'https://github.com/operationspark/first-website',
+        // }
+      );
       projectsList = projectsList.sort(function (a, b) {
         if (a.name < b.name) {
           return -1;
@@ -63,9 +80,14 @@ module.exports.install = install;
 const uninstall = function () {
   chooseClass('uninstall', function (session, action) {
     let projectsList = session.PROJECT;
-    projectsList.push({
-      name: 'Lets Get Functional',
-    });
+    projectsList.push(
+      {
+        _id: 'H5jymW66LEvSQRo4Q',
+        name: 'Let\'s Get Functional',
+        desc: 'An exercise in problem solving in the functional idiom',
+        url: 'https://github.com/OperationSpark/lets-get-functional',
+      }
+    );
     projectsList = test.findAvailableProjects(projectsList, session.sessionId).sort(function (a, b) {
       if (a.name < b.name) return -1;
       if (a.name > b.name) return 1;
