@@ -74,7 +74,6 @@ function deleteGist(url) {
       console.log(err);
     }
     console.log('Gist deleted!'.green);
-    // console.log(stdout);
   });
 }
 
