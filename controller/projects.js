@@ -72,11 +72,12 @@ const uninstall = function () {
     //     url: 'https://github.com/OperationSpark/lets-get-functional',
     //   }
     // );
-    projectsList = test.findAvailableProjects(projectsList, session.sessionId).sort(function (a, b) {
-      if (a.name < b.name) return -1;
-      if (a.name > b.name) return 1;
-      return 0;
-    });
+    projectsList = test.findAvailableProjects(projectsList, session.sessionId)
+      .sort(function (a, b) {
+        if (a.name < b.name) return -1;
+        if (a.name > b.name) return 1;
+        return 0;
+      });
 
     selectProject(projectsList, function (project) {
       uninstallProject(project, null, function () {
