@@ -131,17 +131,17 @@ function runTests(project, submitFlag) {
     if (stderr) {
       return console.log(stderr);
     }
-    const start = stdout.indexOf('OS-START') + 9;
-    const substr = stdout.slice(start);
-    const stop = substr.indexOf('OS-STOP') + start;
-    const slicedStdout = stdout.slice(start, stop);
+    // const start = stdout.indexOf('OS-START') + 9;
+    // const substr = stdout.slice(start);
+    // const stop = substr.indexOf('OS-STOP') + start;
+    // const slicedStdout = stdout.slice(start, stop);
     const split = `{
   "stats": {`;
-    const index = slicedStdout.indexOf(split);
+    const index = stdout.indexOf(split);
     if (index === -1) {
       console.log('There was an error.'.red, err);
     } else {
-      const parsedStdout = JSON.parse(slicedStdout.slice(index));
+      const parsedStdout = JSON.parse(stdout.slice(index));
       const stats = parsedStdout.stats;
       console.log(` Total tests:    ${stats.tests}  `.bgBlack.white);
       console.log(` Passing tests:  ${stats.passes}  `.bgBlue.white);
