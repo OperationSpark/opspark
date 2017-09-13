@@ -29,8 +29,8 @@ function getSessions(auth, complete) {
   const options = {
     method: 'GET',
     // TODO: Switch URI for live version
-    // uri: 'https://greenlight.operationspark.org/api/os/install',
-    uri: 'http://localhost:3000/api/os/install',
+    uri: 'https://greenlight.operationspark.org/api/os/install',
+    // uri: 'http://localhost:3000/api/os/install',
     qs: {
       id: github.grabLocalID(),
     },
@@ -59,8 +59,8 @@ function get() {
   const options = {
     method: 'GET',
     // TODO: Switch URI for live version
-    // uri: 'https://greenlight.operationspark.org/api/os/install',
-    uri: 'http://localhost:3000/api/os/install',
+    uri: 'https://greenlight.operationspark.org/api/os/install',
+    // uri: 'http://localhost:3000/api/os/install',
     qs: {
       id: github.grabLocalID(),
     },
@@ -88,8 +88,8 @@ function grade(project, gist) {
   const options = {
     method: 'POST',
     // TODO: Switch URI for live version
-    // uri: 'https://greenlight.operationspark.org/api/os/grade',
-    uri: 'http://localhost:3000/api/os/grade',
+    uri: 'https://greenlight.operationspark.org/api/os/grade',
+    // uri: 'http://localhost:3000/api/os/grade',
     body: body,
     json: true,
   };
