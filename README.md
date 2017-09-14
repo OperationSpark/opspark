@@ -10,12 +10,15 @@ A node utility supporting installation and configuration of operation spark proj
   - [Usage](#usage)
     - [Initializing Your Portfolio](#initializing-your-portfolio)
     - [Installing Projects](#installing-projects)
+    - [Testing Projects](#testing-projects)
+    - [Submitting Projects](#submitting-projects)
+    - [Shelving Projects](#shelving-projects)
+    - [Uninstalling Projects](#uninstalling-projects)
     - [Pair Programming on Projects](#pair-programming-on-projects)
   - [Help](#help)
   - [For Teachers and Developers](#for-teachers-and-developers)
     - [Headstart](#headstart)
     - [Keeping Master Files](#keeping-master-files)
-
 
 ## Prerequisites
 
@@ -73,13 +76,13 @@ It's not necessary to run this command before installing and working on projects
 2. Select the project you want to install using the arrow keys
 
     <img src="https://raw.githubusercontent.com/OperationSpark/opspark/master/img/use-arrow-keys.png">
-    
+
 3. Once you've selected the project using the arrow keys, press `Return`.  You'll then be asked to confirm:
-    
+
     <img src="https://raw.githubusercontent.com/OperationSpark/opspark/master/img/confirm.png">
 
     Press enter to confirm, and the installation will take place:
-    
+
 <img src="https://raw.githubusercontent.com/OperationSpark/opspark/master/img/installing.png">
 
 ...and when complete, you'll see the message:
@@ -93,6 +96,22 @@ Now, to begin working on our project, typically you will go into the directory o
     projects/frabonacci/index.html
 
 Have fun!
+
+### Testing projects
+
+Coming soon...
+
+### Submitting projects
+
+Coming soon...
+
+### Shelving projects
+
+Coming soon...
+
+### Uninstalling projects
+
+Coming soon...
 
 ### Pair Programming on Projects
 
@@ -117,7 +136,7 @@ If you want to get a fast head-start, instead of having to step through the [pre
 To do this:
 
 1. If you want to publish the website live on GitHub Pages, as is the pattern with our website project, you will first want to create a GitHub repository, so named for your GitHub username, as in, my-github-username.github.io, and then clone it into a new Clould9 workspace (step 2).  <a href="https://github.com/OperationSpark/first-website/blob/master/README.md" target="_blank">See the instructions to do so in the First Website lesson on setting up the GitHub repository for a GitHub Pages website</a>.
-    
+
     If you don't want to publish your website, you can skip this step and move on to step 2.
 
 2.  If you've completed the optional step 1, clone a new Clould9 workspace using the ssh option from your website's GitHub repository and make it an HTML5 environment.
