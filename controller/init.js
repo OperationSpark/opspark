@@ -41,22 +41,6 @@ function portfolio(filepath) {
   var result = html.replace(/<\/body>/g, jQueryCdnScript + portfolioScript);
   try {
     fs.writeFileSync(filepath, result, 'utf8');
-    greenlight.getSessions(null, function(sessions) {
-      const session = _.reduce(sessions, function (res, curr) {
-        return curr.name === 'Bootcamp' ? curr.sessionId : res;
-      }, '');
-      console.log(session);
-      const project = {
-        _id: 'T5LMsegDbMaSr8Z9K',
-        _session: session,
-      };
-      const stats = {
-        passes: 1,
-        failures: 0,
-        tests: 1,
-      };
-      submit.checkGrade(project, stats);
-    });
     console.log('portfolio.html has been initialized!');
   } catch (err) {
     console.log('An error occurred while trying to write the portfolioScript to the portfolio.html file: ', err);

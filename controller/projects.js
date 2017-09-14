@@ -36,16 +36,17 @@ const install = function () {
   } else {
     chooseClass('install', function (session, action) {
       let projectsList = session.PROJECT;
-      projectsList.push({
-        name: 'Lets Get Functional',
-      });
+      // projectsList.push(
+      //   {
+      //     _id: 'H5jymW66LEvSQRo4Q',
+      //     name: 'Let\'s Get Functional',
+      //     desc: 'An exercise in problem solving in the functional idiom',
+      //     url: 'https://github.com/OperationSpark/lets-get-functional',
+      //   }
+      // );
       projectsList = projectsList.sort(function (a, b) {
-        if (a.name < b.name) {
-          return -1;
-        }
-        if (a.name > b.name) {
-          return 1;
-        }
+        if (a.name < b.name) return -1;
+        if (a.name > b.name) return 1;
         return 0;
       });
 
@@ -63,14 +64,20 @@ module.exports.install = install;
 const uninstall = function () {
   chooseClass('uninstall', function (session, action) {
     let projectsList = session.PROJECT;
-    projectsList.push({
-      name: 'Lets Get Functional',
-    });
-    projectsList = test.findAvailableProjects(projectsList, session.sessionId).sort(function (a, b) {
-      if (a.name < b.name) return -1;
-      if (a.name > b.name) return 1;
-      return 0;
-    });
+    // projectsList.push(
+    //   {
+    //     _id: 'H5jymW66LEvSQRo4Q',
+    //     name: 'Let\'s Get Functional',
+    //     desc: 'An exercise in problem solving in the functional idiom',
+    //     url: 'https://github.com/OperationSpark/lets-get-functional',
+    //   }
+    // );
+    projectsList = test.findAvailableProjects(projectsList, session.sessionId)
+      .sort(function (a, b) {
+        if (a.name < b.name) return -1;
+        if (a.name > b.name) return 1;
+        return 0;
+      });
 
     selectProject(projectsList, function (project) {
       uninstallProject(project, null, function () {
@@ -345,9 +352,9 @@ function shelve() {
   chooseClass('shelve', function (session, action) {
     let projectsList = session.PROJECT;
 
-    projectsList.push({
-      name: 'Lets Get Functional',
-    });
+    // projectsList.push({
+    //   name: 'Lets Get Functional',
+    // });
     projectsList = test.findAvailableProjects(projectsList, session.sessionId);
     projectsList = projectsList.sort(function (a, b) {
       if (a.name < b.name) return -1;

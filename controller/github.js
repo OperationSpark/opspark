@@ -3,28 +3,28 @@
 // TODO : re-write using decorator or chain of command (connect?), and use bluebird //
 
 var
-    config = require('../config'),
-    Promise = require("bluebird"),
-    Q = require("bluebird-q"),
-    _ = require('lodash'),
-    util = require('util'),
-    fs = require('fs'),
-    fsJson = require('fs-json')(),
-    child = require('./child'),
-    colors = require('colors'),
-    view = require('../view'),
-    mkdirp = require('mkdirp'),
-    exec = require('child_process').exec,
-    request = require('request'),
-    octonode = require('octonode'),
-    env = require('./env'),
-    applicationDirectory = env.home() + '/opspark',
-    githubFilePath = applicationDirectory + '/github',
-    userFilePath = applicationDirectory + '/user',
-    _auth,
-    _user,
-    _client,
-    _opspark;
+  config = require('../config'),
+  Promise = require("bluebird"),
+  Q = require("bluebird-q"),
+  _ = require('lodash'),
+  util = require('util'),
+  fs = require('fs'),
+  fsJson = require('fs-json')(),
+  child = require('./child'),
+  colors = require('colors'),
+  view = require('../view'),
+  mkdirp = require('mkdirp'),
+  exec = require('child_process').exec,
+  request = require('request'),
+  octonode = require('octonode'),
+  env = require('./env'),
+  applicationDirectory = env.home() + '/opspark',
+  githubFilePath = applicationDirectory + '/github',
+  userFilePath = applicationDirectory + '/user',
+  _auth,
+  _user,
+  _client,
+  _opspark;
 
 // TODO : consider the "module level" vars, like _client in this implementation, are they necessary.
 
@@ -39,38 +39,38 @@ function filesExist() {
 module.exports.filesExist = filesExist;
 
 function user(username, complete) {
-    var deferred = Q.defer();
-    getOrCreateClient(function (err, client) {
-        if (err) return deferred.reject(err);
-        client.get('/users/' + username, {}, function (err, status, body, headers) {
-            if (err) deferred.reject(err);
-            else deferred.resolve(body);
-        });
+  var deferred = Q.defer();
+  getOrCreateClient(function (err, client) {
+    if (err) return deferred.reject(err);
+    client.get('/users/' + username, {}, function (err, status, body, headers) {
+      if (err) deferred.reject(err);
+      else deferred.resolve(body);
     });
-    return deferred.promise.nodeify(complete);
+  });
+  return deferred.promise.nodeify(complete);
 }
 module.exports.user = user;
 
 module.exports.repo = function (username, repoName, complete) {
-    getOrCreateClient(function (err, client) {
-        if (err) return complete(err);
-        var ghrepo = client.repo(username + '/' + username + '.github.io');
-        ghrepo.info(function (er, statu, bod, header) {
-            console.log(bod);
-            complete(null, bod);
-        });
+  getOrCreateClient(function (err, client) {
+    if (err) return complete(err);
+    var ghrepo = client.repo(username + '/' + username + '.github.io');
+    ghrepo.info(function (er, statu, bod, header) {
+      console.log(bod);
+      complete(null, bod);
     });
+  });
 };
 
 module.exports.limit = function (complete) {
-    getOrCreateClient(function (err, client) {
-        if (err) return complete(err);
-        client.limit(function (err, left, max) {
-            if (err) return complete(err);
-            var message = 'GitHub limit: ' + left + ' used of ' + max + '.';
-            complete(null, message);
-        });
+  getOrCreateClient(function (err, client) {
+    if (err) return complete(err);
+    client.limit(function (err, left, max) {
+      if (err) return complete(err);
+      var message = 'GitHub limit: ' + left + ' used of ' + max + '.';
+      complete(null, message);
     });
+  });
 };
 
 module.exports.login = function () {
@@ -118,14 +118,15 @@ function writeToken(token) {
 module.exports.writeToken = writeToken;
 
 function repos(complete) {
-    // the client also initializes opspark, which isn't very clear - perhaps you should refactor to create opspark here, or? //
-    getOrCreateClient(function (err, client) {
-        if (err) return complete(err);
-        _opspark.repos(1, 100, function (err, repos) {
-            if (err) return complete(err);
-            complete(null, repos);
-        });
+  // the client also initializes opspark, which isn't very clear - 
+  // perhaps you should refactor to create opspark here, or? //
+  getOrCreateClient(function (err, client) {
+    if (err) return complete(err);
+    _opspark.repos(1, 100, function (err, repos) {
+      if (err) return complete(err);
+      complete(null, repos);
     });
+  });
 }
 module.exports.repos = repos;
 
@@ -224,18 +225,18 @@ function listAuths(username, complete) {
 module.exports.listAuths = listAuths;
 
 function getNoteForHost() {
-    return util.format(config.github.note, env.hostname());
+  return util.format(config.github.note, env.hostname());
 }
 module.exports.getNoteForHost = getNoteForHost;
 
 function getOrObtainUser() {
-    if(_user) return Q.when(_user);
-    if (fs.existsSync(userFilePath)) {
-        _user = fsJson.loadSync(userFilePath);
-        if (_user) return Q.when(_user);
-        return Q.reject(new Error('A race condition occurred while trying to load the user!'));
-    }
-    return obtainUser();
+  if (_user) return Q.when(_user);
+  if (fs.existsSync(userFilePath)) {
+    _user = fsJson.loadSync(userFilePath);
+    if (_user) return Q.when(_user);
+    return Q.reject(new Error('A race condition occurred while trying to load the user!'));
+  }
+  return obtainUser();
 }
 module.exports.getOrObtainUser = getOrObtainUser;
 
@@ -248,8 +249,8 @@ function obtainUser() {
    * 2. If we don't have auth, just auth, then return the user, cause the auth
    *    process installs the user.
    */
-  return new Promise(function(resolve, reject) {
-    getOrObtainAuth(function(err, auth) {
+  return new Promise(function (resolve, reject) {
+    getOrObtainAuth(function (err, auth) {
       if (err) return reject(err);
       if (_user) return resolve(_user);
       console.log('Before we proceed, we need to retrieve your GitHub user:');
@@ -283,7 +284,7 @@ function writeUser(user) {
 }
 
 function ensureApplicationDirectory() {
-    if (!fs.existsSync(applicationDirectory)) mkdirp.sync(applicationDirectory);
+  if (!fs.existsSync(applicationDirectory)) mkdirp.sync(applicationDirectory);
 }
 
 function deauthorize() {
