@@ -165,7 +165,7 @@ module.exports.obtainAuthorization = obtainAuthorization;
 function grabLocalID() {
   const git = fsJson.loadSync(userFilePath);
   if (!git) {
-    return console.log(`There is no file at ${userFilePath}.`);
+    throw new Error(`There is no file at ${userFilePath}.`);
   }
   return git.id;
 }
@@ -175,7 +175,7 @@ module.exports.grabLocalID = grabLocalID;
 function grabLocalToken() {
   const git = fsJson.loadSync(githubFilePath);
   if (!git) {
-    return console.log(`There is no file at ${githubFilePath}.`);
+    throw new Error(`There is no file at ${githubFilePath}.`);
   }
   return git.token;
 }
@@ -185,7 +185,7 @@ module.exports.grabLocalToken = grabLocalToken;
 function grabLocalLogin() {
   const git = fsJson.loadSync(userFilePath);
   if (!git) {
-    return console.log(`There is no file at ${userFilePath}.`);
+    throw new Error(`There is no file at ${userFilePath}.`);
   }
   return git.login;
 }
