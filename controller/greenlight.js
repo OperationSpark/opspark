@@ -25,12 +25,17 @@ var
   rootDirectory = `${env.home()}/workspace`,
   projectEntriesPath = `${rootDirectory}/projects/projects.json`;
 
+// TODO: Switch URI for live version
+const LOCALHOST = 'http://localhost:3000';
+const GREENLIGHT = 'https://greenlight.operationspark.org';
+const URI = LOCALHOST;
+
+module.exports.URI = URI;
+
 function getSessions(auth, complete) {
   const options = {
     method: 'GET',
-    // TODO: Switch URI for live version
-    uri: 'https://greenlight.operationspark.org/api/os/install',
-    // uri: 'http://localhost:3000/api/os/install',
+    uri: `${URI}/api/os/install`,
     qs: {
       id: github.grabLocalID(),
     },
@@ -58,9 +63,7 @@ module.exports.listEnrolledClasses = listEnrolledClasses;
 function get() {
   const options = {
     method: 'GET',
-    // TODO: Switch URI for live version
-    uri: 'https://greenlight.operationspark.org/api/os/install',
-    // uri: 'http://localhost:3000/api/os/install',
+    uri: `${URI}/api/os/install`,
     qs: {
       id: github.grabLocalID(),
     },
@@ -87,9 +90,7 @@ function grade(project, gist) {
 
   const options = {
     method: 'POST',
-    // TODO: Switch URI for live version
-    uri: 'https://greenlight.operationspark.org/api/os/grade',
-    // uri: 'http://localhost:3000/api/os/grade',
+    uri: `${URI}/api/os/grade`,
     body: body,
     json: true,
   };

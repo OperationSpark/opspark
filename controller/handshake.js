@@ -1,15 +1,18 @@
 'use strict';
 
-var
-  view = require('../view'),
-  request = require('request'),
-  rp = require('request-promise'),
-  fs = require('fs'),
-  fsJson = require('fs-json')(),
-  mkdirp = require('mkdirp'),
-  colors = require('colors'),
-  env = require('./env'),
+var 
+  greenlight = require("./greenlight"),
+  view = require("../view"),
+  request = require("request"),
+  rp = require("request-promise"),
+  fs = require("fs"),
+  fsJson = require("fs-json")(),
+  mkdirp = require("mkdirp"),
+  colors = require("colors"),
+  env = require("./env"),
   filePath = `${env.home()}/opspark`;
+
+const URI = greenlight.URI;
 
 function readHandshake() {
   const path = `${filePath}/handshake`;
@@ -72,8 +75,7 @@ function storeCreds(body, hash) {
 function greenlightRequest(hash) {
   const options = {
     method: 'POST',
-    // uri: 'https://greenlight.operationspark.org/api/os/verify',
-    uri: 'http://localhost:3000/api/os/verify',
+    url: `${URI}/api/os/verify`,
     body: {
       authorization: hash,
     },
