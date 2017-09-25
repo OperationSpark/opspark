@@ -19,10 +19,11 @@ module.exports.jQueryCdnScript = jQueryCdnScript;
 module.exports.portfolioScript = portfolioScript;
 
 function login() {
-  github.obtainAuthorization(function(err) {
+  github.obtainAuthorization(function (err) {
     if (err) {
+      console.log('There was an error.'.red, err);
       console.log('Let\'s try again.'.blue);
-      login();
+      return login();
     }
     console.log('Have fun!'.blue);
   });
