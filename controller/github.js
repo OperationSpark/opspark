@@ -89,28 +89,60 @@ module.exports.login = function () {
  *      OR
  *      a. add a timestamp to the hostname.
  */
+
 function authorize(username, complete) {
-  var note = getNoteForHost();
-  console.log(note);
-  var cmd = `curl https://api.github.com/authorizations --user " ${username} " --data '{"scopes":["public_repo", "repo", "gist"],"note":" ${note} ","note_url":"https://www.npmjs.com/package/opspark"}'`;
-  exec(cmd, function(err, stdout, stderr) {
-    console.log('I made it')
-    if (stdout.indexOf('token') > -1) {
+  const note = getNoteForHost();
+  const cmd = `curl https://api.github.com/authorizations --user "${username}" --data '{"scopes":["public_repo", "repo", "gist"],"note":"${note}","note_url":"https://www.npmjs.com/package/opspark"}'`;
+  const child = exec(cmd);
+  let output = null;
+  child.stdout.on('data', function (data) {
+    // console.log('stdout: ', data);
+    output = JSON.parse(data);
+    if (data.indexOf('token') > -1) {
       try {
-        _auth = JSON.parse(stdout);
+        _auth = JSON.parse(data);
       } catch (err) {
-        return complete(true);
+        return complete(err);
       }
       console.log('GitHub login succeeded!'.green);
       writeToken(_auth);
       obtainAndWriteUser(username);
-    } else {
-      console.log('There was an error with your credentials.'.red);
-      return complete(true);
     }
+  });
+  child.stderr.on('data', function (data) {
+    console.log(data);
+  });
+  child.on('close', function (code) {
+    if (output.message) {
+      return complete(output.message);
+    }
+    // console.log('closing code: ' + code);
     complete(null, _auth);
   });
 }
+
+// function authorize(username, complete) {
+//   var note = getNoteForHost();
+//   console.log(note);
+//   var cmd = `curl https://api.github.com/authorizations --user " ${username} " --data '{"scopes":["public_repo", "repo", "gist"],"note":" ${note} ","note_url":"https://www.npmjs.com/package/opspark"}'`;
+//   exec(cmd, function(err, stdout, stderr) {
+//     console.log('I made it')
+//     if (stdout.indexOf('token') > -1) {
+//       try {
+//         _auth = JSON.parse(stdout);
+//       } catch (err) {
+//         return complete(true);
+//       }
+//       console.log('GitHub login succeeded!'.green);
+//       writeToken(_auth);
+//       obtainAndWriteUser(username);
+//     } else {
+//       console.log('There was an error with your credentials.'.red);
+//       return complete(true);
+//     }
+//     complete(null, _auth);
+//   });
+// }
 module.exports.authorize = authorize;
 
 function writeToken(token) {
