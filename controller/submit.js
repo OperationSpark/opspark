@@ -56,17 +56,33 @@ function createGist(project, stats) {
 
   exec(cmd, function(err, stdout, stderr) {
     if (err) {
-      console.log(err);
+      return console.log(err);
     }
-    const url = JSON.parse(stdout).files['grade.txt'].raw_url;
-    greenlight.grade(project, url);
+    console.log('Gist created!'.green);
+    ensureGistExists(project, JSON.parse(stdout), 1);
+    // greenlight.grade(project, JSON.parse(stdout));
   });
 }
 
 module.exports.createGist = createGist;
 
-function ensureGistExists(project, gist) {
-
+function ensureGistExists(project, gist, tries) {
+  if (tries < 4) {
+    console.log('Ensuring gist exists. . .'.green, `Attempt ${tries}`.yellow);
+    const url = gist.files['grade.txt'].raw_url;
+    const cmd = `curl ${url}`;
+    exec(cmd, function(err, stdout, stderr) {
+      if (err) {
+        return console.log(err);
+      } else if (stdout === '404: Not Found') {
+        ensureGistExists(project, gist, tries + 1);
+      } else {
+        greenlight.grade(project, gist);
+      }
+    });
+  } else {
+    console.log('There was an issue with your gist. Please try submitting again!'.red);
+  }
 }
 
 function deleteGist(url) {
@@ -76,7 +92,7 @@ function deleteGist(url) {
 
   exec(cmd, function(err, stdout, stderr) {
     if (err) {
-      console.log(err);
+      return console.log(err);
     }
     console.log('Gist deleted!'.green);
   });
