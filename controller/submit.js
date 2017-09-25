@@ -58,11 +58,16 @@ function createGist(project, stats) {
     if (err) {
       console.log(err);
     }
-    greenlight.grade(project, JSON.parse(stdout));
+    const url = JSON.parse(stdout).files["grade.txt"].raw_url;
+    greenlight.grade(project, url);
   });
 }
 
 module.exports.createGist = createGist;
+
+function ensureGistExists(project, gist) {
+
+}
 
 function deleteGist(url) {
   const cmd = `curl -X DELETE -u ${github.grabLocalLogin()}:${github.grabLocalToken()} ${url}`;
