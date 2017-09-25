@@ -29,21 +29,15 @@ var
  * Project is installed!
  */
 
-const install = function () {
-  if (!github.filesExist()) {
+const install = function (err) {
+  if (typeof err === 'string') {
+    console.log(err);
+  } else if (!github.filesExist()) {
     console.log('We need some info, let\'s log into Github:'.green);
     github.obtainAuthorization(install);
   } else {
     chooseClass('install', function (session, action) {
       let projectsList = session.PROJECT;
-      // projectsList.push(
-      //   {
-      //     _id: 'H5jymW66LEvSQRo4Q',
-      //     name: 'Let\'s Get Functional',
-      //     desc: 'An exercise in problem solving in the functional idiom',
-      //     url: 'https://github.com/OperationSpark/lets-get-functional',
-      //   }
-      // );
       projectsList = projectsList.sort(function (a, b) {
         if (a.name < b.name) return -1;
         if (a.name > b.name) return 1;
@@ -64,14 +58,6 @@ module.exports.install = install;
 const uninstall = function () {
   chooseClass('uninstall', function (session, action) {
     let projectsList = session.PROJECT;
-    // projectsList.push(
-    //   {
-    //     _id: 'H5jymW66LEvSQRo4Q',
-    //     name: 'Let\'s Get Functional',
-    //     desc: 'An exercise in problem solving in the functional idiom',
-    //     url: 'https://github.com/OperationSpark/lets-get-functional',
-    //   }
-    // );
     projectsList = test.findAvailableProjects(projectsList, session.sessionId)
       .sort(function (a, b) {
         if (a.name < b.name) return -1;

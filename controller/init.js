@@ -56,32 +56,32 @@ module.exports.portfolio = portfolio;
  * or developers can get up to speed quickly.
  */
 module.exports.website = function(next){
-    console.log('Initializing website project, please wait...'.green);
-    installWebsiteFiles(function(err) {
-        if (err) return console.log(err);
-        portfolio();
-        typeof next === 'function' && next(null);
-    });
+  console.log('Initializing website project, please wait...'.green);
+  installWebsiteFiles(function(err) {
+    if (err) return console.log(err);
+    portfolio();
+    typeof next === 'function' && next(null);
+  });
 };
 
 function installWebsiteFiles(next) {
-    var rootDirectory = './';
-    var numFiles = configWebsite.url.length;
-    var downloaded = 0;
-    configWebsite.url.forEach(function(fileUrl){
-        var filename = url.parse(fileUrl).pathname.split('/').pop();
-        var message = 'Downloading ' + filename + ', please wait...';
-        console.log(message.green);
-        console.log(fileUrl);
-        var wget = 'wget -nc -P ' + rootDirectory + ' ' + fileUrl;
-        var child = exec(wget, function(err, stdout, stderr) {
-            if (err) return next(err);
-            message = filename + ' downloaded to ' + rootDirectory;
-            console.log(message.green);
-            if (++downloaded === numFiles) {
-                console.log('All website files downloaded.'.green);
-                next(null);
-            }
-        });
+  var rootDirectory = './';
+  var numFiles = configWebsite.url.length;
+  var downloaded = 0;
+  configWebsite.url.forEach(function(fileUrl){
+    var filename = url.parse(fileUrl).pathname.split('/').pop();
+    var message = 'Downloading ' + filename + ', please wait...';
+    console.log(message.green);
+    console.log(fileUrl);
+    var wget = 'wget -nc -P ' + rootDirectory + ' ' + fileUrl;
+    var child = exec(wget, function(err, stdout, stderr) {
+      if (err) return next(err);
+      message = filename + ' downloaded to ' + rootDirectory;
+      console.log(message.green);
+      if (++downloaded === numFiles) {
+        console.log('All website files downloaded.'.green);
+        next(null);
+      }
     });
+  });
 }
