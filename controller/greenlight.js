@@ -28,7 +28,7 @@ var
 // TODO: Switch URI for live version
 const LOCALHOST = 'http://localhost:3000';
 const GREENLIGHT = 'https://greenlight.operationspark.org';
-const URI = LOCALHOST;
+const URI = GREENLIGHT;
 
 module.exports.URI = URI;
 
