@@ -58,7 +58,7 @@ function createGist(project, stats) {
     if (err) {
       console.log(err);
     }
-    const url = JSON.parse(stdout).files["grade.txt"].raw_url;
+    const url = JSON.parse(stdout).files['grade.txt'].raw_url;
     greenlight.grade(project, url);
   });
 }
