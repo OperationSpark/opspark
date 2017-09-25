@@ -90,7 +90,7 @@ function deleteGist(url) {
 
   console.log('Deleting gist. . .'.green);
 
-  exec(cmd, function(err, stdout, stderr) {
+  exec(cmd, function (err, stdout, stderr) {
     if (err) {
       return console.log(err);
     }

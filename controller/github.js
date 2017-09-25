@@ -91,8 +91,10 @@ module.exports.login = function () {
  */
 function authorize(username, complete) {
   var note = getNoteForHost();
-  var cmd = 'curl https://api.github.com/authorizations --user "' + username + '" --data \'{"scopes":["public_repo", "repo", "gist"],"note":"' + note + '","note_url":"https://www.npmjs.com/package/opspark"}\'';
+  console.log(note);
+  var cmd = `curl https://api.github.com/authorizations --user " ${username} " --data '{"scopes":["public_repo", "repo", "gist"],"note":" ${note} ","note_url":"https://www.npmjs.com/package/opspark"}'`;
   exec(cmd, function(err, stdout, stderr) {
+    console.log('I made it')
     if (stdout.indexOf('token') > -1) {
       try {
         _auth = JSON.parse(stdout);
