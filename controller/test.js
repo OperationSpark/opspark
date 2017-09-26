@@ -53,7 +53,6 @@ function findAvailableProjects(projectsList, session, type) {
   } else if (type === 'test') {
     testableProjects = _.intersection(mappedProjects, files);
   }
-  console.log(testableProjects);
   return projectsList.reduce(function (seed, project) {
     if (testableProjects.indexOf(changeCase.paramCase(project.name)) > -1) {
       project._session = session;
