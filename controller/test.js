@@ -30,30 +30,6 @@ function test(options, submitFlag) {
       return 0;
     });
 
-    // projectsList.push(
-    //   {
-    //     _id: 'H5jymW66LEvSQRo4Q',
-    //     _session: 'vJ3hbkCCwbei343Hz',
-    //     name: 'Let\'s Get Functional',
-    //     desc: 'An exercise in problem solving in the functional idiom',
-    //     url: 'https://github.com/OperationSpark/lets-get-functional',
-    //   },
-    //   {
-    //     _id: 'T5LMsegDbMaSr8Z9K',
-    //     _session: 'vJ3hbkCCwbei343Hz',
-    //     name: 'Portfolio Page',
-    //     desc: 'Add a portfolio page to your website project',
-    //     url: 'https://github.com/OperationSpark/portfolio'
-    //   },
-    //   {
-    //     _id: 'Xe7HfMW7P5YipdZMc',
-    //     _session: 'vJ3hbkCCwbei343Hz',
-    //     name: 'First Website',
-    //     desc: 'A client-side web project into which we\'ll install many projects',
-    //     url: 'https://github.com/OperationSpark/first-website',
-    //   }
-    // );
-
     projects.selectProject(projectsList, grabTests, action, submitFlag);
   });
 }
@@ -66,12 +42,18 @@ module.exports.test = test;
 // Creates files, which is list of currently installed project names
 // Creates testableProjects, intersection of mappedProjects and files
 // Reduces and returns original projectsList to be only those in intersection
-function findAvailableProjects(projectsList, session) {
+function findAvailableProjects(projectsList, session, type) {
   const mappedProjects = _.map(projectsList, function (e) {
     return changeCase.paramCase(e.name);
   });
   const files = fs.readdirSync(projectsDirectory);
-  const testableProjects = _.intersection(mappedProjects, files);
+  let testableProjects;
+  if (type === 'install') {
+    testableProjects = _.difference(mappedProjects, files);  
+  } else if (type === 'test') {
+    testableProjects = _.intersection(mappedProjects, files);
+  }
+  console.log(testableProjects);
   return projectsList.reduce(function (seed, project) {
     if (testableProjects.indexOf(changeCase.paramCase(project.name)) > -1) {
       project._session = session;

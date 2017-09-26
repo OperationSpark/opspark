@@ -38,11 +38,12 @@ const install = function (err) {
   } else {
     chooseClass('install', function (session, action) {
       let projectsList = session.PROJECT;
-      projectsList = projectsList.sort(function (a, b) {
-        if (a.name < b.name) return -1;
-        if (a.name > b.name) return 1;
-        return 0;
-      });
+      projectsList = test.findAvailableProjects(projectsList, session.sessionId, 'install')
+        .sort(function (a, b) {
+          if (a.name < b.name) return -1;
+          if (a.name > b.name) return 1;
+          return 0;
+        });
 
       selectProject(projectsList, function (project) {
         installProject(project, null, function () {
@@ -58,7 +59,7 @@ module.exports.install = install;
 const uninstall = function () {
   chooseClass('uninstall', function (session, action) {
     let projectsList = session.PROJECT;
-    projectsList = test.findAvailableProjects(projectsList, session.sessionId)
+    projectsList = test.findAvailableProjects(projectsList, session.sessionId, 'test')
       .sort(function (a, b) {
         if (a.name < b.name) return -1;
         if (a.name > b.name) return 1;
