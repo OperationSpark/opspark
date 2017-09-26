@@ -19,7 +19,7 @@ var
   program = require('commander');
 
 program
-  .version('2.1.0');
+  .version('2.2.3');
 
 program
   .command('login')
