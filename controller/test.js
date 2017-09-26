@@ -24,7 +24,7 @@ function test(options, submitFlag) {
 
   projects.chooseClass(action, function (session, action) {
     let projectsList = session.PROJECT;
-    projectsList = findAvailableProjects(projectsList, session.sessionId).sort(function (a, b) {
+    projectsList = findAvailableProjects(projectsList, session.sessionId, 'test').sort(function (a, b) {
       if (a.name < b.name) return -1;
       if (a.name > b.name) return 1;
       return 0;
@@ -43,13 +43,18 @@ module.exports.test = test;
 // Creates testableProjects, intersection of mappedProjects and files
 // Reduces and returns original projectsList to be only those in intersection
 function findAvailableProjects(projectsList, session, type) {
+  let files;
+  let testableProjects;
   const mappedProjects = _.map(projectsList, function (e) {
     return changeCase.paramCase(e.name);
   });
-  const files = fs.readdirSync(projectsDirectory);
-  let testableProjects;
+  if (fs.existsSync(projectsDirectory)) {
+    files = fs.readdirSync(projectsDirectory);
+  } else {
+    files = [];
+  }
   if (type === 'install') {
-    testableProjects = _.difference(mappedProjects, files);  
+    testableProjects = _.difference(mappedProjects, files);
   } else if (type === 'test') {
     testableProjects = _.intersection(mappedProjects, files);
   }
