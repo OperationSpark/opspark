@@ -28,57 +28,23 @@ var
 // TODO: Switch URI for live version
 const LOCALHOST = 'http://localhost:3000';
 const GREENLIGHT = 'https://greenlight.operationspark.org';
-const URI = GREENLIGHT;
+const URI = LOCALHOST;
 
 module.exports.URI = URI;
 
-function getSessions(auth, complete) {
+function getSessions({ id }) {
+  console.log('Grabbing enrolled sessions. . .'.yellow)
   const options = {
     method: 'GET',
     uri: `${URI}/api/os/install`,
     qs: {
-      id: github.grabLocalID(),
+      id,
     },
   };
-  rp(options)
-    .then(res => complete(JSON.parse(res)))
-    .catch(err => console.error('upload failed:', err));
+  return rp(options);
 }
 
 module.exports.getSessions = getSessions;
-
-function listEnrolledClasses(classes, complete) {
-  const names = _.map(classes, 'name');
-  const cohorts = _.map(classes, 'cohort');
-  const namesWithCohorts = _.map(classes, function (e) {
-    return `${e.name}: ${e.cohort.split('-').slice(1).join(' ')}`;
-  });
-  if (complete) {
-    complete(names);
-  }
-}
-
-module.exports.listEnrolledClasses = listEnrolledClasses;
-
-function get() {
-  const options = {
-    method: 'GET',
-    uri: `${URI}/api/os/install`,
-    qs: {
-      id: github.grabLocalID(),
-    },
-  };
-  rp(options)
-    .then(res => {
-      console.log(res);
-      const r = JSON.parse(res);
-      var x = _.map(r, 'name');
-      console.log(x);
-    })
-    .catch(err => console.error('upload failed:', err));
-}
-
-module.exports.get = get;
 
 function grade(project, gist) {
   const body = {
@@ -94,7 +60,8 @@ function grade(project, gist) {
     body: body,
     json: true,
   };
-  rp(options)
+
+  return rp(options)
     .then(res => {
       if (res.status === 200) {
         console.log(res.message.blue);

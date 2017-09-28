@@ -18,7 +18,12 @@ var
   cancelOption = '[cancel]',
   env = require('./env'),
   rootDirectory = `${env.home()}/workspace`,
-  projectEntriesPath = `${rootDirectory}/projects/projects.json`;
+  projectEntriesPath = `${rootDirectory}/projects/projects.json`,
+  projectsDirectory = `${rootDirectory}/projects`;
+
+let action = null;
+
+module.exports.action = action;
 
 /**
  * INSTALL
@@ -91,98 +96,88 @@ const chooseClass = function (action, complete) {
 
 module.exports.chooseClass = chooseClass;
 
-function selectClass(classes, action, complete) {
-  async.waterfall([
-    function (next) {
-      inquirer.prompt([{
-        type: 'list',
-        name: 'class',
-        message: `Select the class to ${action} a project from`,
-        choices: classes.concat(cancelOption),
-      }],
-      function (response) {
-        if (response.class === cancelOption) {
-          console.log('Installation cancelled, bye bye!'.green);
-          process.exit();
-        }
-        next(null, response);
-      });
-    },
-    function (response, next) {
-      inquirer.prompt([{
-        type: 'confirm',
-        name: 'install',
-        message: `You selected ${response.class}: Is that correct?`,
-        default: true
-      }],
-      function (confirm) {
-        if (confirm.install) return complete(null, response.class);
-        selectClass(classes, action, complete);
-      });
-    },
-  ]);
-}
-
-module.exports.selectClass = selectClass;
-
-function selectProject(projects, complete, action, flag) {
-  async.waterfall([
-    function (next) {
-      inquirer.prompt([{
-        type: 'list',
-        name: 'project',
-        message: `Select the project you wish to ${action}`,
-        choices: _.map(projects, 'name').concat(cancelOption),
-      }],
-      function (response) {
-        if (response.project === cancelOption) {
-          console.log('Installation cancelled, bye bye!'.green);
-          process.exit();
-        }
-        next(null, _.filter(projects, { name: response.project, })[0]);
-      });
-    },
-    function (project, next) {
-      inquirer.prompt([{
-        type: 'confirm',
-        name: 'install',
-        message: `You selected ${project.name}: Go ahead and ${action}?`,
-        default: true
-      }],
-      function (confirm) {
-        if (confirm.install) return complete(project, flag);
-        selectProject(projects, complete, action, flag);
-      });
-    },
-  ]);
+function selectProject({ session, projectAction }) {
+  action = projectAction;
+  const projects = listProjects(session);
+  return new Promise(function (res) {
+    async.waterfall([
+      function (next) {
+        inquirer.prompt([{
+          type: 'list',
+          name: 'project',
+          message: `Select the project you wish to ${action}`,
+          choices: _.map(projects, 'name').concat(cancelOption),
+        }],
+        function (response) {
+          if (response.project === cancelOption) {
+            console.log('Installation cancelled, bye bye!'.green);
+            process.exit();
+          }
+          next(null, _.filter(projects, { name: response.project, })[0]);
+        });
+      },
+      function (project, next) {
+        inquirer.prompt([{
+          type: 'confirm',
+          name: 'install',
+          message: `You selected ${project.name}: Go ahead and ${action}?`,
+          default: true
+        }],
+        function (confirm) {
+          if (confirm.install) return res(project);
+          return res(selectProject({ session, projectAction }));
+        });
+      },
+    ]);
+  });
 }
 module.exports.selectProject = selectProject;
 
-function installProject(project, pairedWith, complete) {
-  const projectName = project.name.toLowerCase().replace(/\s/g, '-');
-  const authToken = github.grabLocalToken();
-  const projectsDirectory = `${rootDirectory}/projects`;
-  if (!fs.existsSync(projectsDirectory)) mkdirp.sync(projectsDirectory);
-  const projectDirectory = `${projectsDirectory}/${projectName}`;
-  if (fs.existsSync(projectDirectory)) return console.log('Project %s already installed! Please delete manually before reinstalling, or install another project.'.red, projectName);
+function listProjects(session) {
+  console.log('Putting together projects. . .'.yellow);
+  const projects = session.PROJECT;
+  let files;
+  let testableProjects;
+  const mappedProjects = _.map(projects, function(e) {
+    return changeCase.paramCase(e.name);
+  });
+  if (fs.existsSync(projectsDirectory)) {
+    files = fs.readdirSync(projectsDirectory);
+  } else {
+    files = [];
+  }
+  if (action === 'install') {
+    testableProjects = _.difference(mappedProjects, files);
+  } else if (action === 'test') {
+    testableProjects = _.intersection(mappedProjects, files);
+  }
+  return projects.reduce(function (seed, project) {
+    if (testableProjects.indexOf(changeCase.paramCase(project.name)) > -1) {
+      const updatedProject = project;
+      updatedProject._session = session.sessionId;
+      seed.push(updatedProject);
+    }
+    return seed;
+  }, []);
+}
 
-  console.log('Installing project %s, please wait...'.green, projectName);
-  // TODO: change uri back to opspark github
-  // let uri = `https://github.com/livrush/${projectName}`;
-  let uri = `https://github.com/OperationSpark/${projectName}`;
-  console.log('Cloning %s, please wait...'.green, uri);
-
-  // TODO: change /branches/test to /trunk
-  // uri = `${uri}/branches/test --password ${authToken}`;
-  uri = `${uri}/trunk --password ${authToken}`;
-
-  const cmd = `svn co ${uri} ${projectDirectory}`;
-  exec(cmd, function (err) {
-    if (err) return complete(err);
-    console.log('Successfully cloned project!'.green);
-    initializeProject(project, pairedWith, projectDirectory, complete);
+function installProject(project) {
+  return new Promise(function (res, rej) {
+    const projectName = changeCase.paramCase(project.name);
+    const authToken = github.grabLocalToken();
+    if (!fs.existsSync(projectsDirectory)) mkdirp.sync(projectsDirectory);
+    const projectDirectory = `${projectsDirectory}/${projectName}`;
+    if (fs.existsSync(projectDirectory)) return console.log('Project %s already installed! Please delete manually before reinstalling, or install another project.'.red, projectName);
+    console.log('Installing project %s, please wait...'.yellow, projectName);
+    const uri = `${project.url}/trunk --password ${authToken}`;
+    const cmd = `svn co ${uri} ${projectDirectory}`;
+    exec(cmd, function (err) {
+      if (err) return rej(err);
+      res(project);
+    });
   });
 }
+
 module.exports.installProject = installProject;
 
 function uninstallProject(project, pairedWith, complete) {
@@ -207,37 +202,41 @@ function uninstallProject(project, pairedWith, complete) {
 }
 module.exports.uninstallProject = uninstallProject;
 
-function initializeProject(project, pairedWith, projectDirectory, complete) {
-  async.series(
-    [
-      // add revision number and remote //
-      function (next) {
-        removeGitRemnants(projectDirectory, next);
-      },
-      function (next) {
-        removeSvnRemnants(projectDirectory, next);
-      },
-      function (next) {
-        if (program.master) return next();
-        removeMaster(projectDirectory, next);
-      },
-      function (next) {
-        if (program.test) return next();
-        removeTest(projectDirectory, next);
-      },
-      function (next) {
-        installBower(projectDirectory, next);
-      },
-      function (next) {
-        appendProjectEntry(project, pairedWith, next);
-      },
-    ],
-    function (err, result) {
-      if (err) return console.log(err + ''.red);
-      console.log('Installation of project %s complete!'.blue, project.name);
-      complete();
-    }
-  );
+function initializeProject(project) {
+  const projectName = changeCase.paramCase(project.name);
+  const projectDirectory = `${projectsDirectory}/${projectName}`;
+  console.log('Initializing project. . .'.yellow)
+  return new Promise(function (res, rej) {
+    async.series(
+      [
+        // add revision number and remote //
+        function (next) {
+          removeGitRemnants(projectDirectory, next);
+        },
+        function (next) {
+          removeSvnRemnants(projectDirectory, next);
+        },
+        function (next) {
+          if (program.master) return next();
+          removeMaster(projectDirectory, next);
+        },
+        function (next) {
+          if (program.test) return next();
+          removeTest(projectDirectory, next);
+        },
+        function (next) {
+          installBower(projectDirectory, next);
+        },
+        function (next) {
+          appendProjectEntry(project, null, next);
+        },
+      ],
+      function (err, result) {
+        if (err) rej(err);
+        res(project);
+      }
+    );
+  });
 }
 module.exports.initializeProject = initializeProject;
 

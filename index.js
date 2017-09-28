@@ -8,6 +8,7 @@ var
   init = require('./controller/init'),
   github = require('./controller/github'),
   greenlight = require('./controller/greenlight'),
+  install = require('./controller/install'),
   npm = require('./controller/npm'),
   projects = require('./controller/projects'),
   test = require('./controller/test'),
@@ -42,11 +43,11 @@ program
   .action(init.website);
 
 program
-  .option('-t, --test', 'Keep test files')
-  .option('-m, --master', 'Keep master files')
-  .command('install')
-  .description('List installable projects.')
-  .action(projects.install);
+  .option("-t, --test", "Keep test files")
+  .option("-m, --master", "Keep master files")
+  .command("install")
+  .description("List installable projects.")
+  .action(install.install);
 
 program
   .command('shelve')

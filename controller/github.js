@@ -28,6 +28,30 @@ var
 
 // TODO : consider the "module level" vars, like _client in this implementation, are they necessary.
 
+function getCredentials() {
+  // get local creds
+  // fs.existsSync, if yah, get file, extend documents together, and return //
+  // if local creds, return creds
+  console.log("Getting credentials. . .".yellow);
+  return new Promise(function (res, rej) {
+    if (fs.existsSync(githubFilePath) && fs.existsSync(userFilePath)) {
+      const creds = {
+        login: grabLocalLogin(),
+        id: grabLocalID(),
+        token: grabLocalToken()
+      };
+      console.log("Good to go!".green);
+      res(creds);
+    } else {
+      rej("Whoops");
+    }
+  });
+  // return Promise.resove(creds);
+
+  // if not, return authorize()
+}
+
+module.exports.getCredentials = getCredentials;
 
 function filesExist() {
   if (!fs.existsSync(githubFilePath) || !fs.existsSync(userFilePath)) {
