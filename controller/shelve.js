@@ -11,6 +11,7 @@ module.exports = function () {
   console.log('Beginning shelve process!'.blue);
   projects.action = 'shelve';
   github.getCredentials()
+    .catch(janitor.error('Failure getting credentials'.red))
     .then(greenlight.getSessions)
     .catch(janitor.error('Failure getting sessions'.red))
     .then(sessions.selectSession)
@@ -20,5 +21,5 @@ module.exports = function () {
     .then(projects.shelveProject)
     .catch(janitor.error('Failure shelving project'.red))
     .then(path => console.log('Project now available at'.blue, `${path}!`.yellow))
-    .catch((err) => { throw err; });
+    .catch((err) => { console.error(err); });
 };

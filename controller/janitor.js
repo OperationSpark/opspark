@@ -8,7 +8,6 @@ const projects = require('./projects');
 module.exports.error = function (message) {
   return function (error) {
     console.error(message);
-    console.error(error);
     throw error;
     process.exitCode = 1;
   };

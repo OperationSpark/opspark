@@ -6,6 +6,7 @@ const url = require('url');
 const cheerio = require('cheerio');
 const exec = require('child_process').exec;
 
+const janitor = require('./janitor');
 const github = require('./github');
 const configWebsite = require('../config.json').website;
 const configPortfolio = require('../config.json').portfolio;
@@ -20,7 +21,7 @@ module.exports.portfolioScript = portfolioScript;
 function login() {
   github.getCredentials()
     .then(() => console.log('Have fun!'.blue))
-    .catch(err => console.log('There was an error.'.red, err));
+    .catch(err => console.error('Failure getting credentials\n'.red, err));
 }
 module.exports.login = login;
 

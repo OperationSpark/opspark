@@ -28,7 +28,7 @@ module.exports.listSessions = listSessions;
 function pluckSession(cohort, sessions) {
   const dashCohort = changeCase.paramCase(cohort);
   const sessionsArray = _.map(sessions, session => session);
-  return sessionsArray.reduce(function(result, current) {
+  return sessionsArray.reduce(function (result, current) {
     return current.cohort === dashCohort ? current : result;
   });
 }
@@ -52,7 +52,7 @@ function selectSession(sessions) {
           ],
           function (response) {
             if (response.class === cancelOption) {
-              console.log(`${action} cancelled, bye bye!`.green);
+              console.log(`${projects.action} cancelled, bye bye!`.green);
               process.exitCode = 0;
               process.exit();
             }

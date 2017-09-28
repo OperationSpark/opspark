@@ -9,7 +9,7 @@ const github = require('./github');
 // TODO: Switch URI for live version
 const LOCALHOST = 'http://localhost:3000';
 const GREENLIGHT = 'https://greenlight.operationspark.org';
-const URI = GREENLIGHT;
+const URI = LOCALHOST;
 
 module.exports.URI = URI;
 
@@ -17,7 +17,7 @@ function getSessions({ id }) {
   console.log('Grabbing enrolled sessions. . .'.yellow);
   const options = {
     method: 'GET',
-    uri: `${URI}/api/os/insasdfasdftall`,
+    uri: `${URI}/api/os/install`,
     qs: {
       id,
     },
@@ -44,6 +44,7 @@ function grade({ project, gist }) {
 
   return rp(options)
     .then((response) => {
+      console.log(response);
       if (response.status === 200) {
         console.log(response.message.blue);
       } else {

@@ -1,7 +1,6 @@
 'use strict';
 
 require('colors');
-// const Promise = require('bluebird');
 const exec = require('child_process').exec;
 
 const janitor = require('./janitor');
@@ -15,18 +14,29 @@ function submit() {
   console.log('Beginning submit process!'.blue);
   projects.action = 'submit';
   github.getCredentials()
-    .then(greenlight.getSessions, janitor.error('Failure getting sessions'.red))
-    .then(sessions.selectSession, janitor.error('Failure selecting session'.red))
-    .then(projects.selectProject, janitor.error('Failure selecting project'.red))
-    .then(test.grabTests, janitor.error('Failure grabbing tests'.red))
-    .then(test.runTests, janitor.error('Failure running tests'.red))
-    .then(checkGrade, janitor.error('Failure checking grade'.red))
-    .then(createGist, janitor.error('Failure creating gist'.red))
-    .then(ensureGistExists, janitor.error('Failure ensuring gist exists'.red))
-    .then(greenlight.grade, janitor.error('Failure grading project'.red))
-    .then(deleteGist, janitor.error('Failure deleting gist'.red))
+    .catch(janitor.error('Failure getting credentials'.red))
+    .then(greenlight.getSessions)
+    .catch(janitor.error('Failure getting sessions'.red))
+    .then(sessions.selectSession)
+    .catch(janitor.error('Failure selecting session'.red))
+    .then(projects.selectProject)
+    .catch(janitor.error('Failure selecting project'.red))
+    .then(test.grabTests)
+    .catch(janitor.error('Failure grabbing tests'.red))
+    .then(test.runTests)
+    .catch(janitor.error('Failure running tests'.red))
+    .then(checkGrade)
+    .catch(janitor.error('Failure checking grade'.red))
+    .then(createGist)
+    .catch(janitor.error('Failure creating gist'.red))
+    .then(ensureGistExists)
+    .catch(janitor.error('Failure ensuring gist exists'.red))
+    .then(greenlight.grade)
+    .catch(janitor.error('Failure grading project'.red))
+    .then(deleteGist)
+    .catch(janitor.error('Failure deleting gist'.red))
     .then(() => console.log('Successfully concluded submission.'.blue))
-    .catch((err) => { throw new Error(err); });
+    .catch((err) => { console.error(err); });
 }
 
 module.exports.submit = submit;

@@ -56,7 +56,7 @@ function authorizeUser() {
         };
         res(creds);
       })
-      .catch(err => console.log(`${err}`.red));
+      .catch(err => rej(err));
   });
 }
 

@@ -12,10 +12,15 @@ module.exports = function () {
   console.log('Beginning uninstall process!'.blue);
   projects.action = 'uninstall';
   github.getCredentials()
-    .then(greenlight.getSessions, janitor.error('Failure getting sessions'.red))
-    .then(sessions.selectSession, janitor.error('Failure selecting session'.red))
-    .then(projects.selectProject, janitor.error('Failure selecting project'.red))
-    .then(projects.uninstallProject, janitor.error('Failure uninstalling project'.red))
+    .catch(janitor.error('Failure getting credentials'.red))
+    .then(greenlight.getSessions)
+    .catch(janitor.error('Failure getting sessions'.red))
+    .then(sessions.selectSession)
+    .catch(janitor.error('Failure selecting session'.red))
+    .then(projects.selectProject)
+    .catch(janitor.error('Failure selecting project'.red))
+    .then(projects.uninstallProject)
+    .catch(janitor.error('Failure uninstalling project'.red))
     .then(res => console.log(`Successfully uninstalled ${res.name}!`.red))
     .catch(err => console.log(err));
 };

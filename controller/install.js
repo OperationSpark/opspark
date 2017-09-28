@@ -12,11 +12,17 @@ module.exports = function () {
   console.log('Beginning install process!'.blue);
   projects.action = 'install';
   github.getCredentials()
-    .then(greenlight.getSessions, janitor.error('Failure getting sessions'.red))
-    .then(sessions.selectSession, janitor.error('Failure selecting session'.red))
-    .then(projects.selectProject, janitor.error('Failure selecting project'.red))
-    .then(projects.installProject, janitor.error('Failure installing project'.red))
-    .then(projects.initializeProject, janitor.error('Failure initializing'.red))
+    .catch(janitor.error('Failure getting credentials'.red))
+    .then(greenlight.getSessions)
+    .catch(janitor.error('Failure getting sessions'.red))
+    .then(sessions.selectSession)
+    .catch(janitor.error('Failure selecting session'.red))
+    .then(projects.selectProject)
+    .catch(janitor.error('Failure selecting project'.red))
+    .then(projects.installProject)
+    .catch(janitor.error('Failure installing project'.red))
+    .then(projects.initializeProject)
+    .catch(janitor.error('Failure initializing'.red))
     .then(res => console.log(`Successfully installed ${res.name}!`.blue))
-    .catch((err) => { throw new Error(err); });
+    .catch((err) => { console.error(err); });
 };
