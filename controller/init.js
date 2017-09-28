@@ -1,19 +1,18 @@
 'use strict';
 
-var
-  _ = require('lodash'),
-  configPortfolio = require('../config.json').portfolio,
-  configWebsite = require('../config.json').website,
-  fs = require('fs'),
-  url = require('url'),
-  exec = require('child_process').exec,
-  cheerio = require('cheerio'),
-  github = require('./github'),
-  greenlight = require('./greenlight'),
-  submit = require('./submit'),
-  colors = require('colors'),
-  jQueryCdnScript = "    <script src=\"https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js\"></script>\n",
-  portfolioScript = "        <script id=\"portfolioScript\">$(document).ready(function() {$.getJSON('projects/projects.json').then(function(data) { data.projects.forEach(function(project){ $('#portfolio').append('<li><a href=\"projects/' + project.name + '/\">' + project.title + ' : ' + project.description + '</a></li>'); }); }); });</script>\n    </body>";
+require('colors');
+const fs = require('fs');
+const url = require('url');
+const cheerio = require('cheerio');
+const exec = require('child_process').exec;
+
+const github = require('./github');
+const configWebsite = require('../config.json').website;
+const configPortfolio = require('../config.json').portfolio;
+
+const jQueryCdnScript = '    <script src=\"https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js\"></script>\n';
+const portfolioScript = "        <script id=\"portfolioScript\">$(document).ready(function() {$.getJSON('projects/projects.json').then(function(data) { data.projects.forEach(function(project){ $('#portfolio').append('<li><a href=\"projects/' + project.name + '/\">' + project.title + ' : ' + project.description + '</a></li>'); }); }); });</script>\n    </body>";
+require('colors');
 
 module.exports.jQueryCdnScript = jQueryCdnScript;
 module.exports.portfolioScript = portfolioScript;
@@ -28,13 +27,13 @@ module.exports.login = login;
 function portfolio(filepath) {
   filepath = (filepath ? filepath : configPortfolio.filepath);
   if (!fs.existsSync(filepath)) return console.log(configPortfolio.help.incomplete.red);
-  var html = fs.readFileSync(filepath, 'utf8');
-  var $ = cheerio.load(html);
-  var portfolioListTag = $('#portfolio')[0];
+  const html = fs.readFileSync(filepath, 'utf8');
+  const $ = cheerio.load(html);
+  const portfolioListTag = $('#portfolio')[0];
   if (!portfolioListTag) return console.log(configPortfolio.help.noPortfolioList.red);
-  var portfolioScriptTag = $('#portfolioScript')[0];
+  const portfolioScriptTag = $('#portfolioScript')[0];
   if (portfolioScriptTag) return console.log(configPortfolio.help.portfolioScriptTagExists.red);
-  var result = html.replace(/<\/body>/g, jQueryCdnScript + portfolioScript);
+  const result = html.replace(/<\/body>/g, jQueryCdnScript + portfolioScript);
   try {
     fs.writeFileSync(filepath, result, 'utf8');
     console.log('portfolio.html has been initialized!');

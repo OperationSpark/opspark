@@ -1,11 +1,14 @@
-var
-  _ = require('lodash'),
-  changeCase = require('change-case'),
-  async = require('async'),
-  projects = require('./projects'),
-  inquirer = require('inquirer'),
-  colors = require('colors'),
-  cancelOption = '[cancel]';
+'use strict';
+
+require('colors');
+const _ = require('lodash');
+const inquirer = require('inquirer');
+const { waterfall } = require('async');
+const changeCase = require('change-case');
+
+const projects = require('./projects');
+
+const cancelOption = '[cancel]';
 
 function listSessions(sessions) {
   console.log("Grabbing sessions. . .".yellow);
@@ -35,7 +38,7 @@ function selectSession(sessions) {
   const parsedSessions = JSON.parse(sessions);
   const sessionNames = listSessions(parsedSessions);
   return new Promise(function (res, rej) {
-    async.waterfall([
+    waterfall([
       function (next) {
         inquirer.prompt(
           [
@@ -48,7 +51,8 @@ function selectSession(sessions) {
           ],
           function (response) {
             if (response.class === cancelOption) {
-              console.log('Installation cancelled, bye bye!'.green);
+              console.log(`${action} cancelled, bye bye!`.green);
+              process.exitCode = 0;
               process.exit();
             }
             next(null, response);

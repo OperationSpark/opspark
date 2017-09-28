@@ -1,17 +1,16 @@
 'use strict';
 
-var 
-  greenlight = require("./greenlight"),
-  view = require("../view"),
-  request = require("request"),
-  rp = require("request-promise"),
-  fs = require("fs"),
-  fsJson = require("fs-json")(),
-  mkdirp = require("mkdirp"),
-  colors = require("colors"),
-  env = require("./env"),
-  filePath = `${env.home()}/opspark`;
+require('colors');
+const fs = require('fs');
+const mkdirp = require('mkdirp');
+const fsJson = require('fs-json')();
+const rp = require('request-promise');
+const greenlight = require('./greenlight');
 
+const env = require('./env');
+const view = require('../view');
+
+const filePath = `${env.home()}/opspark`;
 const URI = greenlight.URI;
 
 function readHandshake() {
@@ -25,7 +24,7 @@ function readHandshake() {
 // Checks if directory exists and creates if not
 function checkForDirectory(path) {
   if (!fs.existsSync(path)) {
-    console.log(colors.yellow('Creating new directory'));
+    console.log('Creating new directory'.yellow);
     mkdirp.sync(path);
   }
 }
@@ -51,23 +50,23 @@ function storeCreds(body, hash) {
   checkForDirectory(filePath);
 
   if (fs.existsSync(path)) {
-    console.log(colors.red('Hey, this file is already there!'));
+    console.log('Hey, this file is already there!'.red);
     view.inquireForInput('Overwrite file? (y/n)', (err, input) => {
       console.log(input);
       if (err) {
-        console.warn(colors.red('Something went wrong! Run that code again.'));
+        console.warn('Something went wrong! Run that code again.'.red);
       } else if (input.toLowerCase()[0] === 'y') {
-        console.warn(colors.yellow('Rewriting. . .'));
+        console.warn('Rewriting. . .'.yellow);
         fs.writeFileSync(path, JSON.stringify(userInfo));
-        console.warn(colors.green('All done!'));
+        console.warn('All done!'.green);
       } else {
-        console.warn(colors.green('Exiting without overwrite.'));
+        console.warn('Exiting without overwrite.'.green);
       }
     });
   } else {
     console.warn('Writing file. . .');
     fsJson.saveSync(path, JSON.stringify(userInfo));
-    console.warn(colors.green('All done!'));
+    console.warn('All done!'.green);
   }
 }
 

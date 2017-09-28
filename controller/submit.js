@@ -1,17 +1,13 @@
 'use strict';
 
-var
-  _ = require('lodash'),
-  github = require('./github'),
-  greenlight = require('./greenlight'),
-  sessions = require('./sessions'),
-  projects = require('./projects'),
-  test = require('./test'),
-  program = require('commander'),
-  inquirer = require('inquirer'),
-  colors = require('colors'),
-  exec = require('child_process').exec,
-  rp = require('request-promise');
+require('colors');
+const exec = require('child_process').exec;
+
+const github = require('./github');
+const greenlight = require('./greenlight');
+const sessions = require('./sessions');
+const projects = require('./projects');
+const test = require('./test');
 
 function submit() {
   console.log('Beginning submit process!'.blue);

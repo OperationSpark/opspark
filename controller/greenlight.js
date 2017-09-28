@@ -1,29 +1,9 @@
 'use strict';
 
-var
-  config = require('../config'),
-  _ = require('lodash'),
-  util = require('util'),
-  Q = require('q'),
-  fsJson = require('fs-json')(),
-  changeCase = require('change-case'),
-  async = require('async'),
-  github = require('./github'),
-  submit = require('./submit'),
-  program = require('commander'),
-  inquirer = require('inquirer'),
-  colors = require('colors'),
-  fs = require('fs'),
-  url = require('url'),
-  exec = require('child_process').exec,
-  request = require('request'),
-  rp = require('request-promise'),
-  mkdirp = require('mkdirp'),
-  rimraf = require('rimraf'),
-  cancelOption = '[cancel]',
-  env = require('./env'),
-  rootDirectory = `${env.home()}/workspace`,
-  projectEntriesPath = `${rootDirectory}/projects/projects.json`;
+require('colors');
+const rp = require('request-promise');
+
+const github = require('./github');
 
 // TODO: Switch URI for live version
 const LOCALHOST = 'http://localhost:3000';
@@ -33,7 +13,7 @@ const URI = GREENLIGHT;
 module.exports.URI = URI;
 
 function getSessions({ id }) {
-  console.log('Grabbing enrolled sessions. . .'.yellow)
+  console.log('Grabbing enrolled sessions. . .'.yellow);
   const options = {
     method: 'GET',
     uri: `${URI}/api/os/install`,

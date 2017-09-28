@@ -1,25 +1,24 @@
 'use strict';
 
-var
-  _ = require('lodash'),
-  fsJson = require('fs-json')(),
-  changeCase = require('change-case'),
-  async = require('async'),
-  github = require('./github'),
-  greenlight = require('./greenlight'),
-  test = require('./test'),
-  program = require('commander'),
-  inquirer = require('inquirer'),
-  colors = require('colors'),
-  fs = require('fs'),
-  exec = require('child_process').exec,
-  mkdirp = require('mkdirp'),
-  rimraf = require('rimraf'),
-  cancelOption = '[cancel]',
-  env = require('./env'),
-  rootDirectory = `${env.home()}/workspace`,
-  projectEntriesPath = `${rootDirectory}/projects/projects.json`,
-  projectsDirectory = `${rootDirectory}/projects`;
+require('colors');
+const fs = require('fs');
+const _ = require('lodash');
+const mkdirp = require('mkdirp');
+const rimraf = require('rimraf');
+const fsJson = require('fs-json')();
+const program = require('commander');
+const inquirer = require('inquirer');
+const changeCase = require('change-case');
+const exec = require('child_process').exec;
+const { waterfall, series } = require('async');
+
+const env = require('./env');
+const github = require('./github');
+
+const rootDirectory = `${env.home()}/workspace`;
+const projectEntriesPath = `${rootDirectory}/projects/projects.json`;
+const projectsDirectory = `${rootDirectory}/projects`;
+const cancelOption = '[cancel]';
 
 let action = null;
 
@@ -29,7 +28,7 @@ function selectProject({ session, projectAction }) {
   action = projectAction;
   const projects = listProjects(session);
   return new Promise(function (res) {
-    async.waterfall([
+    waterfall([
       function (next) {
         inquirer.prompt([{
           type: 'list',
@@ -39,7 +38,8 @@ function selectProject({ session, projectAction }) {
         }],
         function (response) {
           if (response.project === cancelOption) {
-            console.log('Installation cancelled, bye bye!'.green);
+            console.log(`${action} cancelled, bye bye!`.green);
+            process.exitCode = 0;
             process.exit();
           }
           next(null, _.filter(projects, { name: response.project, })[0]);
@@ -67,8 +67,8 @@ function listProjects(session) {
   const projects = session.PROJECT;
   let files;
   let testableProjects;
-  const mappedProjects = _.map(projects, function(e) {
-    return changeCase.paramCase(e.name);
+  const mappedProjects = _.map(projects, function (project) {
+    return changeCase.paramCase(project.name);
   });
   if (fs.existsSync(projectsDirectory)) {
     files = fs.readdirSync(projectsDirectory);
@@ -81,7 +81,7 @@ function listProjects(session) {
     testableProjects = _.intersection(mappedProjects, files);
   }
   return projects
-    .reduce(function(seed, project) {
+    .reduce(function (seed, project) {
       if (testableProjects.indexOf(changeCase.paramCase(project.name)) > -1) {
         const updatedProject = project;
         updatedProject._session = session.sessionId;
@@ -89,7 +89,7 @@ function listProjects(session) {
       }
       return seed;
     }, [])
-    .sort(function(a, b) {
+    .sort(function (a, b) {
       if (a.name < b.name) return -1;
       if (a.name > b.name) return 1;
       return 0;
@@ -139,21 +139,21 @@ function uninstallProject(project) {
 module.exports.uninstallProject = uninstallProject;
 
 function shelveProject(project) {
-  console.log("Fetching directory. . .".yellow);
-  return new Promise(function(res, rej) {
+  console.log('Fetching directory. . .'.yellow);
+  return new Promise(function (res, rej) {
     removeProjectEntry(project);
     const name = changeCase.paramCase(project.name);
     const path = `${rootDirectory}/projects`;
     const underscores = fs.readdirSync(path).reduce((s, c) => {
       if (c.indexOf(name) > -1) {
-        const u = c.replace(/(_)|[^]/g, "$1");
+        const u = c.replace(/(_)|[^]/g, '$1');
         return u.length > s.length ? u : s;
       }
       return s;
-    }, "");
+    }, '');
     const cmd = `mv ${path}/${name} ${path}/${underscores}_${name}`;
-    console.log("Shelving project. . .".yellow);
-    exec(cmd, function() {
+    console.log('Shelving project. . .'.yellow);
+    exec(cmd, function () {
       res(`${path}/${underscores}_${name}`);
     });
   });
@@ -166,7 +166,7 @@ function initializeProject(project) {
   const projectDirectory = `${projectsDirectory}/${projectName}`;
   console.log('Initializing project. . .'.yellow)
   return new Promise(function (res, rej) {
-    async.series(
+    series(
       [
         // add revision number and remote //
         function (next) {

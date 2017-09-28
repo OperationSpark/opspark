@@ -1,37 +1,31 @@
 'use strict';
 
-// TODO : re-write using decorator or chain of command (connect?), and use bluebird //
+require('colors');
+const fs = require('fs');
+const util = require('util');
+const prompt = require('prompt');
+const mkdirp = require('mkdirp');
+const fsJson = require('fs-json')();
+const Promise = require('bluebird');
+const octonode = require('octonode');
+const rp = require('request-promise');
+const exec = require('child_process').exec;
 
-var
-  config = require('../config'),
-  Promise = require("bluebird"),
-  Q = require("bluebird-q"),
-  _ = require('lodash'),
-  util = require('util'),
-  fs = require('fs'),
-  fsJson = require('fs-json')(),
-  child = require('./child'),
-  colors = require('colors'),
-  prompt = require('prompt'),
-  view = require('../view'),
-  mkdirp = require('mkdirp'),
-  exec = require('child_process').exec,
-  request = require('request'),
-  rp = require('request-promise'),
-  octonode = require('octonode'),
-  env = require('./env'),
-  applicationDirectory = env.home() + '/opspark',
-  authFilePath = applicationDirectory + '/auth',
-  userFilePath = applicationDirectory + '/user',
-  _auth,
-  _user,
-  _client,
-  _opspark;
+const env = require('./env');
+const config = require('../config');
+
+const applicationDirectory = `${env.home()}/opspark`;
+const authFilePath = `${applicationDirectory}/auth`;
+const userFilePath = `${applicationDirectory}/user`;
+let _auth;
+let _user;
+let _client;
+let _opspark;
 
 // TODO : consider the "module level" vars, like _client in this implementation, are they necessary.
 
 function getCredentials() {
-  console.log("Getting credentials. . .".yellow);
+  console.log('Getting credentials. . .'.yellow);
   return new Promise(function (res, rej) {
     if (filesExist()) {
       const creds = {
@@ -39,7 +33,7 @@ function getCredentials() {
         id: grabLocalUserID(),
         token: grabLocalAuthToken()
       };
-      console.log("Good to go!".green);
+      console.log('Good to go!'.green);
       res(creds);
     } else {
       res(authorizeUser());
@@ -50,11 +44,11 @@ function getCredentials() {
 module.exports.getCredentials = getCredentials;
 
 function authorizeUser() {
-  return new Promise(function(res, rej) {
+  return new Promise(function (res, rej) {
     promptForUserInfo()
       .then(obtainAndWriteAuth)
       .then(obtainAndWriteUser)
-      .then(auth => {
+      .then(() => {
         const creds = {
           login: grabLocalLogin(),
           id: grabLocalUserID(),
@@ -93,8 +87,8 @@ function promptForUserInfo() {
 module.exports.promptForUserInfo = promptForUserInfo;
 
 function writeAuth(auth) {
-  console.log("Writing auth. . .".yellow);
-  return new Promise(function(res, rej) {
+  console.log('Writing auth. . .'.yellow);
+  return new Promise(function (res, rej) {
     ensureApplicationDirectory();
     fsJson.saveSync(authFilePath, auth);
     res(true);
@@ -153,7 +147,7 @@ module.exports.obtainAndWriteUser = obtainAndWriteUser;
 module.exports.repo = function (username, repoName, complete) {
   getOrCreateClient()
     .then(function (client) {
-      var ghrepo = client.repo(username + '/' + username + '.github.io');
+      const ghrepo = client.repo(`${username}/${username}.github.io`);
       ghrepo.info(function (er, statu, bod, header) {
         console.log(bod);
         complete(null, bod);
@@ -165,9 +159,9 @@ module.exports.repo = function (username, repoName, complete) {
 module.exports.limit = function (complete) {
   getOrCreateClient()
     .then(function (client) {
-      client.limit(function(err, left, max) {
+      client.limit(function (err, left, max) {
         if (err) return complete(err);
-        var message = "GitHub limit: " + left + " used of " + max + ".";
+        const message = `GitHub limit: ${left} used of ${max}.`;
         complete(null, message);
       });
     })
@@ -192,9 +186,9 @@ function getOrCreateClient() {
   return new Promise(function (res, rej) {
     if (_client) return res(_client);
     getOrObtainAuth()
-      .then(function(auth) {
+      .then(function (auth) {
         _client = octonode.client(auth.token);
-        _opspark = _client.org("OperationSpark");
+        _opspark = _client.org('OperationSpark');
         res(_client);
       })
       .catch(err => console.error(err));
@@ -227,7 +221,7 @@ module.exports.getOrObtainAuth = getOrObtainAuth;
 
 
 function hasAuthorization(token) {
-  var options = {
+  const options = {
     url: util.format('https://api.github.com/?access_token=%s', token),
     headers: {
       'User-Agent': config.userAgent
@@ -247,8 +241,6 @@ function filesExist() {
 }
 
 module.exports.filesExist = filesExist;
-
-
 
 function grabLocalUserID() {
   const git = fsJson.loadSync(userFilePath);
@@ -303,13 +295,12 @@ function deauthorizeUser() {
 module.exports.deauthorizeUser = deauthorizeUser;
 
 function deleteToken({ username, password }) {
-  console.log("Deleting token. . .".red);
-  return new Promise(function(res, rej) {
+  console.log('Deleting token. . .'.red);
+  return new Promise(function (res, rej) {
     const cmd = `curl -X "DELETE" -A "${config.userAgent}" -H "Accept: application/json" https://api.github.com/authorizations/${grabLocalAuthID()} --user "${username}:${password}"`;
-    exec(cmd, function(err, stdout, stderr) {
+    exec(cmd, function (err, stdout, stderr) {
       if (err) rej(err);
       else res();
-      // else rej("Something went wrong, try again or ask for help.".red);
     });
   });
 }
@@ -317,30 +308,34 @@ function deleteToken({ username, password }) {
 module.exports.deleteToken = deleteToken;
 
 function deleteUserInfo() {
-  console.log("Deleting files. . .".red);
+  console.log('Deleting files. . .'.red);
   if (fs.existsSync(authFilePath)) fs.unlinkSync(authFilePath);
   if (fs.existsSync(userFilePath)) fs.unlinkSync(userFilePath);
 }
 
 module.exports.deleteUserInfo = deleteUserInfo;
 
-function listAuths(username, complete) {
-  var cmd =
-    'curl -A "' +
-    config.userAgent +
-    '" --user "' +
-    username +
-    '" https://api.github.com/authorizations';
-  exec(cmd, function(err, stdout, stderr) {
-    if (err) return complete(err);
-    console.log("stdout: ", stdout.green);
-    console.log("stdout: ", stderr.green);
-    complete(err, stdout, stderr);
+function obtainAuths(user) {
+  return new Promise(function (res, rej) {
+    const cmd = `curl -A "${config.userAgent}" --user "${user.username}:${user.password}" https://api.github.com/authorizations`;
+    exec(cmd, function (err, stdout) {
+      if (err) return rej(err);
+      res(JSON.parse(stdout));
+    });
   });
 }
+
+function listAuths() {
+  promptForUserInfo()
+    .then(obtainAuths)
+    .then(res => console.log(res))
+    .catch(err => console.error(err));
+}
+
 module.exports.listAuths = listAuths;
 
 function getNoteForHost() {
   return util.format(config.github.note, env.hostname());
 }
+
 module.exports.getNoteForHost = getNoteForHost;

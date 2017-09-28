@@ -1,9 +1,11 @@
-const 
-  github = require('./github'),
-  greenlight = require('./greenlight'),
-  projects = require('./projects'),
-  sessions = require('./sessions'),
-  colors = require('colors');
+'use strict';
+
+require('colors');
+
+const github = require('./github');
+const greenlight = require('./greenlight');
+const projects = require('./projects');
+const sessions = require('./sessions');
 
 module.exports = function () {
   console.log('Beginning install process!'.blue);

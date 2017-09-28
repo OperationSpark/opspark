@@ -1,15 +1,15 @@
 'use strict';
 
-const _ = require('lodash');
+require('colors');
+const fs = require('fs');
 const changeCase = require('change-case');
+const exec = require('child_process').exec;
+
+const env = require('./env');
 const github = require('./github');
 const greenlight = require('./greenlight');
 const sessions = require('./sessions');
 const projects = require('./projects');
-const fs = require('fs');
-const colors = require('colors');
-const exec = require('child_process').exec;
-const env = require('./env');
 
 const rootDirectory = `${env.home()}/workspace`;
 const projectsDirectory = `${rootDirectory}/projects`;
@@ -18,8 +18,8 @@ const projectsDirectory = `${rootDirectory}/projects`;
 // Runs the listProjectsOf function from projects to select project
 // that user wants to be tested
 function test() {
-  console.log("Beginning test process!".blue);
-  projects.action = "test";
+  console.log('Beginning test process!'.blue);
+  projects.action = 'test';
   github.getCredentials()
     .then(greenlight.getSessions)
     .then(sessions.selectSession)
@@ -77,7 +77,7 @@ module.exports.grabTests = grabTests;
 // when used with other commands
 // If error, runs postTestCleanup to delete new directories so students can't have them
 // If no error, calls postTestCleanup function
-function runTests(project, submitFlag) {
+function runTests(project) {
   return new Promise(function (res, rej) {
     const name = changeCase.paramCase(project.name);
     console.log('Running tests. . .'.green);
