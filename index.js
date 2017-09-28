@@ -93,7 +93,7 @@ program
 program
   .command('logout')
   .description('Will clear any local authorizations from the user\'s workspace. The user will be asked to authorize next time they trip the need.')
-  .action(github.deauthorize);
+  .action(github.deauthorizeUser);
 
 program
   .command('fix')
