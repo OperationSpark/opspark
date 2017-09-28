@@ -2,10 +2,12 @@
 
 require('colors');
 const fs = require('fs');
+// const Promise = require('bluebird');
 const changeCase = require('change-case');
 const exec = require('child_process').exec;
 
 const env = require('./env');
+const janitor = require('./janitor');
 const github = require('./github');
 const greenlight = require('./greenlight');
 const sessions = require('./sessions');
@@ -21,14 +23,14 @@ function test() {
   console.log('Beginning test process!'.blue);
   projects.action = 'test';
   github.getCredentials()
-    .then(greenlight.getSessions)
-    .then(sessions.selectSession)
-    .then(projects.selectProject)
-    .then(grabTests)
-    .then(runTests)
-    .then(displayResults)
+    .then(greenlight.getSessions, janitor.error('Failure getting sessions'.red))
+    .then(sessions.selectSession, janitor.error('Failure selecting session'.red))
+    .then(projects.selectProject, janitor.error('Failure selecting project'.red))
+    .then(grabTests, janitor.error('Failure grabbing tests'.red))
+    .then(runTests, janitor.error('Failure running tests'.red))
+    .then(displayResults, janitor.error('Failure displaying results'.red))
     .then(() => console.log('Successfully concluded test.'.blue))
-    .catch(err => console.log(err));
+    .catch((err) => { throw new Error(err); });
 }
 
 module.exports.test = test;

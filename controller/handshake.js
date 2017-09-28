@@ -4,6 +4,7 @@ require('colors');
 const fs = require('fs');
 const mkdirp = require('mkdirp');
 const fsJson = require('fs-json')();
+// const Promise = require("bluebird");
 const rp = require('request-promise');
 const greenlight = require('./greenlight');
 

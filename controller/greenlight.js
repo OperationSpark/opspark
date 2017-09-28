@@ -1,6 +1,7 @@
 'use strict';
 
 require('colors');
+// const Promise = require("bluebird");
 const rp = require('request-promise');
 
 const github = require('./github');
@@ -16,7 +17,7 @@ function getSessions({ id }) {
   console.log('Grabbing enrolled sessions. . .'.yellow);
   const options = {
     method: 'GET',
-    uri: `${URI}/api/os/install`,
+    uri: `${URI}/api/os/insasdfasdftall`,
     qs: {
       id,
     },
@@ -41,22 +42,16 @@ function grade({ project, gist }) {
     json: true,
   };
 
-  return new Promise(function (res, rej) {
-    rp(options)
-      .then((response) => {
-        if (response.status === 200) {
-          console.log(response.message.blue);
-        } else {
-          console.log(response.reason.red);
-          console.log(response.details.red);
-        }
-        res(gist.url);
-      })
-      .catch((err) => {
-        rej(err);
-        res(gist.url);
-      });
-  });
+  return rp(options)
+    .then((response) => {
+      if (response.status === 200) {
+        console.log(response.message.blue);
+      } else {
+        console.log(response.reason.red);
+        console.log(response.details.red);
+      }
+      return gist.url;
+    });
 }
 
 module.exports.grade = grade;

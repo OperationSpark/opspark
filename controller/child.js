@@ -1,7 +1,7 @@
 'use strict';
 
 const exec = require('child_process').exec;
-const Promise = require('bluebird');
+// const Promise = require('bluebird');
 
 function execute(command) {
   return new Promise(function (resolve, reject) {

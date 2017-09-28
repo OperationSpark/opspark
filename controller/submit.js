@@ -1,8 +1,10 @@
 'use strict';
 
 require('colors');
+// const Promise = require('bluebird');
 const exec = require('child_process').exec;
 
+const janitor = require('./janitor');
 const github = require('./github');
 const greenlight = require('./greenlight');
 const sessions = require('./sessions');
@@ -13,18 +15,18 @@ function submit() {
   console.log('Beginning submit process!'.blue);
   projects.action = 'submit';
   github.getCredentials()
-    .then(greenlight.getSessions)
-    .then(sessions.selectSession)
-    .then(projects.selectProject)
-    .then(test.grabTests)
-    .then(test.runTests)
-    .then(checkGrade)
-    .then(createGist)
-    .then(ensureGistExists)
-    .then(greenlight.grade)
-    .then(deleteGist)
+    .then(greenlight.getSessions, janitor.error('Failure getting sessions'.red))
+    .then(sessions.selectSession, janitor.error('Failure selecting session'.red))
+    .then(projects.selectProject, janitor.error('Failure selecting project'.red))
+    .then(test.grabTests, janitor.error('Failure grabbing tests'.red))
+    .then(test.runTests, janitor.error('Failure running tests'.red))
+    .then(checkGrade, janitor.error('Failure checking grade'.red))
+    .then(createGist, janitor.error('Failure creating gist'.red))
+    .then(ensureGistExists, janitor.error('Failure ensuring gist exists'.red))
+    .then(greenlight.grade, janitor.error('Failure grading project'.red))
+    .then(deleteGist, janitor.error('Failure deleting gist'.red))
     .then(() => console.log('Successfully concluded submission.'.blue))
-    .catch(err => console.log(err));
+    .catch((err) => { throw new Error(err); });
 }
 
 module.exports.submit = submit;
