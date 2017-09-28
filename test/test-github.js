@@ -1,5 +1,5 @@
 /* global describe it expect before beforeEach afterEach */
-'use strict';
+'doneuse strict';
 
 require('mocha');
 require('should');
@@ -8,7 +8,9 @@ const _ = require('lodash');
 const util = require('util');
 const fs = require('fs-extra');
 const sinon = require('sinon');
+const prompt = require('prompt');
 const rimraf = require('rimraf');
+const process = require('process');
 const fsJson = require('fs-json')();
 const chai = require('./helpers/chai');
 const stdin = require('mock-stdin').stdin();
@@ -79,13 +81,10 @@ const dummyUser = {
 };
 
 describe('github', function () {
-  before(function () {
-    rimraf(applicationDirectory, function () {});
-  });
 
   describe('#ensureApplicationDirectory()', function () {
-    beforeEach(function () {
-      rimraf(applicationDirectory, function () {});
+    beforeEach(function (done) {
+      rimraf(applicationDirectory, function () { done(); });
     });
 
     it('should create directory if none', function (done) {
@@ -98,8 +97,8 @@ describe('github', function () {
   });
 
   describe('#writeAuth()', function () {
-    beforeEach(function () {
-      rimraf(applicationDirectory, function () {});
+    beforeEach(function (done) {
+      rimraf(applicationDirectory, function () { done(); });
     });
 
     it('should write auth file', function (done) {
@@ -120,8 +119,8 @@ describe('github', function () {
   });
 
   describe('#writeUser()', function () {
-    beforeEach(function () {
-      rimraf(applicationDirectory, function () {});
+    beforeEach(function (done) {
+      rimraf(applicationDirectory, function () { done(); });
     });
 
     it('should write user file', function (done) {
@@ -235,11 +234,26 @@ describe('github', function () {
   });
 
 
-  describe('#promptForUserInfo', function () {
+  describe('#promptForUserInfo()', function () {
     const promptForUserInfo = github.promptForUserInfo;
 
     it('should return a promise', function () {
       expect(promptForUserInfo()).to.be.an.instanceof(Promise);
+    });
+
+    it('should correctly receive user input', function () {
+      promptForUserInfo();
+      console.log(prompt.history('username'));
+      console.log(prompt.history('password'));
+      process.stdout.write('hey\r');
+      // process.stdout.write('pass\r');
+      console.log(prompt.history('username'));
+      console.log(prompt.history('password'));
+        // .then(function (response) {
+        //   console.log(response);
+        //   expect(response.username).to.exist;
+        //   expect(response.password).to.exist;
+        // });
     });
   });
 

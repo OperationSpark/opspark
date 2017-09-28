@@ -251,6 +251,16 @@ function grabLocalUserID() {
 
 module.exports.grabLocalUserID = grabLocalUserID;
 
+function grabLocalLogin() {
+  const git = fsJson.loadSync(userFilePath);
+  if (!git) {
+    throw new Error(`There is no file at ${userFilePath}.`);
+  }
+  return git.login;
+}
+
+module.exports.grabLocalLogin = grabLocalLogin;
+
 function grabLocalAuthID() {
   const git = fsJson.loadSync(authFilePath);
   if (!git) {
@@ -270,16 +280,6 @@ function grabLocalAuthToken() {
 }
 
 module.exports.grabLocalAuthToken = grabLocalAuthToken;
-
-function grabLocalLogin() {
-  const git = fsJson.loadSync(userFilePath);
-  if (!git) {
-    throw new Error(`There is no file at ${userFilePath}.`);
-  }
-  return git.login;
-}
-
-module.exports.grabLocalLogin = grabLocalLogin;
 
 function deauthorizeUser() {
   return new Promise(function (res, rej) {
