@@ -77,7 +77,7 @@ function grabTests(project, submitFlag) {
   const repo = `${project.url}/trunk`;
   const directory = `${projectsDirectory}/${name}/test`;
   console.log(`Downloading tests for ${name}. . .`.green);
-  const token = github.grabLocalToken();
+  const token = github.grabLocalAuthToken();
   const cmd = `svn export ${repo}/test ${directory} --password ${token}`;
   const packageName = `${projectsDirectory}/${name}/package.json`;
   const packageCmd = `svn export ${repo}/package.json ${packageName} --password ${token}`;

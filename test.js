@@ -17,8 +17,8 @@ function getCredentials() {
     if (fs.existsSync(githubFilePath) && fs.existsSync(userFilePath)) {
       const creds = {
         login: github.grabLocalLogin(),
-        id: github.grabLocalID(),
-        token: github.grabLocalToken(),
+        id: github.grabLocalUserID(),
+        token: github.grabLocalAuthToken(),
       };
       console.log('Good to go!'.green);
       res(creds);

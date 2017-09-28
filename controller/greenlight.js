@@ -48,7 +48,7 @@ module.exports.getSessions = getSessions;
 
 function grade(project, gist) {
   const body = {
-    id: github.grabLocalID().toString(),
+    id: github.grabLocalUserID().toString(),
     requirementId: project._id,
     sessionId: project._session,
     url: gist.files['grade.txt'].raw_url,

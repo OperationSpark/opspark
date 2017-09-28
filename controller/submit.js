@@ -31,7 +31,7 @@ module.exports.checkGrade = checkGrade;
 
 function createGist(project, stats) {
   const files = {
-    id: github.grabLocalID(),
+    id: github.grabLocalUserID(),
     requirementId: project._id,
     sessionId: project._session,
     type: 'PROJECT',
@@ -50,7 +50,7 @@ function createGist(project, stats) {
     }
   };
 
-  const cmd = `curl -X POST -d '${JSON.stringify(content)}' -u ${github.grabLocalLogin()}:${github.grabLocalToken()} https://api.github.com/gists`;
+  const cmd = `curl -X POST -d '${JSON.stringify(content)}' -u ${github.grabLocalLogin()}:${github.grabLocalAuthToken()} https://api.github.com/gists`;
 
   console.log('Creating gist. . .'.green);
 
@@ -86,7 +86,7 @@ function ensureGistExists(project, gist, tries) {
 }
 
 function deleteGist(url) {
-  const cmd = `curl -X DELETE -u ${github.grabLocalLogin()}:${github.grabLocalToken()} ${url}`;
+  const cmd = `curl -X DELETE -u ${github.grabLocalLogin()}:${github.grabLocalAuthToken()} ${url}`;
 
   console.log('Deleting gist. . .'.green);
 

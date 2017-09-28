@@ -164,7 +164,7 @@ function listProjects(session) {
 function installProject(project) {
   return new Promise(function (res, rej) {
     const projectName = changeCase.paramCase(project.name);
-    const authToken = github.grabLocalToken();
+    const authToken = github.grabLocalAuthToken();
     if (!fs.existsSync(projectsDirectory)) mkdirp.sync(projectsDirectory);
     const projectDirectory = `${projectsDirectory}/${projectName}`;
     if (fs.existsSync(projectDirectory)) return console.log('Project %s already installed! Please delete manually before reinstalling, or install another project.'.red, projectName);
