@@ -6,14 +6,13 @@ const
   colors = require('colors');
 
 module.exports = function () {
-  console.log('Beginning install process!'.blue);
-  projects.action = 'install';
+  console.log('Beginning shelve process!'.blue);
+  projects.action = 'shelve';
   github.getCredentials()
     .then(greenlight.getSessions)
     .then(sessions.selectSession)
     .then(projects.selectProject)
-    .then(projects.installProject)
-    .then(projects.initializeProject)
-    .then(res => console.log(`Successfully installed ${res.name}!`.blue))
+    .then(projects.shelveProject)
+    .then(path => console.log('Project now available at'.blue, `${path}!`.yellow))
     .catch(err => console.log(err));
 };

@@ -66,8 +66,6 @@ function authorizeUser() {
   });
 }
 
-
-
 function promptForUserInfo() {
   return new Promise(function (res, rej) {
     prompt.get(
@@ -106,8 +104,7 @@ function writeAuth(auth) {
 module.exports.writeAuth = writeAuth;
 
 function obtainAndWriteAuth({ username, password }) {
-  console.log('obtain and write auth. . .'.yellow);
-  // console.log('Authorizing with GitHub. . .'.yellow);
+  console.log('Authorizing with GitHub. . .'.yellow);
   return new Promise(function (res, rej) {
     const note = getNoteForHost();
     const cmd = `curl https://api.github.com/authorizations --user "${username}:${password}" --data '{"scopes":["public_repo", "repo", "gist"],"note":"${note}","note_url":"https://www.npmjs.com/package/opspark"}'`;
@@ -139,7 +136,6 @@ function writeUser(user) {
 module.exports.writeUser = writeUser;
 
 function obtainAndWriteUser(username) {
-  console.log('Obtain and write user!');
   return new Promise(function (res, rej) {
     getOrCreateClient()
       .then(function (client) {
@@ -193,7 +189,6 @@ function repos(complete) {
 module.exports.repos = repos;
 
 function getOrCreateClient() {
-  console.log('GET OR CREATE CLIENT'.blue);
   return new Promise(function (res, rej) {
     if (_client) return res(_client);
     getOrObtainAuth()
@@ -207,7 +202,6 @@ function getOrCreateClient() {
 }
 
 function getOrObtainAuth() {
-  console.log('Get or obtain auth!!!!');
   return new Promise(function (res) {
     if (_auth) return res(_auth);
     if (fs.existsSync(authFilePath)) {
@@ -233,7 +227,6 @@ module.exports.getOrObtainAuth = getOrObtainAuth;
 
 
 function hasAuthorization(token) {
-  console.log('Has authorization', token);
   var options = {
     url: util.format('https://api.github.com/?access_token=%s', token),
     headers: {
@@ -280,7 +273,7 @@ module.exports.grabLocalAuthID = grabLocalAuthID;
 function grabLocalAuthToken() {
   const git = fsJson.loadSync(authFilePath);
   if (!git) {
-    throw new Error(`There is no file at ${githubFilePath}.`);
+    throw new Error(`There is no file at ${authFilePath}.`);
   }
   return git.token;
 }
@@ -298,7 +291,7 @@ function grabLocalLogin() {
 module.exports.grabLocalLogin = grabLocalLogin;
 
 function deauthorizeUser() {
-  return new Promise(function(res, rej) {
+  return new Promise(function (res, rej) {
     promptForUserInfo()
       .then(deleteToken)
       .then(deleteUserInfo)

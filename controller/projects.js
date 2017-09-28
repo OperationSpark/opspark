@@ -25,77 +25,6 @@ let action = null;
 
 module.exports.action = action;
 
-/**
- * INSTALL
- * Grabs all sessions a user is enrolled in
- * Creates list of all enrolled classes
- * User selects class to install project from
- * User selects project to install
- * Project is installed!
- */
-
-const install = function (err) {
-  if (typeof err === 'string') {
-    console.log(err);
-  } else if (!github.filesExist()) {
-    console.log('We need some info, let\'s log into Github:'.green);
-    github.obtainAuthorization(install);
-  } else {
-    chooseClass('install', function (session, action) {
-      let projectsList = session.PROJECT;
-      projectsList = test.findAvailableProjects(projectsList, session.sessionId, 'install')
-        .sort(function (a, b) {
-          if (a.name < b.name) return -1;
-          if (a.name > b.name) return 1;
-          return 0;
-        });
-
-      selectProject(projectsList, function (project) {
-        installProject(project, null, function () {
-          console.log('Have fun!!!'.green);
-        });
-      }, action);
-    });
-  }
-};
-
-module.exports.install = install;
-
-const uninstall = function () {
-  chooseClass('uninstall', function (session, action) {
-    let projectsList = session.PROJECT;
-    projectsList = test.findAvailableProjects(projectsList, session.sessionId, 'test')
-      .sort(function (a, b) {
-        if (a.name < b.name) return -1;
-        if (a.name > b.name) return 1;
-        return 0;
-      });
-
-    selectProject(projectsList, function (project) {
-      uninstallProject(project, null, function () {
-        console.log('All done!'.green);
-      });
-    }, action);
-  });
-};
-
-module.exports.uninstall = uninstall;
-
-const chooseClass = function (action, complete) {
-  greenlight.getSessions(null, function (sessions) {
-    greenlight.listEnrolledClasses(sessions, function (classes) {
-      selectClass(classes, action, function (err, className) {
-        const chosenClass = _.pickBy(sessions, obj => obj.name === className);
-        let session = Object.keys(chosenClass)[0];
-        session = chosenClass[session];
-        complete(session, action);
-      });
-    });
-  });
-};
-
-module.exports.chooseClass = chooseClass;
-
 function selectProject({ session, projectAction }) {
   action = projectAction;
   const projects = listProjects(session);
@@ -134,7 +63,7 @@ function selectProject({ session, projectAction }) {
 module.exports.selectProject = selectProject;
 
 function listProjects(session) {
-  console.log('Putting together projects. . .'.yellow);
+  console.log('Grabbing projects. . .'.yellow);
   const projects = session.PROJECT;
   let files;
   let testableProjects;
@@ -148,17 +77,23 @@ function listProjects(session) {
   }
   if (action === 'install') {
     testableProjects = _.difference(mappedProjects, files);
-  } else if (action === 'test') {
+  } else {
     testableProjects = _.intersection(mappedProjects, files);
   }
-  return projects.reduce(function (seed, project) {
-    if (testableProjects.indexOf(changeCase.paramCase(project.name)) > -1) {
-      const updatedProject = project;
-      updatedProject._session = session.sessionId;
-      seed.push(updatedProject);
-    }
-    return seed;
-  }, []);
+  return projects
+    .reduce(function(seed, project) {
+      if (testableProjects.indexOf(changeCase.paramCase(project.name)) > -1) {
+        const updatedProject = project;
+        updatedProject._session = session.sessionId;
+        seed.push(updatedProject);
+      }
+      return seed;
+    }, [])
+    .sort(function(a, b) {
+      if (a.name < b.name) return -1;
+      if (a.name > b.name) return 1;
+      return 0;
+    });
 }
 
 function installProject(project) {
@@ -180,27 +115,51 @@ function installProject(project) {
 
 module.exports.installProject = installProject;
 
-function uninstallProject(project, pairedWith, complete) {
-  inquirer.prompt({
-    type: 'confirm',
-    name: 'delete',
-    message: `Are you sure you want to delete ${project.name}? This cannot be undone.`.bgRed,
-  }, function (confirm) {
-    if (confirm.delete) {
-      const name = changeCase.paramCase(project.name);
-      const projectDirectory = `${rootDirectory}/projects/${name}`;
-      removeProjectEntry(project);
-      console.log('Removing project directory. . .'.red);
-      exec(`rm -rf ${projectDirectory}`, function() {
-        console.log('Successfully removed!'.red);
-        complete();
-      })
-    } else {
-      console.log('Delete aborted'.blue);
-    }
+function uninstallProject(project) {
+  return new Promise(function (res, rej) {
+    inquirer.prompt({
+      type: 'confirm',
+      name: 'delete',
+      message: `Are you sure you want to delete ${project.name}? This cannot be undone.`.bgRed,
+    }, function (confirm) {
+      if (confirm.delete) {
+        const name = changeCase.paramCase(project.name);
+        const projectDirectory = `${rootDirectory}/projects/${name}`;
+        removeProjectEntry(project);
+        console.log('Removing project directory. . .'.red);
+        exec(`rm -rf ${projectDirectory}`, function () {
+          res(project);
+        })
+      } else {
+        rej('Delete aborted');
+      }
+    });
   });
 }
 module.exports.uninstallProject = uninstallProject;
+
+function shelveProject(project) {
+  console.log("Fetching directory. . .".yellow);
+  return new Promise(function(res, rej) {
+    removeProjectEntry(project);
+    const name = changeCase.paramCase(project.name);
+    const path = `${rootDirectory}/projects`;
+    const underscores = fs.readdirSync(path).reduce((s, c) => {
+      if (c.indexOf(name) > -1) {
+        const u = c.replace(/(_)|[^]/g, "$1");
+        return u.length > s.length ? u : s;
+      }
+      return s;
+    }, "");
+    const cmd = `mv ${path}/${name} ${path}/${underscores}_${name}`;
+    console.log("Shelving project. . .".yellow);
+    exec(cmd, function() {
+      res(`${path}/${underscores}_${name}`);
+    });
+  });
+}
+
+module.exports.shelveProject = shelveProject;
 
 function initializeProject(project) {
   const projectName = changeCase.paramCase(project.name);
@@ -332,48 +291,3 @@ function loadOrCreateEntries() {
   return fsJson.loadSync(projectEntriesPath) || { projects: [] };
 }
 module.exports.loadOrCreateEntries = loadOrCreateEntries;
-
-function shelve() {
-  console.log('Shelve a project');
-  chooseClass('shelve', function (session, action) {
-    let projectsList = session.PROJECT;
-
-    // projectsList.push({
-    //   name: 'Lets Get Functional',
-    // });
-    projectsList = test.findAvailableProjects(projectsList, session.sessionId);
-    projectsList = projectsList.sort(function (a, b) {
-      if (a.name < b.name) return -1;
-      if (a.name > b.name) return 1;
-      return 0;
-    });
-
-    selectProject(projectsList, function (project) {
-      shelveProject(project, null, function (pwd) {
-        console.log('Successfully shelved project! Now available at:'.green);
-        console.log(pwd.blue);
-      });
-    }, action);
-  });
-}
-
-module.exports.shelve = shelve;
-
-function shelveProject(project, partner, complete) {
-  console.log('Fetching directory. . .'.yellow);
-  removeProjectEntry(project);
-  const name = changeCase.paramCase(project.name);
-  const path = `${rootDirectory}/projects`;
-  const underscores = fs.readdirSync(path).reduce((s, c) => {
-    if (c.indexOf(name) > -1) {
-      const u = c.replace(/(_)|[^]/g, '$1');
-      return u.length > s.length ? u : s;
-    }
-    return s;
-  }, '');
-  const cmd = `mv ${path}/${name} ${path}/${underscores}_${name}`;
-  console.log('Shelving project. . .'.yellow);
-  exec(cmd, function () {
-    complete(`${path}/${underscores}_${name}`);
-  });
-}

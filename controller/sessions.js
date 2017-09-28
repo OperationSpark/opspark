@@ -8,7 +8,7 @@ var
   cancelOption = '[cancel]';
 
 function listSessions(sessions) {
-  console.log("Putting together sessions. . .".yellow);
+  console.log("Grabbing sessions. . .".yellow);
   const sessionNames = _.map(sessions, session =>
     changeCase.titleCase(session.cohort)
   );
@@ -22,7 +22,6 @@ function listSessions(sessions) {
 module.exports.listSessions = listSessions;
 
 function pluckSession(cohort, sessions) {
-  console.log('Plucking session. . .'.yellow);
   const dashCohort = changeCase.paramCase(cohort);
   const sessionsArray = _.map(sessions, session => session);
   return sessionsArray.reduce(function(result, current) {

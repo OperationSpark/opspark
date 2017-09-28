@@ -9,6 +9,8 @@ var
   github = require('./controller/github'),
   greenlight = require('./controller/greenlight'),
   install = require('./controller/install'),
+  shelve = require('./controller/shelve'),
+  uninstall = require('./controller/uninstall'),
   npm = require('./controller/npm'),
   projects = require('./controller/projects'),
   test = require('./controller/test'),
@@ -47,17 +49,17 @@ program
   .option("-m, --master", "Keep master files")
   .command("install")
   .description("List installable projects.")
-  .action(install.install);
+  .action(install);
 
 program
   .command('shelve')
   .description('Save previous work in a project in order to begin anew.')
-  .action(projects.shelve);
+  .action(shelve);
 
 program
   .command('uninstall')
   .description('Remove an installed project.')
-  .action(projects.uninstall);
+  .action(uninstall);
 
 program
   .option('-m, --master', 'Keep master files')

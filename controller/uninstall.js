@@ -6,14 +6,13 @@ const
   colors = require('colors');
 
 module.exports = function () {
-  console.log('Beginning install process!'.blue);
-  projects.action = 'install';
+  console.log('Beginning uninstall process!'.blue);
+  projects.action = 'uninstall';
   github.getCredentials()
     .then(greenlight.getSessions)
     .then(sessions.selectSession)
     .then(projects.selectProject)
-    .then(projects.installProject)
-    .then(projects.initializeProject)
-    .then(res => console.log(`Successfully installed ${res.name}!`.blue))
+    .then(projects.uninstallProject)
+    .then(res => console.log(`Successfully uninstalled ${res.name}!`.red))
     .catch(err => console.log(err));
-};
+}

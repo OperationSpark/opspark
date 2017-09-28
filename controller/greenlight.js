@@ -28,7 +28,7 @@ var
 // TODO: Switch URI for live version
 const LOCALHOST = 'http://localhost:3000';
 const GREENLIGHT = 'https://greenlight.operationspark.org';
-const URI = LOCALHOST;
+const URI = GREENLIGHT;
 
 module.exports.URI = URI;
 
@@ -46,7 +46,7 @@ function getSessions({ id }) {
 
 module.exports.getSessions = getSessions;
 
-function grade(project, gist) {
+function grade({ project, gist }) {
   const body = {
     id: github.grabLocalUserID().toString(),
     requirementId: project._id,
@@ -55,26 +55,28 @@ function grade(project, gist) {
   };
 
   const options = {
+    body,
     method: 'POST',
     uri: `${URI}/api/os/grade`,
-    body: body,
     json: true,
   };
 
-  return rp(options)
-    .then(res => {
-      if (res.status === 200) {
-        console.log(res.message.blue);
-      } else {
-        console.log(res.reason.red);
-        console.log(res.details.red);
-      }
-      submit.deleteGist(gist.url);
-    })
-    .catch(err => {
-      console.error('upload failed:'.red, err);
-      submit.deleteGist(gist.url);
-    });
+  return new Promise(function (res, rej) {
+    rp(options)
+      .then((response) => {
+        if (response.status === 200) {
+          console.log(response.message.blue);
+        } else {
+          console.log(response.reason.red);
+          console.log(response.details.red);
+        }
+        res(gist.url);
+      })
+      .catch((err) => {
+        rej(err);
+        res(gist.url);
+      });
+  });
 }
 
 module.exports.grade = grade;
