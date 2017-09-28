@@ -6,7 +6,6 @@ const _ = require('lodash');
 const mkdirp = require('mkdirp');
 const rimraf = require('rimraf');
 const fsJson = require('fs-json')();
-// const Promise = require('bluebird');
 const program = require('commander');
 const inquirer = require('inquirer');
 const changeCase = require('change-case');

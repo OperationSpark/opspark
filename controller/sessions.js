@@ -2,7 +2,6 @@
 
 require('colors');
 const _ = require('lodash');
-// const Promise = require("bluebird");
 const inquirer = require('inquirer');
 const { waterfall } = require('async');
 const changeCase = require('change-case');

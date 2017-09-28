@@ -6,7 +6,6 @@ const util = require('util');
 const prompt = require('prompt');
 const mkdirp = require('mkdirp');
 const fsJson = require('fs-json')();
-// const Promise = require('bluebird');
 const octonode = require('octonode');
 const rp = require('request-promise');
 const exec = require('child_process').exec;

@@ -1,7 +1,6 @@
 'use strict';
 
 require('colors');
-// const Promise = require("bluebird");
 const rp = require('request-promise');
 
 const github = require('./github');
