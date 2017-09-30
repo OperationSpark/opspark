@@ -14,17 +14,28 @@ const process = require('process');
 const fsJson = require('fs-json')();
 const bddStdin = require('bdd-stdin');
 const chai = require('./helpers/chai');
+const proxyquire = require('proxyquire');
 const stdin = require('mock-stdin').stdin();
+
+const { githubAuthToken } = require('./helpers/fakeHelpers');
+
+githubAuthToken();
+
+console.log(githubAuthToken);
+
+// const helpers = proxyquire('../controller/helpers', fakeHelpers);
+
+// console.log(JSON.stringify(fakeHelpers));
 
 const config = require('../config');
 const env = require('../controller/env');
 const github = require('../controller/github');
-const { githubAuthToken } = require('./helpers/fakeHelpers');
 const { dummyAuth, dummyUser } = require('./helpers/dummyData');
 
 const applicationDirectory = `${env.home()}/opspark`;
 const authFilePath = `${applicationDirectory}/auth`;
 const userFilePath = `${applicationDirectory}/user`;
+
 
 describe('github', function () {
 
@@ -211,7 +222,7 @@ describe('github', function () {
     });
 
     it('should pipe out user inputs', function (done) {
-      obtainAndWriteAuth(dummyAuth, githubAuthToken)
+      obtainAndWriteAuth(dummyAuth)
         .then(function (result) {
           expect(result).to.eql(dummyAuth);
           done();

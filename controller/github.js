@@ -102,11 +102,11 @@ function writeAuth(auth) {
 
 module.exports.writeAuth = writeAuth;
 
-function obtainAndWriteAuth({ username, password }, getToken = githubAuthToken) {
+function obtainAndWriteAuth({ username, password }) {
   console.log('Authorizing with GitHub. . .'.yellow);
   return new Promise(function (res, rej) {
     const note = getNoteForHost();
-    const cmd = getToken(username, password, note);
+    const cmd = githubAuthToken(username, password, note);
     exec(cmd, function (err, stdout, stderr) {
       _auth = JSON.parse(stdout);
       if (_auth.message) {
