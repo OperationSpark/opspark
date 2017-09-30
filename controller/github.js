@@ -3,7 +3,7 @@
 require('colors');
 const fs = require('fs');
 const util = require('util');
-const prompt = require('prompt');
+const prompt = require('inquirer').prompt;
 const mkdirp = require('mkdirp');
 const fsJson = require('fs-json')();
 const octonode = require('octonode');
@@ -12,6 +12,8 @@ const exec = require('child_process').exec;
 
 const env = require('./env');
 const config = require('../config');
+const { githubAuthToken } = require('./helpers');
+
 
 const applicationDirectory = `${env.home()}/opspark`;
 const authFilePath = `${applicationDirectory}/auth`;
@@ -26,7 +28,7 @@ let _opspark;
 function getCredentials() {
   console.log('Getting credentials. . .'.yellow);
   return new Promise(function (res, rej) {
-    if (filesExist()) {
+    if (userInfoExists()) {
       const creds = {
         login: grabLocalLogin(),
         id: grabLocalUserID(),
@@ -59,24 +61,27 @@ function authorizeUser() {
   });
 }
 
+module.exports.authorizeUser = authorizeUser;
+
 function promptForUserInfo() {
   return new Promise(function (res, rej) {
-    prompt.get(
+    prompt(
       [
         {
-          description: 'Enter your GitHub username',
+          message: 'Enter your GitHub username',
           name: 'username',
+          type: 'input',
           required: true
         },
         {
-          description: 'Enter your GitHub password',
+          message: 'Enter your GitHub password',
           name: 'password',
+          type: 'password',
           hidden: true,
           conform: () => true,
         }
       ],
-      function (err, user) {
-        if (err) return rej(err);
+      function (user) {
         res(user);
       }
     );
@@ -86,6 +91,7 @@ function promptForUserInfo() {
 module.exports.promptForUserInfo = promptForUserInfo;
 
 function writeAuth(auth) {
+  deleteAuth();
   console.log('Writing auth. . .'.yellow);
   return new Promise(function (res, rej) {
     ensureApplicationDirectory();
@@ -96,15 +102,15 @@ function writeAuth(auth) {
 
 module.exports.writeAuth = writeAuth;
 
-function obtainAndWriteAuth({ username, password }) {
+function obtainAndWriteAuth({ username, password }, getToken = githubAuthToken) {
   console.log('Authorizing with GitHub. . .'.yellow);
   return new Promise(function (res, rej) {
     const note = getNoteForHost();
-    const cmd = `curl https://api.github.com/authorizations --user "${username}:${password}" --data '{"scopes":["public_repo", "repo", "gist"],"note":"${note}","note_url":"https://www.npmjs.com/package/opspark"}'`;
+    const cmd = getToken(username, password, note);
     exec(cmd, function (err, stdout, stderr) {
       _auth = JSON.parse(stdout);
       if (_auth.message) {
-        rej(_auth.message);
+        rej(_auth);
       } else {
         console.log('GitHub login succeeded!'.green);
         _auth.username = username;
@@ -118,6 +124,7 @@ function obtainAndWriteAuth({ username, password }) {
 module.exports.obtainAndWriteAuth = obtainAndWriteAuth;
 
 function writeUser(user) {
+  deleteUser();
   console.log('Writing user. . .'.yellow);
   return new Promise(function (res, rej) {
     ensureApplicationDirectory();
@@ -235,11 +242,23 @@ function ensureApplicationDirectory() {
 
 module.exports.ensureApplicationDirectory = ensureApplicationDirectory;
 
-function filesExist() {
-  return fs.existsSync(authFilePath) && fs.existsSync(userFilePath);
+function authExists() {
+  return fs.existsSync(authFilePath);
 }
 
-module.exports.filesExist = filesExist;
+module.exports.authExists = authExists;
+
+function userExists() {
+  return fs.existsSync(userFilePath);
+}
+
+module.exports.userExists = userExists;
+
+function userInfoExists() {
+  return authExists() && userExists();
+}
+
+module.exports.userInfoExists = userInfoExists;
 
 function grabLocalUserID() {
   const git = fsJson.loadSync(userFilePath);
@@ -306,10 +325,22 @@ function deleteToken({ username, password }) {
 
 module.exports.deleteToken = deleteToken;
 
+function deleteAuth() {
+  if (fs.existsSync(authFilePath)) fs.unlinkSync(authFilePath);
+}
+
+module.exports.deleteAuth = deleteAuth;
+
+function deleteUser() {
+  if (fs.existsSync(userFilePath)) fs.unlinkSync(userFilePath);
+}
+
+module.exports.deleteUser = deleteUser;
+
 function deleteUserInfo() {
   console.log('Deleting files. . .'.red);
-  if (fs.existsSync(authFilePath)) fs.unlinkSync(authFilePath);
-  if (fs.existsSync(userFilePath)) fs.unlinkSync(userFilePath);
+  deleteAuth();
+  deleteUser();
 }
 
 module.exports.deleteUserInfo = deleteUserInfo;

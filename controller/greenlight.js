@@ -26,7 +26,7 @@ function getSessions({ id }) {
 
 module.exports.getSessions = getSessions;
 
-function grade({ project, gist }) {
+function grade({ gist, project }) {
   const body = {
     id: github.grabLocalUserID().toString(),
     requirementId: project._id,
@@ -43,7 +43,6 @@ function grade({ project, gist }) {
 
   return rp(options)
     .then((response) => {
-      console.log(response);
       if (response.status === 200) {
         console.log(response.message.blue);
       } else {

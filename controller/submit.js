@@ -56,7 +56,6 @@ function checkGrade({ project, parsedStdout }) {
 module.exports.checkGrade = checkGrade;
 
 function createGist({ project, stats }) {
-
   const files = {
     id: github.grabLocalUserID(),
     requirementId: project._id,
@@ -81,7 +80,7 @@ function createGist({ project, stats }) {
 
   console.log('Creating gist. . .'.green);
 
-  return new Promise(function(res, rej) {
+  return new Promise(function (res, rej) {
     exec(cmd, function (err, stdout, stderr) {
       const gist = JSON.parse(stdout);
       if (err) rej(err);
@@ -94,7 +93,7 @@ function createGist({ project, stats }) {
 module.exports.createGist = createGist;
 
 function ensureGistExists({ project, gist, tries }) {
-  return new Promise(function(res, rej) {
+  return new Promise(function (res, rej) {
     if (tries < 4) {
       console.log('Ensuring gist exists. . .'.green, `Attempt ${tries}`.yellow);
       const url = gist.files['grade.txt'].raw_url;

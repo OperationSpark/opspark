@@ -7,7 +7,7 @@ const mkdirp = require('mkdirp');
 const rimraf = require('rimraf');
 const fsJson = require('fs-json')();
 const program = require('commander');
-const inquirer = require('inquirer');
+const prompt = require('inquirer').prompt;
 const changeCase = require('change-case');
 const exec = require('child_process').exec;
 const { waterfall, series } = require('async');
@@ -22,7 +22,7 @@ const cancelOption = '[cancel]';
 
 let action = null;
 
-module.exports.action = action;
+module.exports.action = () => action;
 
 function selectProject({ session, projectAction }) {
   action = projectAction;
@@ -30,7 +30,7 @@ function selectProject({ session, projectAction }) {
   return new Promise(function (res) {
     waterfall([
       function (next) {
-        inquirer.prompt([{
+        prompt([{
           type: 'list',
           name: 'project',
           message: `Select the project you wish to ${action}`,
@@ -46,7 +46,7 @@ function selectProject({ session, projectAction }) {
         });
       },
       function (project, next) {
-        inquirer.prompt([{
+        prompt([{
           type: 'confirm',
           name: 'install',
           message: `You selected ${project.name}: Go ahead and ${action}?`,
@@ -117,7 +117,7 @@ module.exports.installProject = installProject;
 
 function uninstallProject(project) {
   return new Promise(function (res, rej) {
-    inquirer.prompt({
+    prompt({
       type: 'confirm',
       name: 'delete',
       message: `Are you sure you want to delete ${project.name}? This cannot be undone.`.bgRed,
