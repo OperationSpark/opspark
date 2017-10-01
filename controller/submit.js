@@ -9,6 +9,8 @@ const greenlight = require('./greenlight');
 const sessions = require('./sessions');
 const projects = require('./projects');
 const test = require('./test');
+const createGistHelper = require('./helpers').createGist;
+const deleteGistHelper = require('./helpers').deleteGist;
 
 function submit() {
   console.log('Beginning submit process!'.blue);
@@ -66,7 +68,7 @@ function createGist({ project, stats }) {
     failures: stats.failures,
   };
 
-  const content = {
+  let content = {
     public: true,
     description: 'Project results',
     files: {
@@ -76,7 +78,10 @@ function createGist({ project, stats }) {
     }
   };
 
-  const cmd = `curl -X POST -d '${JSON.stringify(content)}' -u ${github.grabLocalLogin()}:${github.grabLocalAuthToken()} https://api.github.com/gists`;
+  content = JSON.stringify(content);
+
+  const cmd = createGistHelper(content, github.grabLocalLogin(), github.grabLocalAuthToken());
+  // const cmd = `curl -X POST -d '${JSON.stringify(content)}' -u ${github.grabLocalLogin()}:${github.grabLocalAuthToken()} https://api.github.com/gists`;
 
   console.log('Creating gist. . .'.green);
 
@@ -115,7 +120,8 @@ function ensureGistExists({ project, gist, tries }) {
 
 function deleteGist(url) {
   return new Promise(function (res, rej) {
-    const cmd = `curl -X DELETE -u ${github.grabLocalLogin()}:${github.grabLocalAuthToken()} ${url}`;
+    const cmd = deleteGistHelper(github.grabLocalLogin(), github.grabLocalAuthToken(), url);
+    // const cmd = `curl -X DELETE -u ${github.grabLocalLogin()}:${github.grabLocalAuthToken()} ${url}`;
     console.log('Deleting gist. . .'.green);
     exec(cmd, function (err, stdout, stderr) {
       if (err) {
