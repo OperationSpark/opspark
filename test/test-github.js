@@ -17,15 +17,11 @@ const chai = require('./helpers/chai');
 const proxyquire = require('proxyquire');
 const stdin = require('mock-stdin').stdin();
 
-const { githubAuthToken } = require('./helpers/fakeHelpers');
+const fakeHelpers = require('./helpers/fakeHelpers');
 
-githubAuthToken();
+const helpers = proxyquire('../controller/github', { './helpers': fakeHelpers });
 
-console.log(githubAuthToken);
-
-// const helpers = proxyquire('../controller/helpers', fakeHelpers);
-
-// console.log(JSON.stringify(fakeHelpers));
+console.log(helpers);
 
 const config = require('../config');
 const env = require('../controller/env');
