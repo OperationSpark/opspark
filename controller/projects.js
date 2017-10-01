@@ -14,6 +14,7 @@ const { waterfall, series } = require('async');
 
 const env = require('./env');
 const github = require('./github');
+const { downloadProject, downloadProjectTests } = require('./helpers');
 
 const rootDirectory = `${env.home()}/workspace`;
 const projectEntriesPath = `${rootDirectory}/projects/projects.json`;
@@ -98,14 +99,14 @@ function listProjects(session) {
 
 function installProject(project) {
   return new Promise(function (res, rej) {
+    ensureProjectsDirectory();
     const projectName = changeCase.paramCase(project.name);
-    const authToken = github.grabLocalAuthToken();
-    if (!fs.existsSync(projectsDirectory)) mkdirp.sync(projectsDirectory);
     const projectDirectory = `${projectsDirectory}/${projectName}`;
-    if (fs.existsSync(projectDirectory)) return console.log('Project %s already installed! Please delete manually before reinstalling, or install another project.'.red, projectName);
+    if (ensureProjectDirectory(projectDirectory)) {
+      rej(`${project.name} already installed!`.red);
+    }
     console.log('Installing project %s, please wait...'.yellow, projectName);
-    const uri = `${project.url}/trunk --password ${authToken}`;
-    const cmd = `svn co ${uri} ${projectDirectory}`;
+    const cmd = downloadProject(project.url, github.grabLocalAuthToken(), projectDirectory);
     exec(cmd, function (err) {
       if (err) return rej(err);
       res(project);
@@ -291,3 +292,10 @@ function loadOrCreateEntries() {
   return fsJson.loadSync(projectEntriesPath) || { projects: [] };
 }
 module.exports.loadOrCreateEntries = loadOrCreateEntries;
+
+function ensureProjectsDirectory() {
+  if (!fs.existsSync(projectsDirectory)) mkdirp.sync(projectsDirectory);
+}
+function ensureProjectDirectory(projectDirectory) {
+  return fs.existsSync(projectDirectory);
+}
