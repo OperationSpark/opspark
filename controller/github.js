@@ -12,7 +12,7 @@ const exec = require('child_process').exec;
 
 const env = require('./env');
 const config = require('../config');
-const { githubAuthToken } = require('./helpers');
+const { getGithubToken, deleteGithubToken, readGithubAuths } = require('./helpers');
 
 
 const applicationDirectory = `${env.home()}/opspark`;
@@ -106,7 +106,7 @@ function obtainAndWriteAuth({ username, password }) {
   console.log('Authorizing with GitHub. . .'.yellow);
   return new Promise(function (res, rej) {
     const note = getNoteForHost();
-    const cmd = githubAuthToken(username, password, note);
+    const cmd = getGithubToken(username, password, note);
     exec(cmd, function (err, stdout, stderr) {
       _auth = JSON.parse(stdout);
       if (_auth.message) {
@@ -171,11 +171,11 @@ module.exports.limit = function (complete) {
         complete(null, message);
       });
     })
-    .catch(err => console.error(err));    
+    .catch(err => console.error(err));
 };
 
 function repos(complete) {
-  // the client also initializes opspark, which isn't very clear - 
+  // the client also initializes opspark, which isn't very clear -
   // perhaps you should refactor to create opspark here, or? //
   getOrCreateClient()
     .then(function (client) {
@@ -305,7 +305,7 @@ function deauthorizeUser() {
     promptForUserInfo()
       .then(deleteToken)
       .then(deleteUserInfo)
-      .then(() => console.log("Successfully logged out!".blue))
+      .then(() => console.log('Successfully logged out!'.blue))
       .catch(err => console.log(`${err}`.red));
   });
 }
@@ -315,7 +315,7 @@ module.exports.deauthorizeUser = deauthorizeUser;
 function deleteToken({ username, password }) {
   console.log('Deleting token. . .'.red);
   return new Promise(function (res, rej) {
-    const cmd = `curl -X "DELETE" -A "${config.userAgent}" -H "Accept: application/json" https://api.github.com/authorizations/${grabLocalAuthID()} --user "${username}:${password}"`;
+    const cmd = deleteGithubToken(username, password, config.userAgent, grabLocalAuthID());
     exec(cmd, function (err, stdout, stderr) {
       if (err) rej(err);
       else res();
@@ -347,7 +347,7 @@ module.exports.deleteUserInfo = deleteUserInfo;
 
 function obtainAuths(user) {
   return new Promise(function (res, rej) {
-    const cmd = `curl -A "${config.userAgent}" --user "${user.username}:${user.password}" https://api.github.com/authorizations`;
+    const cmd = readGithubAuths(user.username, user.password, config.userAgent);
     exec(cmd, function (err, stdout) {
       if (err) return rej(err);
       res(JSON.parse(stdout));
