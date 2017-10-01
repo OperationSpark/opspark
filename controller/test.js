@@ -11,6 +11,7 @@ const github = require('./github');
 const greenlight = require('./greenlight');
 const sessions = require('./sessions');
 const projects = require('./projects');
+const { downloadProjectTests, downloadProjectPackage } = require('./helpers');
 
 const rootDirectory = `${env.home()}/workspace`;
 const projectsDirectory = `${rootDirectory}/projects`;
@@ -47,22 +48,20 @@ module.exports.test = test;
 function grabTests(project) {
   return new Promise(function (res, rej) {
     const name = changeCase.paramCase(project.name);
-    const repo = `${project.url}/trunk`;
-    const directory = `${projectsDirectory}/${name}/test`;
-    console.log(`Downloading tests for ${name}. . .`.green);
-    const token = github.grabLocalAuthToken();
-    const cmd = `svn export ${repo}/test ${directory} --password ${token}`;
-    const packageName = `${projectsDirectory}/${name}/package.json`;
-    const packageCmd = `svn export ${repo}/package.json ${packageName} --password ${token}`;
-    if (fs.existsSync(directory)) {
+    console.log(`Downloading tests for ${name}. . .`.yellow);
+    const directory = `${projectsDirectory}/${name}`;
+    const cmd = downloadProjectTests(project.url, github.grabLocalAuthToken(), directory);
+    const pckgCmd = downloadProjectPackage(project.url, github.grabLocalAuthToken(), directory);
+    if (fs.existsSync(`${directory}/test`)) {
       console.log('Skipping tests.'.green);
       res(project);
     } else {
       exec(cmd, function (error) {
         if (error) return rej(error);
         console.log('Successfully downloaded tests!'.green);
-        if (!fs.existsSync(packageName)) {
-          exec(packageCmd, function () {
+        if (!fs.existsSync(`${directory}/package.json`)) {
+          console.log(`Downloading Package.json for ${name}. . .`.yellow);
+          exec(pckgCmd, function () {
             console.log('Package.json successfully installed'.green);
             res(project);
           });
@@ -88,7 +87,7 @@ module.exports.grabTests = grabTests;
 function runTests(project) {
   return new Promise(function (res, rej) {
     const name = changeCase.paramCase(project.name);
-    console.log('Running tests. . .'.green);
+    console.log('Running tests. . .'.yellow);
     const directory = `${projectsDirectory}/${name}/`;
     const cmd = `npm test --prefix ${directory}`;
     exec(cmd, function (err, stdout, stderr) {
