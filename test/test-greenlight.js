@@ -49,7 +49,7 @@ describe('greenlight', function () {
     });
   });
 
-  describe('#grade()', function () {
+  describe('#sendGrade()', function () {
     let log;
     const grade = greenlight.grade;
 
@@ -62,7 +62,7 @@ describe('greenlight', function () {
     });
 
     it('should receive good response', function (done) {
-      grade({ gist: dummyGistGood, project: dummyProject })
+      sendGrade({ gist: dummyGistGood, project: dummyProject })
         .then(function () {
           expect(log.calledWith('Project attempt saved for Liv Rush'.blue)).to.be.true;
           done();
@@ -70,7 +70,7 @@ describe('greenlight', function () {
     });
 
     it('should receive bad response', function (done) {
-      grade({ gist: dummyGistBad, project: dummyProject })
+      sendGrade({ gist: dummyGistBad, project: dummyProject })
         .then(function () {
           expect(log.calledWith('Bad Request'.red)).to.be.true;
           done();
@@ -78,7 +78,7 @@ describe('greenlight', function () {
     });
 
     it('should return gist url', function (done) {
-      grade({ gist: dummyGistGood, project: dummyProject })
+      sendGrade({ gist: dummyGistGood, project: dummyProject })
         .then(function (res) {
           expect(res).to.equal(dummyGistGood.url);
           done();

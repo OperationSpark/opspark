@@ -1,8 +1,8 @@
 const { dummyAuth } = require('./dummyData');
 
-const githubAuthToken = function () {
-  console.log('Hey');
+const getGithubToken = function () {
+  console.log('I\'m a fake helper');
   return `echo '${JSON.stringify(dummyAuth)}'`;
 };
 
-module.exports.githubAuthToken = githubAuthToken;
+module.exports.getGithubToken = getGithubToken;

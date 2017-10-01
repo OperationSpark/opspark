@@ -31,7 +31,7 @@ function submit() {
     .catch(janitor.error('Failure creating gist'.red))
     .then(ensureGistExists)
     .catch(janitor.error('Failure ensuring gist exists'.red))
-    .then(greenlight.grade)
+    .then(greenlight.sendGrade)
     .catch(janitor.error('Failure grading project'.red))
     .then(deleteGist)
     .catch(janitor.error('Failure deleting gist'.red))

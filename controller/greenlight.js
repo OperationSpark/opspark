@@ -26,7 +26,7 @@ function getSessions({ id }) {
 
 module.exports.getSessions = getSessions;
 
-function grade({ gist, project }) {
+function sendGrade({ gist, project }) {
   const body = {
     id: github.grabLocalUserID().toString(),
     requirementId: project._id,
