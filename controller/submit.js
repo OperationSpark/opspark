@@ -9,8 +9,7 @@ const greenlight = require('./greenlight');
 const sessions = require('./sessions');
 const projects = require('./projects');
 const test = require('./test');
-const createGistHelper = require('./helpers').createGist;
-const deleteGistHelper = require('./helpers').deleteGist;
+const { createGistHelper, deleteGistHelper, readGistHelper } = require('./helpers');
 
 function submit() {
   console.log('Beginning submit process!'.blue);
@@ -79,13 +78,9 @@ function createGist({ project, stats }) {
   };
 
   content = JSON.stringify(content);
-
-  const cmd = createGistHelper(content, github.grabLocalLogin(), github.grabLocalAuthToken());
-  // const cmd = `curl -X POST -d '${JSON.stringify(content)}' -u ${github.grabLocalLogin()}:${github.grabLocalAuthToken()} https://api.github.com/gists`;
-
-  console.log('Creating gist. . .'.green);
-
   return new Promise(function (res, rej) {
+    console.log('Creating gist. . .'.green);
+    const cmd = createGistHelper(content, github.grabLocalLogin(), github.grabLocalAuthToken());
     exec(cmd, function (err, stdout, stderr) {
       const gist = JSON.parse(stdout);
       if (err) rej(err);
@@ -101,8 +96,7 @@ function ensureGistExists({ project, gist, tries }) {
   return new Promise(function (res, rej) {
     if (tries < 4) {
       console.log('Ensuring gist exists. . .'.green, `Attempt ${tries}`.yellow);
-      const url = gist.files['grade.txt'].raw_url;
-      const cmd = `curl ${url}`;
+      const cmd = readGistHelper(gist.files['grade.txt'].raw_url);
       exec(cmd, function (err, stdout, stderr) {
         if (err) {
           rej(err);
@@ -120,9 +114,8 @@ function ensureGistExists({ project, gist, tries }) {
 
 function deleteGist(url) {
   return new Promise(function (res, rej) {
-    const cmd = deleteGistHelper(github.grabLocalLogin(), github.grabLocalAuthToken(), url);
-    // const cmd = `curl -X DELETE -u ${github.grabLocalLogin()}:${github.grabLocalAuthToken()} ${url}`;
     console.log('Deleting gist. . .'.green);
+    const cmd = deleteGistHelper(github.grabLocalLogin(), github.grabLocalAuthToken(), url);
     exec(cmd, function (err, stdout, stderr) {
       if (err) {
         rej(err);

@@ -12,7 +12,7 @@ const exec = require('child_process').exec;
 
 const env = require('./env');
 const config = require('../config');
-const { getGithubToken, deleteGithubToken, readGithubAuths } = require('./helpers');
+const { createGithubToken, deleteGithubToken, readGithubAuths, checkGithubAuth } = require('./helpers');
 
 
 const applicationDirectory = `${env.home()}/opspark`;
@@ -106,7 +106,7 @@ function obtainAndWriteAuth({ username, password }) {
   console.log('Authorizing with GitHub. . .'.yellow);
   return new Promise(function (res, rej) {
     const note = getNoteForHost();
-    const cmd = getGithubToken(username, password, note);
+    const cmd = createGithubToken(username, password, note);
     exec(cmd, function (err, stdout, stderr) {
       _auth = JSON.parse(stdout);
       if (_auth.message) {
@@ -208,6 +208,7 @@ function getOrObtainAuth() {
       _auth = fsJson.loadSync(authFilePath);
       hasAuthorization(_auth.token)
         .then(function (response) {
+          console.log('THIS IS THE RESPONSE', response);
           if (response.statusCode === 200) {
             res(_auth);
           } else {
@@ -227,13 +228,13 @@ module.exports.getOrObtainAuth = getOrObtainAuth;
 
 
 function hasAuthorization(token) {
-  const options = {
-    url: util.format('https://api.github.com/?access_token=%s', token),
-    headers: {
-      'User-Agent': config.userAgent
-    }
-  };
-  return rp(options);
+  return new Promise(function (res, rej) {
+    const cmd = checkGithubAuth(token, config.userAgent);
+    exec(cmd, function (err, stdout, stderr) {
+      if (err) rej(err);
+      else res(stdout);
+    });
+  });
 }
 
 function ensureApplicationDirectory() {
