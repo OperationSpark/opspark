@@ -6,11 +6,11 @@ module.exports.getClient = () => new Promise((res, rej) => res(dummyData.dummyUs
 
 module.exports.createGithubToken = () => `echo '${JSON.stringify(dummyData.dummyAuth)}'`;
 
-module.exports.deleteGithubToken = () => `echo ${dummyData.dummy}`;
+module.exports.deleteGithubToken = () => 'echo ""';
 
 module.exports.readGithubAuths = () => `echo ${dummyData.dummy}`;
 
-module.exports.checkGithubAuth = () => `echo ${dummyData.dummy}`;
+module.exports.checkGithubAuth = () => 'echo \'{ "statusCode": 200 }\'';
 
 module.exports.downloadProject = () => `echo ${dummyData.dummy}`;
 
