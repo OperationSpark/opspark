@@ -151,44 +151,6 @@ function obtainAndWriteUser(user) {
 
 module.exports.obtainAndWriteUser = obtainAndWriteUser;
 
-// module.exports.repo = function (username, repoName, complete) {
-//   getOrCreateClient()
-//     .then(function (client) {
-//       const ghrepo = client.repo(`${username}/${username}.github.io`);
-//       ghrepo.info(function (er, statu, bod, header) {
-//         console.log(bod);
-//         complete(null, bod);
-//       });
-//     })
-//     .catch(err => console.error(err));
-// };
-
-// module.exports.limit = function (complete) {
-//   getOrCreateClient()
-//     .then(function (client) {
-//       client.limit(function (err, left, max) {
-//         if (err) return complete(err);
-//         const message = `GitHub limit: ${left} used of ${max}.`;
-//         complete(null, message);
-//       });
-//     })
-//     .catch(err => console.error(err));
-// };
-
-// function repos(complete) {
-//   // the client also initializes opspark, which isn't very clear -
-//   // perhaps you should refactor to create opspark here, or? //
-//   getOrCreateClient()
-//     .then(function (client) {
-//       _opspark.repos(1, 100, function (repos) {
-//         // if (err) return complete(err);
-//         complete(null, repos);
-//       });
-//     })
-//     .catch(err => console.log(err));
-// }
-// module.exports.repos = repos;
-
 function getOrCreateClient() {
   return new Promise(function (res, rej) {
     if (_client) return res(_client);
@@ -202,6 +164,8 @@ function getOrCreateClient() {
   });
 }
 
+module.exports.getOrCreateClient = getOrCreateClient;
+
 function getOrObtainAuth() {
   return new Promise(function (res) {
     if (_auth) return res(_auth);
@@ -209,7 +173,6 @@ function getOrObtainAuth() {
       _auth = fsJson.loadSync(authFilePath);
       hasAuthorization(_auth.token)
         .then(function (response) {
-          console.log('THIS IS THE RESPONSE', response);
           if (response.statusCode === 200) {
             res(_auth);
           } else {
@@ -232,11 +195,16 @@ function hasAuthorization(token) {
   return new Promise(function (res, rej) {
     const cmd = checkGithubAuth(token, config.userAgent);
     exec(cmd, function (err, stdout, stderr) {
-      if (err) rej(err);
-      else res(stdout);
+      if (err) return rej(err);
+      if (typeof stdout === 'string') {
+        stdout = JSON.parse(stdout);
+      }
+      res(stdout);
     });
   });
 }
+
+module.exports.hasAuthorization = hasAuthorization;
 
 function ensureApplicationDirectory() {
   if (!fs.existsSync(applicationDirectory)) mkdirp.sync(applicationDirectory);
@@ -307,8 +275,11 @@ function deauthorizeUser() {
     promptForUserInfo()
       .then(deleteToken)
       .then(deleteUserInfo)
-      .then(() => console.log('Successfully logged out!'.blue))
-      .catch(err => console.log(`${err}`.red));
+      .then(() => {
+        console.log('Successfully logged out!'.blue);
+        res(true);
+      })
+      .catch(err => rej(`${err}`.red));
   });
 }
 
@@ -319,8 +290,9 @@ function deleteToken({ username, password }) {
   return new Promise(function (res, rej) {
     const cmd = deleteGithubToken(username, password, config.userAgent, grabLocalAuthID());
     exec(cmd, function (err, stdout, stderr) {
-      if (err) rej(err);
-      else res();
+      if (stdout.indexOf('message') > -1) return rej(stdout);
+      console.log(stdout);
+      res(stdout);
     });
   });
 }
@@ -371,3 +343,41 @@ function getNoteForHost() {
 }
 
 module.exports.getNoteForHost = getNoteForHost;
+
+// module.exports.repo = function (username, repoName, complete) {
+//   getOrCreateClient()
+//     .then(function (client) {
+//       const ghrepo = client.repo(`${username}/${username}.github.io`);
+//       ghrepo.info(function (er, statu, bod, header) {
+//         console.log(bod);
+//         complete(null, bod);
+//       });
+//     })
+//     .catch(err => console.error(err));
+// };
+
+// module.exports.limit = function (complete) {
+//   getOrCreateClient()
+//     .then(function (client) {
+//       client.limit(function (err, left, max) {
+//         if (err) return complete(err);
+//         const message = `GitHub limit: ${left} used of ${max}.`;
+//         complete(null, message);
+//       });
+//     })
+//     .catch(err => console.error(err));
+// };
+
+// function repos(complete) {
+//   // the client also initializes opspark, which isn't very clear -
+//   // perhaps you should refactor to create opspark here, or? //
+//   getOrCreateClient()
+//     .then(function (client) {
+//       _opspark.repos(1, 100, function (repos) {
+//         // if (err) return complete(err);
+//         complete(null, repos);
+//       });
+//     })
+//     .catch(err => console.log(err));
+// }
+// module.exports.repos = repos;
