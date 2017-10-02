@@ -181,9 +181,9 @@ function repos(complete) {
   getOrCreateClient()
     .then(function (client) {
       _opspark.repos(1, 100, function (repos) {
-        if (err) return complete(err);
+        // if (err) return complete(err);
         complete(null, repos);
-      })
+      });
     })
     .catch(err => console.log(err));
 }

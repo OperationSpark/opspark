@@ -232,6 +232,7 @@ describe('github', function () {
       expect(authorizeUser()).to.be.an.instanceof(Promise);
     });
 
+    // TODO: update "getOrCreateClient" function
     it('should pipe out user inputs', function (done) {
       bddStdin('livrush\nPassword\n');
       authorizeUser()
