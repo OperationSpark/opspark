@@ -244,36 +244,31 @@ describe('github', function () {
     });
   });
 
-  describe.skip('#authorizeUser()', function () {
-    const authorizeUser = github.authorizeUser;
-
+  describe.skip('#getOrObtainAuth()', function () {
     it('should return a promise', function () {
-      expect(authorizeUser()).to.be.an.instanceof(Promise);
+      expect(github.getOrObtainAuth()).to.be.an.instanceof(Promise);
     });
-    it('should resolve credentials when they exist', function (done) {
-      github.writeAuth(dummyAuth);
-      github.writeUser(dummyUser);
-      github.authorize()
-        .then(function (user) {
-          expect(user.login).to.equal('livrush');
-          expect(user.id).to.equal(23201987);
-          expect(user.token).to.equal('fauxToken');
-          fs.unlinkSync(authFilePath);
-          fs.unlinkSync(userFilePath);
+
+    it('should resolve an object', function (done) {
+      github.getOrObtainAuth()
+        .then(function (res) {
+          expect(res).to.be.an.object;
           done();
         });
     });
   });
 
-  describe.skip('#getOrCreateClient()', function () {
+  describe('#getOrCreateClient()', function () {
     it('should return a promise', function () {
-      expect(1).to.equal(2);
+      expect(github.getOrCreateClient()).to.be.an.instanceof(Promise);
     });
-  });
 
-  describe.skip('#getOrObtainAuth()', function () {
-    it('should return a promise', function () {
-      expect(1).to.equal(2);
+    it('should resolve an object', function (done) {
+      github.getOrCreateClient()
+        .then(function (res) {
+          expect(res).to.be.an.object;
+          done();
+        });
     });
   });
 
@@ -299,19 +294,45 @@ describe('github', function () {
     });
   });
 
-  describe.skip('#deleteAuth()', function () {
+  describe.skip('#authorizeUser()', function () {
     it('should return a promise', function () {
-      expect(1).to.equal(2);
+      expect(github.authorizeUser()).to.be.an.instanceof(Promise);
+    });
+
+    // TODO: update "getOrCreateClient" function
+    it('should pipe out user inputs', function (done) {
+      bddStdin('livrush\nPassword\n');
+      github.authorizeUser()
+        .then(function (user) {
+          expect(user.username).to.equal('Username');
+          expect(user.password).to.equal('Password');
+          done();
+        })
+        .catch(function (err) {
+          console.log(err);
+        });
     });
   });
 
-  describe.skip('#deleteUser()', function () {
-    it('should return a promise', function () {
-      expect(1).to.equal(2);
+  describe('#deleteAuth()', function () {
+    it('should delete auth file', function () {
+      fs.createFileSync(authFilePath, dummyAuth);
+      expect(fs.existsSync(authFilePath)).to.be.true;
+      github.deleteAuth();
+      expect(fs.existsSync(authFilePath)).to.be.false;
     });
   });
 
-  describe.skip('#deleteUserInfo()', function () {
+  describe('#deleteUser()', function () {
+    it('should delete user file', function () {
+      fs.createFileSync(userFilePath, dummyUser);
+      expect(fs.existsSync(userFilePath)).to.be.true;
+      github.deleteUser();
+      expect(fs.existsSync(userFilePath)).to.be.false;
+    });
+  });
+
+  describe('#deleteUserInfo()', function () {
     beforeEach(function () {
       github.writeAuth(dummyAuth);
       github.writeUser(dummyUser);
