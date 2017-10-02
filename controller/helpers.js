@@ -1,3 +1,18 @@
+const octonode = require('octonode');
+
+module.exports.createClient = function (token) {
+  return octonode.client(token);
+};
+
+module.exports.getClient = function (client, username) {
+  return new Promise(function (res, rej) {
+    client.get(`/users/${username}`, {}, function (err, status, body) {
+      if (err) rej(err);
+      else res(body);
+    });
+  });
+};
+
 module.exports.createGithubToken = function (username, password, note) {
   return `curl -u "${username}:${password}" -d '{"scopes":["public_repo", "repo", "gist"],"note":"${note}","note_url":"https://www.npmjs.com/package/opspark"}' https://api.github.com/authorizations`;
 };

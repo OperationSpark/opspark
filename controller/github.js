@@ -12,8 +12,7 @@ const exec = require('child_process').exec;
 
 const env = require('./env');
 const config = require('../config');
-const { createGithubToken, deleteGithubToken, readGithubAuths, checkGithubAuth } = require('./helpers');
-
+const { createGithubToken, deleteGithubToken, readGithubAuths, checkGithubAuth, createClient, getClient } = require('./helpers');
 
 const applicationDirectory = `${env.home()}/opspark`;
 const authFilePath = `${applicationDirectory}/auth`;
@@ -37,7 +36,8 @@ function getCredentials() {
       console.log('Good to go!'.green);
       res(creds);
     } else {
-      res(authorizeUser());
+      authorizeUser()
+        .then(user => res(user));
     }
   });
 }
@@ -57,7 +57,7 @@ function authorizeUser() {
         };
         res(creds);
       })
-      .catch(err => rej(err));
+      .catch(err => res(err));
   });
 }
 
@@ -135,15 +135,15 @@ function writeUser(user) {
 
 module.exports.writeUser = writeUser;
 
-function obtainAndWriteUser(username) {
+function obtainAndWriteUser(user) {
   console.log('Grabbing user. . .'.yellow);
   return new Promise(function (res, rej) {
     getOrCreateClient()
       .then(function (client) {
-        client.get(`/users/${username.username}`, {}, function (err, status, body) {
-          if (err) rej(err);
-          else writeUser(body).then(user => res(user));
-        });
+        getClient(client, user.username)
+          .catch(err => rej(err))
+          .then(writeUser)
+          .then(user => res(user));
       })
       .catch(err => console.error(err));
   });
@@ -151,51 +151,51 @@ function obtainAndWriteUser(username) {
 
 module.exports.obtainAndWriteUser = obtainAndWriteUser;
 
-module.exports.repo = function (username, repoName, complete) {
-  getOrCreateClient()
-    .then(function (client) {
-      const ghrepo = client.repo(`${username}/${username}.github.io`);
-      ghrepo.info(function (er, statu, bod, header) {
-        console.log(bod);
-        complete(null, bod);
-      });
-    })
-    .catch(err => console.error(err));
-};
+// module.exports.repo = function (username, repoName, complete) {
+//   getOrCreateClient()
+//     .then(function (client) {
+//       const ghrepo = client.repo(`${username}/${username}.github.io`);
+//       ghrepo.info(function (er, statu, bod, header) {
+//         console.log(bod);
+//         complete(null, bod);
+//       });
+//     })
+//     .catch(err => console.error(err));
+// };
 
-module.exports.limit = function (complete) {
-  getOrCreateClient()
-    .then(function (client) {
-      client.limit(function (err, left, max) {
-        if (err) return complete(err);
-        const message = `GitHub limit: ${left} used of ${max}.`;
-        complete(null, message);
-      });
-    })
-    .catch(err => console.error(err));
-};
+// module.exports.limit = function (complete) {
+//   getOrCreateClient()
+//     .then(function (client) {
+//       client.limit(function (err, left, max) {
+//         if (err) return complete(err);
+//         const message = `GitHub limit: ${left} used of ${max}.`;
+//         complete(null, message);
+//       });
+//     })
+//     .catch(err => console.error(err));
+// };
 
-function repos(complete) {
-  // the client also initializes opspark, which isn't very clear -
-  // perhaps you should refactor to create opspark here, or? //
-  getOrCreateClient()
-    .then(function (client) {
-      _opspark.repos(1, 100, function (repos) {
-        // if (err) return complete(err);
-        complete(null, repos);
-      });
-    })
-    .catch(err => console.log(err));
-}
-module.exports.repos = repos;
+// function repos(complete) {
+//   // the client also initializes opspark, which isn't very clear -
+//   // perhaps you should refactor to create opspark here, or? //
+//   getOrCreateClient()
+//     .then(function (client) {
+//       _opspark.repos(1, 100, function (repos) {
+//         // if (err) return complete(err);
+//         complete(null, repos);
+//       });
+//     })
+//     .catch(err => console.log(err));
+// }
+// module.exports.repos = repos;
 
 function getOrCreateClient() {
   return new Promise(function (res, rej) {
     if (_client) return res(_client);
     getOrObtainAuth()
       .then(function (auth) {
-        _client = octonode.client(auth.token);
-        _opspark = _client.org('OperationSpark');
+        _client = createClient(auth.token);
+        // _opspark = _client.org('OperationSpark');
         res(_client);
       })
       .catch(err => console.error(err));
@@ -225,8 +225,8 @@ function getOrObtainAuth() {
     }
   });
 }
-module.exports.getOrObtainAuth = getOrObtainAuth;
 
+module.exports.getOrObtainAuth = getOrObtainAuth;
 
 function hasAuthorization(token) {
   return new Promise(function (res, rej) {

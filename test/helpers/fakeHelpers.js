@@ -1,5 +1,9 @@
 const dummyData = require('./dummyData');
 
+module.exports.createClient = () => dummyData.dummyUser;
+
+module.exports.getClient = () => new Promise((res, rej) => res(dummyData.dummyUser));
+
 module.exports.createGithubToken = () => `echo '${JSON.stringify(dummyData.dummyAuth)}'`;
 
 module.exports.deleteGithubToken = () => `echo ${dummyData.dummy}`;

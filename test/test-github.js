@@ -20,8 +20,6 @@ const fakeHelpers = require('./helpers/fakeHelpers');
 
 const helpers = proxyquire('../controller/github', { './helpers': fakeHelpers });
 
-console.log(helpers);
-
 const config = require('../config');
 const env = require('../controller/env');
 const github = require('../controller/github');
@@ -33,17 +31,71 @@ const userFilePath = `${applicationDirectory}/user`;
 
 
 describe('github', function () {
+  describe('#promptForUserInfo()', function () {
+    it('should return a promise', function () {
+      expect(github.promptForUserInfo()).to.be.an.instanceof(Promise);
+    });
+    it('should pipe out user inputs', function (done) {
+      bddStdin('Username\nPassword\n');
+      github.promptForUserInfo()
+        .then(function (user) {
+          expect(user.username).to.equal('Username');
+          expect(user.password).to.equal('Password');
+        });
+      bddStdin('livrush\n********\n');
+      github.promptForUserInfo()
+        .then(function (user) {
+          expect(user.username).to.equal('livrush');
+          expect(user.password).to.equal('********');
+          done();
+        });
+    });
+  });
 
   describe('#ensureApplicationDirectory()', function () {
     beforeEach(function (done) {
       rimraf(applicationDirectory, function () { done(); });
     });
-
     it('should create directory if none', function (done) {
-      console.log('begin');
       expect(fs.existsSync(applicationDirectory)).to.be.false;
       github.ensureApplicationDirectory();
       expect(fs.existsSync(applicationDirectory)).to.be.true;
+      done();
+    });
+  });
+
+  describe('#authExists()', function () {
+    it('should return true if directory exists', function (done) {
+      expect(github.authExists()).to.be.false;
+      fs.writeFileSync(authFilePath, dummyAuth);
+      expect(github.authExists()).to.be.true;
+      fs.unlinkSync(authFilePath);
+      expect(github.authExists()).to.be.false;
+      done();
+    });
+  });
+
+  describe('#userExists()', function () {
+    it('should return true if directory exists', function (done) {
+      expect(github.userExists()).to.be.false;
+      fs.writeFileSync(userFilePath, dummyAuth);
+      expect(github.userExists()).to.be.true;
+      fs.unlinkSync(userFilePath);
+      expect(github.userExists()).to.be.false;
+      done();
+    });
+  });
+
+  describe('#userInfoExists()', function () {
+    beforeEach(function () {
+      github.writeAuth(dummyAuth);
+      github.writeUser(dummyUser);
+    });
+    afterEach(function (done) {
+      rimraf(applicationDirectory, function () { done(); });
+    });
+    it('should return true if directory exists', function (done) {
+      expect(github.userInfoExists()).to.be.true;
       done();
     });
   });
@@ -52,14 +104,12 @@ describe('github', function () {
     beforeEach(function (done) {
       rimraf(applicationDirectory, function () { done(); });
     });
-
     it('should write auth file', function (done) {
       expect(fs.existsSync(authFilePath)).to.be.false;
       github.writeAuth(dummyAuth);
       expect(fs.existsSync(authFilePath)).to.be.true;
       done();
     });
-
     it('should write correct information', function (done) {
       github.writeAuth(dummyAuth);
       let auth = fs.readFileSync(authFilePath);
@@ -73,45 +123,17 @@ describe('github', function () {
     beforeEach(function (done) {
       rimraf(applicationDirectory, function () { done(); });
     });
-
     it('should write user file', function (done) {
       expect(fs.existsSync(userFilePath)).to.be.false;
       github.writeUser(dummyUser);
       expect(fs.existsSync(userFilePath)).to.be.true;
       done();
     });
-
     it('should write correct information', function (done) {
       github.writeUser(dummyUser);
       let user = fs.readFileSync(userFilePath);
       user = JSON.parse(user);
       expect(user).to.eql(dummyUser);
-      done();
-    });
-  });
-
-  describe('#userInfoExists()', function () {
-    beforeEach(function () {
-      github.writeAuth(dummyAuth);
-      github.writeUser(dummyUser);
-    });
-
-    it('should return true if directory exists', function (done) {
-      expect(github.userInfoExists()).to.be.true;
-      done();
-    });
-  });
-
-  describe('#deleteUserInfo()', function () {
-    beforeEach(function () {
-      github.writeAuth(dummyAuth);
-      github.writeUser(dummyUser);
-    });
-
-    it('should return true if directory exists', function (done) {
-      expect(github.userInfoExists()).to.be.true;
-      github.deleteUserInfo();
-      expect(github.userInfoExists()).to.be.false;
       done();
     });
   });
@@ -184,32 +206,78 @@ describe('github', function () {
     });
   });
 
-
-  describe('#promptForUserInfo()', function () {
-    const promptForUserInfo = github.promptForUserInfo;
-
+  describe('#getCredentials()', function () {
     it('should return a promise', function () {
-      expect(promptForUserInfo()).to.be.an.instanceof(Promise);
+      expect(github.getCredentials()).to.be.an.instanceof(Promise);
     });
 
-    it('should pipe out user inputs', function (done) {
-      bddStdin('Username\nPassword\n');
-      promptForUserInfo()
+    it('should resolve credentials when they exist', function (done) {
+      github.writeAuth(dummyAuth);
+      github.writeUser(dummyUser);
+      expect(github.userInfoExists()).to.be.true;
+      github.getCredentials()
         .then(function (user) {
-          expect(user.username).to.equal('Username');
-          expect(user.password).to.equal('Password');
+          expect(user.login).to.equal('livrush');
+          expect(user.id).to.equal(23201987);
+          expect(user.token).to.equal('fauxToken');
+          fs.unlinkSync(authFilePath);
+          fs.unlinkSync(userFilePath);
+          done();
         });
-      bddStdin('livrush\n********\n');
-      promptForUserInfo()
+    });
+
+    // it('should call authorizeUser when no credentials exist', function (done) {
+    //   expect(github.userInfoExists()).to.be.false;
+    //   github.authorizeUser = sinon.stub(github, 'authorizeUser');
+    //   bddStdin('username\npassword\n');
+    //   github.getCredentials()
+    //     .then(function (user) {
+    //       expect(github.authorizeUser.callCount).to.equal(1);
+    //       done();
+    //     });
+    // });
+  });
+
+  describe.skip('#hasAuthorization()', function () {
+    it('should return a promise', function () {
+      expect(1).to.equal(2);
+    });
+  });
+
+  describe.skip('#authorizeUser()', function () {
+    const authorizeUser = github.authorizeUser;
+
+    it('should return a promise', function () {
+      expect(authorizeUser()).to.be.an.instanceof(Promise);
+    });
+    it('should resolve credentials when they exist', function (done) {
+      github.writeAuth(dummyAuth);
+      github.writeUser(dummyUser);
+      github.authorize()
         .then(function (user) {
-          expect(user.username).to.equal('livrush');
-          expect(user.password).to.equal('********');
+          expect(user.login).to.equal('livrush');
+          expect(user.id).to.equal(23201987);
+          expect(user.token).to.equal('fauxToken');
+          fs.unlinkSync(authFilePath);
+          fs.unlinkSync(userFilePath);
           done();
         });
     });
   });
 
-  describe('#obtainAndWriteAuth()', function () {
+  describe.skip('#getOrCreateClient()', function () {
+    it('should return a promise', function () {
+      expect(1).to.equal(2);
+    });
+  });
+
+  describe.skip('#getOrObtainAuth()', function () {
+    it('should return a promise', function () {
+      expect(1).to.equal(2);
+    });
+  });
+
+  describe.skip('#obtainAndWriteAuth()', function () {
     const obtainAndWriteAuth = github.obtainAndWriteAuth;
 
     it('should return a promise', function () {
@@ -225,26 +293,47 @@ describe('github', function () {
     });
   });
 
-  describe('#authorizeUser()', function () {
-    const authorizeUser = github.authorizeUser;
-
+  describe.skip('#obtainAndWriteUser()', function () {
     it('should return a promise', function () {
-      expect(authorizeUser()).to.be.an.instanceof(Promise);
+      expect(1).to.equal(2);
+    });
+  });
+
+  describe.skip('#deleteAuth()', function () {
+    it('should return a promise', function () {
+      expect(1).to.equal(2);
+    });
+  });
+
+  describe.skip('#deleteUser()', function () {
+    it('should return a promise', function () {
+      expect(1).to.equal(2);
+    });
+  });
+
+  describe.skip('#deleteUserInfo()', function () {
+    beforeEach(function () {
+      github.writeAuth(dummyAuth);
+      github.writeUser(dummyUser);
     });
 
-    // TODO: update "getOrCreateClient" function
-    it('should pipe out user inputs', function (done) {
-      bddStdin('livrush\nPassword\n');
-      authorizeUser()
-        .then(function (user) {
-          console.log('hey')
-          expect(user.username).to.equal('Username');
-          expect(user.password).to.equal('Password');
-          done();
-        })
-        .catch(function (err) {
-          console.log(err);
-        })
+    it('should return true if directory exists', function (done) {
+      expect(github.userInfoExists()).to.be.true;
+      github.deleteUserInfo();
+      expect(github.userInfoExists()).to.be.false;
+      done();
+    });
+  });
+
+  describe.skip('#deleteToken()', function () {
+    it('should return a promise', function () {
+      expect(1).to.equal(2);
+    });
+  });
+
+  describe.skip('#deauthorizeUser()', function () {
+    it('should return a promise', function () {
+      expect(1).to.equal(2);
     });
   });
 
@@ -327,7 +416,7 @@ describe('github', function () {
   // });
 
   // /*
-  //  * Run manually
+  //  * Run manually 
   //  */
   // describe.skip('#findToken()', function () {
   //   it('looks for token key', function (done) {
