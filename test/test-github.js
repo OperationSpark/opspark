@@ -238,21 +238,31 @@ describe('github', function () {
     // });
   });
 
-  describe.skip('#hasAuthorization()', function () {
+  describe('#hasAuthorization()', function () {
     it('should return a promise', function () {
-      expect(1).to.equal(2);
+      expect(github.hasAuthorization()).to.be.an.instanceof(Promise);
+    });
+
+    it('should return a response object', function () {
+      github.hasAuthorization()
+        .then(function (res) {
+          expect(res.statusCode).to.equal(200);
+        });
     });
   });
 
-  describe.skip('#getOrObtainAuth()', function () {
+  describe('#getOrObtainAuth()', function () {
     it('should return a promise', function () {
       expect(github.getOrObtainAuth()).to.be.an.instanceof(Promise);
     });
 
-    it('should resolve an object', function (done) {
+    it('should resolve auth object', function (done) {
+      github.writeAuth(dummyAuth);
+      github.writeUser(dummyUser);
       github.getOrObtainAuth()
         .then(function (res) {
-          expect(res).to.be.an.object;
+          expect(res).to.eql(dummyAuth);
+          github.deleteUserInfo();
           done();
         });
     });
@@ -263,24 +273,35 @@ describe('github', function () {
       expect(github.getOrCreateClient()).to.be.an.instanceof(Promise);
     });
 
-    it('should resolve an object', function (done) {
+    it('should resolve user object', function (done) {
+      github.writeAuth(dummyAuth);
+      github.writeUser(dummyUser);
       github.getOrCreateClient()
         .then(function (res) {
-          expect(res).to.be.an.object;
+          expect(res).to.eql(dummyUser);
+          github.deleteUserInfo();
           done();
         });
     });
   });
 
-  describe.skip('#obtainAndWriteAuth()', function () {
-    const obtainAndWriteAuth = github.obtainAndWriteAuth;
-
+  describe('#obtainAndWriteAuth()', function () {
     it('should return a promise', function () {
-      expect(obtainAndWriteAuth(dummyAuth)).to.be.an.instanceof(Promise);
+      expect(github.obtainAndWriteAuth(dummyAuth)).to.be.an.instanceof(Promise);
     });
 
-    it('should pipe out user inputs', function (done) {
-      obtainAndWriteAuth(dummyAuth)
+    it('should create auth file', function (done) {
+      github.deleteAuth();
+      expect(github.authExists()).to.be.false;
+      github.obtainAndWriteAuth(dummyAuth)
+        .then(function () {
+          expect(github.authExists()).to.be.true;
+          done();
+        });
+    });
+
+    it('should send on auth data', function (done) {
+      github.obtainAndWriteAuth(dummyAuth)
         .then(function (result) {
           expect(result).to.eql(dummyAuth);
           done();
@@ -288,28 +309,44 @@ describe('github', function () {
     });
   });
 
-  describe.skip('#obtainAndWriteUser()', function () {
+  describe('#obtainAndWriteUser()', function () {
     it('should return a promise', function () {
-      expect(1).to.equal(2);
+      expect(github.obtainAndWriteUser(dummyUser)).to.be.an.instanceof(Promise);
+    });
+
+    it('should create auth file', function (done) {
+      github.deleteUser();
+      expect(github.userExists()).to.be.false;
+      github.obtainAndWriteUser(dummyUser)
+        .then(function () {
+          expect(github.userExists()).to.be.true;
+          done();
+        });
+    });
+
+    it('should send on auth data', function (done) {
+      github.obtainAndWriteUser(dummyUser)
+        .then(function (result) {
+          expect(result).to.eql(dummyUser);
+          done();
+        });
     });
   });
 
-  describe.skip('#authorizeUser()', function () {
+  describe('#authorizeUser()', function () {
+    github.deleteUserInfo();
+    
     it('should return a promise', function () {
       expect(github.authorizeUser()).to.be.an.instanceof(Promise);
     });
 
-    // TODO: update "getOrCreateClient" function
-    it('should pipe out user inputs', function (done) {
+    it('should provide creds', function (done) {
       bddStdin('livrush\nPassword\n');
       github.authorizeUser()
         .then(function (user) {
-          expect(user.username).to.equal('Username');
-          expect(user.password).to.equal('Password');
+          expect(user.login).to.equal('livrush');
+          expect(user.token).to.equal('fauxToken');
           done();
-        })
-        .catch(function (err) {
-          console.log(err);
         });
     });
   });
@@ -346,110 +383,43 @@ describe('github', function () {
     });
   });
 
-  describe.skip('#deleteToken()', function () {
+  describe('#deleteToken()', function () {
+    beforeEach(function () {
+      github.writeAuth(dummyAuth);
+      github.writeUser(dummyUser);
+    });
+
     it('should return a promise', function () {
-      expect(1).to.equal(2);
+      expect(github.deleteToken(dummyAuth)).to.be.an.instanceof(Promise);
+    });
+
+    it('should return empty line if successful', function (done) {
+      bddStdin('livrush\nPassword\n');
+      github.deleteToken(dummyAuth)
+        .then(function (res) {
+          expect(res).to.equal('\n');
+          done();
+        });
     });
   });
 
-  describe.skip('#deauthorizeUser()', function () {
+  describe('#deauthorizeUser()', function () {
+    beforeEach(function () {
+      github.writeAuth(dummyAuth);
+      github.writeUser(dummyUser);
+    });
+
     it('should return a promise', function () {
-      expect(1).to.equal(2);
+      expect(github.deauthorizeUser()).to.be.an.instanceof(Promise);
+    });
+
+    it('should return empty line if successful', function (done) {
+      bddStdin('livrush\nPassword\n');
+      github.deauthorizeUser()
+        .then(function (res) {
+          expect(res).to.equal(true);
+          done();
+        });
     });
   });
-
-  // describe.skip('#user()', function () {
-  //   this.timeout(15000);
-  //   it("returns valid github user", function (done) {
-  //     github.user("jfraboni", function (err, user) {
-  //       expect(user)
-  //         .to.have.property("login")
-  //         .and.to.equal("jfraboni");
-  //       done();
-  //     });
-  //   });
-
-  //   it("throws err if invalid github user", function (done) {
-  //     github.user("*-^xyz", function (err, user) {
-  //       expect(err).to.be.not.null;
-  //       expect(user).to.be.undefined;
-  //       done();
-  //     });
-  //   });
-  // });
-
-  // describe.skip('#repos()', function () {
-  //   it('should obtain auth, then get all org repos', function (done) {
-  //     github.repos(function (err, repos) {
-  //       var names = _.map(repos, 'name');
-  //       expect(names).to.include('circularity', 'frabonacci', 'line-crawler');
-  //       done();
-  //     });
-  //   });
-  // });
-
-  // describe.skip('#limit()', function () {
-  //   it('should return GitHub API rate-limit usage', function (done) {
-  //     github.limit(function (err, msg) {
-  //       console.log(msg);
-  //       expect(msg).to.include('GitHub limit');
-  //       done();
-  //     });
-  //   });
-  // });
-
-  // // deprecated: todo : remove //
-  // describe.skip('#listAuth()', function () {
-  //   this.timeout(15000);
-  //   it('should list valid GitHub auths for the user', function (done) {
-  //     github.listAuths('jfraboni', function (err, stdout, stderr) {
-  //       if (err) console.log(err);
-  //       done();
-  //     });
-  //   });
-  // });
-
-  // /*
-  //  * Run manually : depends on creds.
-  //  */
-  // describe.skip('#authorize()', function () {
-  //   this.timeout(30000);
-  //   it('should authorize cli with github token', function (done) {
-  //     var opsparkDir = github.getUserHome() + '/opspark';
-  //     var filepath = opsparkDir + '/github';
-  //     github.authorize('jfraboni', function () {
-  //       assert(fs.existsSync(opsparkDir));
-  //       assert(fs.existsSync(filepath));
-  //       var auth = fsJson.loadSync(filepath);
-  //       assert(_.has(auth, 'token'));
-  //       done();
-  //     });
-  //   });
-  // });
-
-  // describe('#getNoteForHost()', function () {
-  //   it('returns auth note unique to env', function (done) {
-  //     var note = util.format(config.github.note, env.hostname());
-  //     console.log(github.getNoteForHost());
-  //     expect(github.getNoteForHost()).to.equal(note);
-  //     done();
-  //   });
-  // });
-
-  // /*
-  //  * Run manually 
-  //  */
-  // describe.skip('#findToken()', function () {
-  //   it('looks for token key', function (done) {
-  //     var filepath = github.getUserHome() + '/opspark/github';
-  //     if (fs.existsSync(filepath)) {
-  //       var auth = fsJson.loadSync(filepath);
-  //       assert(_.has(auth, 'token'));
-
-  //       // var hasToken = (data.indexOf('token') > -1);
-  //       // assert(hasToken);
-  //       done();
-  //     }
-  //   });
-  // });
 });
