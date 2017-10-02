@@ -136,6 +136,7 @@ function writeUser(user) {
 module.exports.writeUser = writeUser;
 
 function obtainAndWriteUser(username) {
+  console.log('Grabbing user. . .'.yellow);
   return new Promise(function (res, rej) {
     getOrCreateClient()
       .then(function (client) {

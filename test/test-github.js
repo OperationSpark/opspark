@@ -1,5 +1,5 @@
 /* global describe it expect before beforeEach afterEach */
-'doneuse strict';
+'use strict';
 
 require('mocha');
 require('should');
@@ -12,10 +12,9 @@ const prompt = require('prompt');
 const rimraf = require('rimraf');
 const process = require('process');
 const fsJson = require('fs-json')();
+const expect = require('chai').expect;
 const bddStdin = require('bdd-stdin');
-const chai = require('./helpers/chai');
 const proxyquire = require('proxyquire');
-const stdin = require('mock-stdin').stdin();
 
 const fakeHelpers = require('./helpers/fakeHelpers');
 
@@ -226,7 +225,7 @@ describe('github', function () {
     });
   });
 
-  describe.skip('#authorizeUser()', function () {
+  describe('#authorizeUser()', function () {
     const authorizeUser = github.authorizeUser;
 
     it('should return a promise', function () {
@@ -234,19 +233,17 @@ describe('github', function () {
     });
 
     it('should pipe out user inputs', function (done) {
-      bddStdin('Username\nPassword\n');
+      bddStdin('livrush\nPassword\n');
       authorizeUser()
         .then(function (user) {
+          console.log('hey')
           expect(user.username).to.equal('Username');
           expect(user.password).to.equal('Password');
-        });
-      bddStdin('livrush\nAs if\n');
-      authorizeUser()
-        .then(function (user) {
-          expect(user.username).to.equal('livrush');
-          expect(user.password).to.equal('As if');
           done();
-        });
+        })
+        .catch(function (err) {
+          console.log(err);
+        })
     });
   });
 
@@ -329,7 +326,7 @@ describe('github', function () {
   // });
 
   // /*
-  //  * Run manually 
+  //  * Run manually
   //  */
   // describe.skip('#findToken()', function () {
   //   it('looks for token key', function (done) {
