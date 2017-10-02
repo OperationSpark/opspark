@@ -131,6 +131,6 @@ const startProject = function (project) {
   const cmd = `${enterDirectory} && npm start`;
   exec(cmd, function (err) {
     if (err) return console.log('error:'.red, err);
-    console.log('Going going going. . .'.green);
+    console.log('Going going going. . .'.yellow);
   });
 };

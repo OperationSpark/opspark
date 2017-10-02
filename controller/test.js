@@ -51,6 +51,7 @@ function grabTests(project) {
     console.log(`Downloading tests for ${name}. . .`.yellow);
     const directory = `${projectsDirectory}/${name}`;
     const cmd = downloadProjectTests(project.url, github.grabLocalAuthToken(), directory);
+    console.log(cmd);
     const pckgCmd = downloadProjectPackage(project.url, github.grabLocalAuthToken(), directory);
     if (fs.existsSync(`${directory}/test`)) {
       console.log('Skipping tests.'.green);

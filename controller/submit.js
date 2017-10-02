@@ -48,7 +48,7 @@ function checkGrade({ project, parsedStdout }) {
     if (stats.passes < (stats.tests / 2)) {
       rej(`You have not passed all tests for ${project.name}! Must be have finished at least 50% to submit. Canceling submit.`.red);
     } else {
-      console.log('Great! Beginning the upload process. . .'.green);
+      console.log('Great!'.green, 'Beginning the upload process. . .'.yellow);
       res({ project, stats });
     }
   });
@@ -79,9 +79,10 @@ function createGist({ project, stats }) {
 
   content = JSON.stringify(content);
   return new Promise(function (res, rej) {
-    console.log('Creating gist. . .'.green);
+    console.log('Creating gist. . .'.yellow);
     const cmd = createGistHelper(content, github.grabLocalLogin(), github.grabLocalAuthToken());
     exec(cmd, function (err, stdout, stderr) {
+      console.log(stdout);
       const gist = JSON.parse(stdout);
       if (err) rej(err);
       console.log('Gist created!'.green);
@@ -95,9 +96,10 @@ module.exports.createGist = createGist;
 function ensureGistExists({ project, gist, tries }) {
   return new Promise(function (res, rej) {
     if (tries < 4) {
-      console.log('Ensuring gist exists. . .'.green, `Attempt ${tries}`.yellow);
+      console.log(`Ensuring gist exists. . . Attempt ${tries}`.yellow);
       const cmd = readGistHelper(gist.files['grade.txt'].raw_url);
       exec(cmd, function (err, stdout, stderr) {
+        console.log(stdout);
         if (err) {
           rej(err);
         } else if (stdout === '404: Not Found') {
@@ -114,9 +116,10 @@ function ensureGistExists({ project, gist, tries }) {
 
 function deleteGist(url) {
   return new Promise(function (res, rej) {
-    console.log('Deleting gist. . .'.green);
+    console.log('Deleting gist. . .'.yellow);
     const cmd = deleteGistHelper(github.grabLocalLogin(), github.grabLocalAuthToken(), url);
     exec(cmd, function (err, stdout, stderr) {
+      console.log(stdout);
       if (err) {
         rej(err);
       }

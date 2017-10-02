@@ -14,7 +14,7 @@ const { waterfall, series } = require('async');
 
 const env = require('./env');
 const github = require('./github');
-const { downloadProject, downloadProjectTests } = require('./helpers');
+const { downloadProject } = require('./helpers');
 
 const rootDirectory = `${env.home()}/workspace`;
 const projectEntriesPath = `${rootDirectory}/projects/projects.json`;

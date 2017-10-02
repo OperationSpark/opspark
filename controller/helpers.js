@@ -15,11 +15,15 @@ module.exports.checkGithubAuth = function (token, userAgent) {
 };
 
 module.exports.downloadProject = function (url, token, directory) {
-  return `svn co ${url}/trunk --password ${token} ${directory}`
+  return `svn co ${url}/trunk --password ${token} ${directory}`;
 };
 
-module.exports.downloadProjectTests = function () {
-  return ``;
+module.exports.downloadProjectTests = function (url, token, directory) {
+  return `svn export ${url}/trunk/test --password ${token} ${directory}/test`;
+};
+
+module.exports.downloadProjectPackage = function (url, token, directory) {
+  return `svn export ${url}/trunk/package.json --password ${token} ${directory}/package.json`;
 };
 
 module.exports.createGistHelper = function (username, token, content) {
