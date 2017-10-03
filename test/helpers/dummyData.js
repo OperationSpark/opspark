@@ -44,7 +44,7 @@ module.exports.dummyGistBad = {
   },
 };
 
-module.exports.dummySession = {
+const dummySession = {
   sessionId: 'Dnw6SEou4hYxBMpZP',
   name: 'Bootcamp',
   cohort: 'bootcamp-28-aug-2017-6-pm',
@@ -75,6 +75,14 @@ module.exports.dummySession = {
     }
   ]
 };
+
+module.exports.dummySession = dummySession;
+
+module.exports.dummySessions = [
+  dummySession,
+  dummySession,
+  dummySession,
+];
 
 module.exports.dummyProjectsDirectory = [
   'billypedia',
