@@ -78,15 +78,29 @@ const dummySession = {
 
 module.exports.dummySession = dummySession;
 
+const dummySession2 = {
+  sessionId: '6uBQDL8A7Yq7qSgJa',
+  name: 'Prep',
+  cohort: 'prep-18-sep-2017-9-am',
+  PROJECT: [],
+};
+
+const dummySession3 = {
+  sessionId: 'cdvvyXikGpuEoSErx',
+  name: 'Fundamentals of Software Development',
+  cohort: 'fundamentals-of-software-development-20-sep-2017-4-pm',
+  PROJECT: [
+    {
+      _id: 'DkLWgh47DNaLK6yYY',
+      name: 'Underpants',
+      desc: 'Fun with functional Functions',
+      url: 'https://github.com/operationspark/underpants'
+    },
+  ]
+};
+
 module.exports.dummySessions = [
   dummySession,
-  dummySession,
-  dummySession,
-];
-
-module.exports.dummyProjectsDirectory = [
-  'billypedia',
-  'product-project',
-  'scratch-pad',
-  'underpants',
+  dummySession2,
+  dummySession3,
 ];
