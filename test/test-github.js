@@ -18,19 +18,34 @@ const proxyquire = require('proxyquire');
 
 const fakeHelpers = require('./helpers/fakeHelpers');
 
-const helpers = proxyquire('../controller/github', { './helpers': fakeHelpers });
-
 const config = require('../config');
-const env = require('../controller/env');
-const github = require('../controller/github');
 const { dummyAuth, dummyUser } = require('./helpers/dummyData');
 
-const applicationDirectory = `${env.home()}/opspark`;
+const github = proxyquire('../controller/github', {
+  './helpers': fakeHelpers,
+  './env': {
+    home: fakeHelpers.home,
+  },
+});
+
+const applicationDirectory = './test/files/opspark';
 const authFilePath = `${applicationDirectory}/auth`;
 const userFilePath = `${applicationDirectory}/user`;
 
 
 describe('github', function () {
+  describe('#ensureApplicationDirectory()', function () {
+    beforeEach(function (done) {
+      rimraf(applicationDirectory, function () { done(); });
+    });
+    it('should create directory if none', function (done) {
+      expect(fs.existsSync(applicationDirectory)).to.be.false;
+      github.ensureApplicationDirectory();
+      expect(fs.existsSync(applicationDirectory)).to.be.true;
+      done();
+    });
+  });
+
   describe('#promptForUserInfo()', function () {
     it('should return a promise', function () {
       expect(github.promptForUserInfo()).to.be.an.instanceof(Promise);
@@ -49,18 +64,6 @@ describe('github', function () {
           expect(user.password).to.equal('********');
           done();
         });
-    });
-  });
-
-  describe('#ensureApplicationDirectory()', function () {
-    beforeEach(function (done) {
-      rimraf(applicationDirectory, function () { done(); });
-    });
-    it('should create directory if none', function (done) {
-      expect(fs.existsSync(applicationDirectory)).to.be.false;
-      github.ensureApplicationDirectory();
-      expect(fs.existsSync(applicationDirectory)).to.be.true;
-      done();
     });
   });
 

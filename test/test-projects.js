@@ -1,89 +1,69 @@
+/* global describe it expect before beforeEach afterEach */
 'use strict';
 
 require('mocha');
+require('should');
+require('colors');
+const fs = require('fs');
 const _ = require('lodash');
-const config = require('../config');
-const fs = require('fs-extra');
-const chai = require('./helpers/chai');
+const util = require('util');
 const sinon = require('sinon');
-const should = require('should');
-const colors = require('colors');
-const stdin = require('mock-stdin').stdin();
-const projects = require('../controller/projects');
+const prompt = require('prompt');
+const rimraf = require('rimraf');
+const process = require('process');
+const fsJson = require('fs-json')();
+const expect = require('chai').expect;
+const bddStdin = require('bdd-stdin');
+const proxyquire = require('proxyquire');
 
-const mockProjects = [
-  {
-    id: 29655824,
-    name: 'line-crawler'
+const fakeHelpers = require('./helpers/fakeHelpers');
+const { dummySession, dummyProjectsDirectory } = require('./helpers/dummyData');
+
+const projects = proxyquire('../controller/projects', {
+  './helpers': fakeHelpers,
+  './env': {
+    home: fakeHelpers.home,
   },
-  {
-    id: 29925564,
-    name: 'circularity'
+  fs: {
+    readdirSync: () => dummyProjectsDirectory,
   },
-  {
-    id: 30997229,
-    name: 'worm-hole'
-  }
-];
+});
+
+const env = './test/files';
+const projectsDirectory = `${env}/workspace/projects`;
 
 describe('projects', function () {
-  after(function () {
-    stdin.restore();
-  });
+  describe('#ensureProjectsDirectory()', function () {
+    beforeEach(function () {
+      if (fs.existsSync(projectsDirectory)) {
+        rimraf(projectsDirectory, () => {});
+      }
+    });
 
-  // TODO : mock //
-  describe('#listProjectsOf()', function () {
-    this.timeout(3000);
-    it('returns valid projects.json for user', function () {
-      return projects.listProjectsOf('jfraboni').then(function (projects) {
-        console.log(projects);
-        var names = _.map(projects, 'name');
-        expect(names).to.include('circularity', 'frabonacci', 'line-crawler');
-      });
+    it('should create directory if it doesn\'t exist', function () {
+      expect(fs.existsSync(projectsDirectory)).to.be.false;
+      projects.ensureProjectsDirectory();
+      expect(fs.existsSync(projectsDirectory)).to.be.true;
     });
   });
 
-  // TODO : mock //
-  // REQUIRES AUTH //
-  describe.skip('#list()', function () {
-    this.timeout(3000);
-    it('returns loosely valid list of projects from github.com/OperationSpark', function (done) {
-      projects.list(function (err, projects) {
-        var names = _.map(projects, 'name');
-        expect(names).to.include('circularity', 'frabonacci', 'line-crawler');
-        done();
-      });
+  describe('#listProjects()', function () {
+    it('should list projects properly when installing', function () {
+      const projectsList = projects.listProjects(dummySession, 'install');
+      const result = [dummySession.PROJECT[3], dummySession.PROJECT[2]];
+      expect(projectsList).to.eql(result);
+    });
+
+    it('should list projects properly when not installing', function () {
+      const projectsList = projects.listProjects(dummySession, 'test');
+      const result = [dummySession.PROJECT[1], dummySession.PROJECT[0]];
+      expect(projectsList).to.eql(result);
     });
   });
 
-  describe.skip('#download()', function () {
-    this.timeout(15000);
-
-    it('should download a project or any directory', function (done) {
-      projects.download('https://github.com/jfraboni/jfraboni.github.io/trunk/frabonacci', function (err) {
-        // test files exist //
-        // expect(project.id).to.equal(29655824);
-        // expect(project.name).to.equal('line-crawler');
-        done();
-      });
-
-    });
-
-  });
-
-  // need to figure out mocking stdin in this case - but do we need to test this anyway?  According to Inquirers test, this is already covered //
-  describe.skip('#selectProject()', function () {
-    this.timeout(15000);
-
-    it('allows user to select a project', function (done) {
-      projects.selectProject(mockProjects, function (err, project) {
-        expect(project.id).to.equal(29655824);
-        expect(project.name).to.equal('line-crawler');
-        done();
-      });
-      stdin.send("\n", "ascii");
-      // stdin.end();
-    });
-  });
-
+  // describe('#installProject()', function () {
+  //   it('should work', function () {
+  //     projects.installProject(dummySession.PROJECT[0]);
+  //   });
+  // });
 });

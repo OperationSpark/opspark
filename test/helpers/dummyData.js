@@ -43,3 +43,42 @@ module.exports.dummyGistBad = {
     }
   },
 };
+
+module.exports.dummySession = {
+  sessionId: 'Dnw6SEou4hYxBMpZP',
+  name: 'Bootcamp',
+  cohort: 'bootcamp-28-aug-2017-6-pm',
+  PROJECT: [
+    {
+      _id: 'DkLWgh47DNaLK6yYY',
+      name: 'Underpants',
+      desc: 'Fun with functional Functions',
+      url: 'https://github.com/operationspark/underpants'
+    },
+    {
+      _id: 'L9YQQn63z4S7p6cba',
+      name: 'Scratch Pad',
+      desc: 'Practice the art of JavaScript by passing unit tests',
+      url: 'https://github.com/OperationSpark/scratch-pad'
+    },
+    {
+      _id: 'ZnRsPsdsMWPzfYZ2S',
+      name: 'Matchy',
+      desc: 'Practice all the ways to dynamically create and access data structures',
+      url: 'https://github.com/operationspark/matchy'
+    },
+    {
+      _id: 'v4sZfMFaanbqaWeNS',
+      name: 'Function Master',
+      desc: 'Master the art of Functions',
+      url: 'https://github.com/OperationSpark/function-master'
+    }
+  ]
+};
+
+module.exports.dummyProjectsDirectory = [
+  'billypedia',
+  'product-project',
+  'scratch-pad',
+  'underpants',
+];

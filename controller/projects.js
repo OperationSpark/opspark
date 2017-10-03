@@ -26,8 +26,9 @@ let action = null;
 module.exports.action = () => action;
 
 function selectProject({ session, projectAction }) {
+  console.log(session);
   action = projectAction;
-  const projects = listProjects(session);
+  const projects = listProjects(session, action);
   return new Promise(function (res) {
     waterfall([
       function (next) {
@@ -63,7 +64,7 @@ function selectProject({ session, projectAction }) {
 }
 module.exports.selectProject = selectProject;
 
-function listProjects(session) {
+function listProjects(session, listAction) {
   console.log('Grabbing projects. . .'.yellow);
   const projects = session.PROJECT;
   let files;
@@ -76,7 +77,7 @@ function listProjects(session) {
   } else {
     files = [];
   }
-  if (action === 'install') {
+  if (listAction === 'install') {
     testableProjects = _.difference(mappedProjects, files);
   } else {
     testableProjects = _.intersection(mappedProjects, files);
@@ -96,6 +97,8 @@ function listProjects(session) {
       return 0;
     });
 }
+
+module.exports.listProjects = listProjects;
 
 function installProject(project) {
   return new Promise(function (res, rej) {
@@ -238,6 +241,8 @@ function removeProjectEntry(project) {
   console.log('Successfully removed!'.red);
 }
 
+module.exports.removeProjectEntry = removeProjectEntry;
+
 function installBower(projectDirectory, complete) {
   if (!fs.existsSync(`${projectDirectory}/bower.json`)) return complete();
   console.log('Installing bower components, please wait...'.green);
@@ -291,11 +296,17 @@ module.exports.removeMaster = removeMaster;
 function loadOrCreateEntries() {
   return fsJson.loadSync(projectEntriesPath) || { projects: [] };
 }
+
 module.exports.loadOrCreateEntries = loadOrCreateEntries;
 
 function ensureProjectsDirectory() {
   if (!fs.existsSync(projectsDirectory)) mkdirp.sync(projectsDirectory);
 }
+
+module.exports.ensureProjectsDirectory = ensureProjectsDirectory;
+
 function ensureProjectDirectory(projectDirectory) {
   return fs.existsSync(projectDirectory);
 }
+
+module.exports.ensureProjectDirectory = ensureProjectDirectory;
