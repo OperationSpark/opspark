@@ -28,6 +28,7 @@ const projects = proxyquire('../controller/projects', {
   },
 });
 
+const readAndParse = path => JSON.parse(fs.readFileSync(path));
 const projectsDirectory = './test/files/workspace/projects';
 const projectEntriesPath = './test/files/workspace/projects/projects.json';
 
@@ -149,7 +150,7 @@ describe('projects', function () {
       expect(fs.existsSync(projectEntriesPath)).to.be.false;
       projects.appendProjectEntry(dummySession.PROJECT[2], null, function () {
         expect(fs.existsSync(projectEntriesPath)).to.be.true;
-        const projectsFile = JSON.parse(fs.readFileSync(projectEntriesPath));
+        const projectsFile = readAndParse(projectEntriesPath);
         expect(projectsFile.projects.length).to.equal(1);
         done();
       });
@@ -157,7 +158,7 @@ describe('projects', function () {
 
     it('should append project in projects.json', function (done) {
       projects.appendProjectEntry(dummySession.PROJECT[3], null, function () {
-        const projectsFile = JSON.parse(fs.readFileSync(projectEntriesPath));
+        const projectsFile = readAndParse(projectEntriesPath);
         expect(projectsFile.projects.length).to.equal(2);
         done();
       });
@@ -297,7 +298,14 @@ describe('projects', function () {
 
   describe('#removeProjectEntry()', function () {
     it('should remove project from projects.json', function (done) {
-
+      projects.appendProjectEntry(dummySession.PROJECT[0], null, function (project) {
+        let projectList = readAndParse(projectEntriesPath);
+        expect(projectList.projects.length).to.equal(1);
+        projects.removeProjectEntry(dummySession.PROJECT[0]);
+        projectList = readAndParse(projectEntriesPath);
+        expect(projectList.projects.length).to.equal(0);
+        done();
+      });
     });
   });
 });
