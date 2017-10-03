@@ -6,7 +6,7 @@ const mocha = require('mocha');
 const should = require('should');
 const colors = require('colors');
 const init = require('../controller/init');
-const tempPortfolioPath = 'test/files/temp-portfolio.html';
+const tempPortfolioPath = 'test/files/workspace/temp-portfolio.html';
 
 describe('init', function () {
   afterEach(function () {
@@ -28,14 +28,14 @@ describe('init', function () {
     it('should bail with improperly id\'ed <ul> help message if <ul> with id portfolio not found in portfolio.html', function (done) {
       var spy = sinon.spy(console, 'log');
       spy.withArgs(config.portfolio.help.noPortfolioList.red);
-      init.portfolio('test/files/no-portfolio-list-portfolio.html');
+      init.portfolio('test/files/workspace/no-portfolio-list-portfolio.html');
       assert(spy.withArgs(config.portfolio.help.noPortfolioList.red).calledOnce);
       done();
     });
 
     it('should load portfolio and replace end-body-tag with jQuery-cdn-script, portfolio-script and end-body-tag', function (done) {
       // for the test, make a copy of a pre-initialized portfolio.html //
-      fs.copySync('test/files/portfolio.html', tempPortfolioPath);
+      fs.copySync('test/files/workspace/portfolio.html', tempPortfolioPath);
 
       var html = fs.readFileSync(tempPortfolioPath, 'utf8');
       expect(html).to.not.have.string(init.jQueryCdnScript);
@@ -50,7 +50,7 @@ describe('init', function () {
       var spy = sinon.spy(console, 'log');
       spy.withArgs(config.portfolio.help.portfolioScriptTagExists.red);
 
-      var filepath = 'test/files/temp-portfolio.html';
+      var filepath = 'test/files/workspace/temp-portfolio.html';
       var html = fs.readFileSync(filepath, 'utf8');
       expect(html).to.have.string(init.jQueryCdnScript);
       expect(html).to.have.string(init.portfolioScript);

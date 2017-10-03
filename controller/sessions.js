@@ -11,7 +11,7 @@ const projects = require('./projects');
 const cancelOption = '[cancel]';
 
 function listSessions(sessions) {
-  console.log("Grabbing sessions. . .".yellow);
+  console.log('Grabbing sessions. . .'.yellow);
   const sessionNames = _.map(sessions, session =>
     changeCase.titleCase(session.cohort)
   );
