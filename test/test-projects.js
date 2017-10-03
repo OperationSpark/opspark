@@ -18,7 +18,7 @@ const proxyquire = require('proxyquire');
 
 const fakeHelpers = require('./helpers/fakeHelpers');
 
-const { dummySession, dummyProjectsDirectory } = require('./helpers/dummyData');
+const { dummySession } = require('./helpers/dummyData');
 
 const projects = proxyquire('../controller/projects', {
   './helpers': fakeHelpers,
