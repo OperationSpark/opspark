@@ -199,7 +199,7 @@ describe('projects', function () {
     });
   });
 
-  describe('#initializeProject()', function () {
+  describe('#uninstallProject()', function () {
     it('should uninstall project', function (done) {
       const path = `${projectsDirectory}/matchy`;
       expect(fs.existsSync(path)).to.be.true;
@@ -220,6 +220,84 @@ describe('projects', function () {
           expect(fs.existsSync(path)).to.be.false;
           done();
         });
+    });
+  });
+
+  describe('#shelveProject()', function () {
+    it('should shelve project', function (done) {
+      const path = `${projectsDirectory}/underpants`;
+      const newPath = `${projectsDirectory}/_underpants`;
+      expect(fs.existsSync(path)).to.be.true;
+      expect(fs.existsSync(newPath)).to.be.false;
+      bddStdin('y\n');
+      projects.shelveProject(dummySession.PROJECT[0])
+        .then(function (resPath) {
+          expect(fs.existsSync(path)).to.be.false;
+          expect(fs.existsSync(newPath)).to.be.true;
+          expect(resPath).to.equal(newPath);
+          done();
+        });
+    });
+
+    it('should shelve projects infinitely', function (done) {
+      const path = `${projectsDirectory}/underpants`;
+      expect(fs.existsSync(path)).to.be.false;
+      fs.mkdirSync(path);
+      const newPath = `${projectsDirectory}/_underpants`;
+      const newestPath = `${projectsDirectory}/__underpants`;
+      expect(fs.existsSync(path)).to.be.true;
+      expect(fs.existsSync(newPath)).to.be.true;
+      expect(fs.existsSync(newestPath)).to.be.false;
+      bddStdin('y\n');
+      projects.shelveProject(dummySession.PROJECT[0])
+        .then(function (resPath) {
+          expect(fs.existsSync(path)).to.be.false;
+          expect(fs.existsSync(newPath)).to.be.true;
+          expect(fs.existsSync(newestPath)).to.be.true;
+          expect(resPath).to.equal(newestPath);
+          done();
+        });
+    });
+
+    it('should shelve project', function (done) {
+      const path = `${projectsDirectory}/scratch-pad`;
+      const newPath = `${projectsDirectory}/_scratch-pad`;
+      expect(fs.existsSync(path)).to.be.true;
+      expect(fs.existsSync(newPath)).to.be.false;
+      bddStdin('y\n');
+      projects.shelveProject(dummySession.PROJECT[1])
+        .then(function (resPath) {
+          expect(fs.existsSync(path)).to.be.false;
+          expect(fs.existsSync(newPath)).to.be.true;
+          expect(resPath).to.equal(newPath);
+          done();
+        });
+    });
+
+    it('should shelve projects infinitely', function (done) {
+      const path = `${projectsDirectory}/scratch-pad`;
+      expect(fs.existsSync(path)).to.be.false;
+      fs.mkdirSync(path);
+      const newPath = `${projectsDirectory}/_scratch-pad`;
+      const newestPath = `${projectsDirectory}/__scratch-pad`;
+      expect(fs.existsSync(path)).to.be.true;
+      expect(fs.existsSync(newPath)).to.be.true;
+      expect(fs.existsSync(newestPath)).to.be.false;
+      bddStdin('y\n');
+      projects.shelveProject(dummySession.PROJECT[1])
+        .then(function (resPath) {
+          expect(fs.existsSync(path)).to.be.false;
+          expect(fs.existsSync(newPath)).to.be.true;
+          expect(fs.existsSync(newestPath)).to.be.true;
+          expect(resPath).to.equal(newestPath);
+          done();
+        });
+    });
+  });
+
+  describe('#removeProjectEntry()', function () {
+    it('should remove project from projects.json', function (done) {
+
     });
   });
 });
