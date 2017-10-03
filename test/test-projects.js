@@ -17,26 +17,27 @@ const bddStdin = require('bdd-stdin');
 const proxyquire = require('proxyquire');
 
 const fakeHelpers = require('./helpers/fakeHelpers');
+
 const { dummySession, dummyProjectsDirectory } = require('./helpers/dummyData');
 
 const projects = proxyquire('../controller/projects', {
   './helpers': fakeHelpers,
+  './github': fakeHelpers,
   './env': {
     home: fakeHelpers.home,
   },
-  fs: {
-    readdirSync: () => dummyProjectsDirectory,
-  },
 });
 
-const env = './test/files';
-const projectsDirectory = `${env}/workspace/projects`;
+const projectsDirectory = './test/files/workspace/projects';
 
 describe('projects', function () {
   describe('#ensureProjectsDirectory()', function () {
-    beforeEach(function () {
+
+    before(function (done) {
       if (fs.existsSync(projectsDirectory)) {
-        rimraf(projectsDirectory, () => {});
+        rimraf(projectsDirectory, () => done());
+      } else {
+        done();
       }
     });
 
@@ -47,7 +48,31 @@ describe('projects', function () {
     });
   });
 
+  describe('#ensureProjectDirectory()', function () {
+    const path = `${projectsDirectory}/billypedia`;
+
+    before(function (done) {
+      if (fs.existsSync(path)) {
+        rimraf(path, () => done());
+      } else {
+        done();
+      }
+    });
+
+    it('should create directory if it doesn\'t exist', function () {
+      expect(projects.ensureProjectDirectory(path)).to.be.false;
+      fs.mkdirSync(path);
+      expect(projects.ensureProjectDirectory(path)).to.be.true;
+    });
+  });
+
   describe('#listProjects()', function () {
+    before(function () {
+      fs.mkdirSync(`${projectsDirectory}/product-project`);
+      fs.mkdirSync(`${projectsDirectory}/scratch-pad`);
+      fs.mkdirSync(`${projectsDirectory}/underpants`);
+    });
+
     it('should list projects properly when installing', function () {
       const projectsList = projects.listProjects(dummySession, 'install');
       const result = [dummySession.PROJECT[3], dummySession.PROJECT[2]];
@@ -61,9 +86,61 @@ describe('projects', function () {
     });
   });
 
-  // describe('#installProject()', function () {
-  //   it('should work', function () {
-  //     projects.installProject(dummySession.PROJECT[0]);
-  //   });
-  // });
+  describe('#selectProject()', function () {
+    it('should select project', function (done) {
+      bddStdin(bddStdin.keys.left, '\n', '\n');
+      projects.selectProject({ session: dummySession, projectAction: 'install' })
+        .then(function (project) {
+          expect(project).to.be.an.object;
+          expect(project.name).to.equal('Function Master');
+          expect(project._id).to.exist;
+          expect(project._session).to.exist;
+          expect(project.desc).to.exist;
+          expect(project.url).to.exist;
+          done();
+        });
+    });
+
+    it('should select correct project', function (done) {
+      bddStdin(bddStdin.keys.left, bddStdin.keys.down, '\n', '\n');
+      projects.selectProject({ session: dummySession, projectAction: 'install' })
+        .then(function (project) {
+          expect(project).to.be.an.object;
+          expect(project.name).to.equal('Matchy');
+          expect(project._id).to.exist;
+          expect(project._session).to.exist;
+          expect(project.desc).to.exist;
+          expect(project.url).to.exist;
+          done();
+        });
+    });
+  });
+
+  describe('#installProject()', function () {
+    it('should select project', function (done) {
+      projects.installProject(dummySession.PROJECT[2])
+        .then(function (project) {
+          expect(project).to.be.an.object;
+          expect(project.name).to.equal('Matchy');
+          expect(project._id).to.exist;
+          expect(project._session).to.exist;
+          expect(project.desc).to.exist;
+          expect(project.url).to.exist;
+          done();
+        });
+    });
+
+    it('should select project', function (done) {
+      projects.installProject(dummySession.PROJECT[3])
+        .then(function (project) {
+          expect(project).to.be.an.object;
+          expect(project.name).to.equal('Function Master');
+          expect(project._id).to.exist;
+          expect(project._session).to.exist;
+          expect(project.desc).to.exist;
+          expect(project.url).to.exist;
+          done();
+        });
+    });
+  });
 });
