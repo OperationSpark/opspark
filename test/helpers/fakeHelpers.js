@@ -30,16 +30,16 @@ module.exports.readGistHelper = () => `echo ${dummyUser}`;
 module.exports.home = () => './test/files';
 
 module.exports.downloadProject = (url, token, directory) => {
-  fs.mkdir(directory);
-  fs.mkdir(`${directory}/.git`);
-  fs.mkdir(`${directory}/.svn`);
-  fs.mkdir(`${directory}/.master`);
-  fs.mkdir(`${directory}/test`);
+  fs.mkdirSync(directory);
+  fs.mkdirSync(`${directory}/.git`);
+  fs.mkdirSync(`${directory}/.svn`);
+  fs.mkdirSync(`${directory}/.master`);
+  fs.mkdirSync(`${directory}/test`);
 };
 
 module.exports.downloadProjectTests = (url, token, directory) => {
-  fs.mkdir(`${directory}/test`);
-  fs.mkdir(`${directory}/node_modules`);
+  fs.mkdirSync(`${directory}/test`);
+  fs.mkdirSync(`${directory}/node_modules`);
 };
 
 module.exports.downloadProjectPackage = (url, token, directory) => {

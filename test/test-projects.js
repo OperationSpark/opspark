@@ -29,10 +29,10 @@ const projects = proxyquire('../controller/projects', {
 });
 
 const projectsDirectory = './test/files/workspace/projects';
+const projectEntriesPath = './test/files/workspace/projects/projects.json';
 
 describe('projects', function () {
   describe('#ensureProjectsDirectory()', function () {
-
     before(function (done) {
       if (fs.existsSync(projectsDirectory)) {
         rimraf(projectsDirectory, () => done());
@@ -88,7 +88,7 @@ describe('projects', function () {
 
   describe('#selectProject()', function () {
     it('should select project', function (done) {
-      bddStdin(bddStdin.keys.left, '\n', '\n');
+      bddStdin(bddStdin.keys.left, '\n', 'y\n');
       projects.selectProject({ session: dummySession, projectAction: 'install' })
         .then(function (project) {
           expect(project).to.be.an.object;
@@ -102,7 +102,7 @@ describe('projects', function () {
     });
 
     it('should select correct project', function (done) {
-      bddStdin(bddStdin.keys.left, bddStdin.keys.down, '\n', '\n');
+      bddStdin(bddStdin.keys.left, bddStdin.keys.down, '\n', 'y\n');
       projects.selectProject({ session: dummySession, projectAction: 'install' })
         .then(function (project) {
           expect(project).to.be.an.object;
@@ -117,7 +117,7 @@ describe('projects', function () {
   });
 
   describe('#installProject()', function () {
-    it('should select project', function (done) {
+    it('should install project', function (done) {
       projects.installProject(dummySession.PROJECT[2])
         .then(function (project) {
           expect(project).to.be.an.object;
@@ -130,7 +130,7 @@ describe('projects', function () {
         });
     });
 
-    it('should select project', function (done) {
+    it('should install project', function (done) {
       projects.installProject(dummySession.PROJECT[3])
         .then(function (project) {
           expect(project).to.be.an.object;
@@ -139,6 +139,85 @@ describe('projects', function () {
           expect(project._session).to.exist;
           expect(project.desc).to.exist;
           expect(project.url).to.exist;
+          done();
+        });
+    });
+  });
+
+  describe('#appendProjectEntry()', function () {
+    it('should create projects.json if it doesn\'t exist', function (done) {
+      expect(fs.existsSync(projectEntriesPath)).to.be.false;
+      projects.appendProjectEntry(dummySession.PROJECT[2], null, function () {
+        expect(fs.existsSync(projectEntriesPath)).to.be.true;
+        const projectsFile = JSON.parse(fs.readFileSync(projectEntriesPath));
+        expect(projectsFile.projects.length).to.equal(1);
+        done();
+      });
+    });
+
+    it('should append project in projects.json', function (done) {
+      projects.appendProjectEntry(dummySession.PROJECT[3], null, function () {
+        const projectsFile = JSON.parse(fs.readFileSync(projectEntriesPath));
+        expect(projectsFile.projects.length).to.equal(2);
+        done();
+      });
+    });
+  });
+
+  describe('#initializeProject()', function () {
+    it('should remove .git, .svn, .master, and test directories from project', function (done) {
+      const path = `${projectsDirectory}/matchy`;
+      expect(fs.existsSync(`${path}/.git`)).to.be.true;
+      expect(fs.existsSync(`${path}/.svn`)).to.be.true;
+      expect(fs.existsSync(`${path}/.master`)).to.be.true;
+      expect(fs.existsSync(`${path}/test`)).to.be.true;
+      projects.initializeProject(dummySession.PROJECT[2])
+        .then(function (project) {
+          expect(fs.existsSync(projectEntriesPath)).to.be.true;
+          expect(fs.existsSync(`${path}/.git`)).to.be.false;
+          expect(fs.existsSync(`${path}/.svn`)).to.be.false;
+          expect(fs.existsSync(`${path}/.master`)).to.be.false;
+          expect(fs.existsSync(`${path}/test`)).to.be.false;
+          done();
+        });
+    });
+    it('should remove .git, .svn, .master, and test directories from project', function (done) {
+      const path = `${projectsDirectory}/function-master`;
+      expect(fs.existsSync(`${path}/.git`)).to.be.true;
+      expect(fs.existsSync(`${path}/.svn`)).to.be.true;
+      expect(fs.existsSync(`${path}/.master`)).to.be.true;
+      expect(fs.existsSync(`${path}/test`)).to.be.true;
+      projects.initializeProject(dummySession.PROJECT[3])
+        .then(function (project) {
+          expect(fs.existsSync(projectEntriesPath)).to.be.true;
+          expect(fs.existsSync(`${path}/.git`)).to.be.false;
+          expect(fs.existsSync(`${path}/.svn`)).to.be.false;
+          expect(fs.existsSync(`${path}/.master`)).to.be.false;
+          expect(fs.existsSync(`${path}/test`)).to.be.false;
+          done();
+        });
+    });
+  });
+
+  describe('#initializeProject()', function () {
+    it('should uninstall project', function (done) {
+      const path = `${projectsDirectory}/matchy`;
+      expect(fs.existsSync(path)).to.be.true;
+      bddStdin('y\n');
+      projects.uninstallProject(dummySession.PROJECT[2])
+        .then(function (project) {
+          expect(fs.existsSync(path)).to.be.false;
+          done();
+        });
+    });
+
+    it('should uninstall project', function (done) {
+      const path = `${projectsDirectory}/function-master`;
+      expect(fs.existsSync(path)).to.be.true;
+      bddStdin('y\n');
+      projects.uninstallProject(dummySession.PROJECT[3])
+        .then(function (project) {
+          expect(fs.existsSync(path)).to.be.false;
           done();
         });
     });
