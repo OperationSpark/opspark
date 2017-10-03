@@ -26,7 +26,6 @@ let action = null;
 module.exports.action = () => action;
 
 function selectProject({ session, projectAction }) {
-  console.log(session);
   action = projectAction;
   const projects = listProjects(session, action);
   return new Promise(function (res) {

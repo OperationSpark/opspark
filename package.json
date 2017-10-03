@@ -9,7 +9,7 @@
   "scripts": {
     "postinstall": "bash ./install.sh",
     "dev": "nodemon test-server.js",
-    "test": "mocha ./test/test-github"
+    "test": "mocha ./test/test-projects"
   },
   "repository": {
     "type": "git",
