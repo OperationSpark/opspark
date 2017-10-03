@@ -18,7 +18,6 @@ const proxyquire = require('proxyquire');
 
 const fakeHelpers = require('./helpers/fakeHelpers');
 
-const config = require('../config');
 const { dummyAuth, dummyUser } = require('./helpers/dummyData');
 
 const github = proxyquire('../controller/github', {
