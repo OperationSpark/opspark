@@ -3,18 +3,21 @@
 require('colors');
 const fs = require('fs');
 const _ = require('lodash');
+const env = require('./env');
 const projects = require('./projects');
+
+const root = `${env.home()}/workspace`;
+const projectsDirectory = `${root}/projects`;
 
 module.exports.error = function (message) {
   return function (error) {
     console.error(message);
-    throw error;
+    throw new Error(error);
     process.exitCode = 1;
   };
 };
 
 module.exports.fix = function (complete) {
-  const projectsDirectory = './projects';
   if (!fs.existsSync(projectsDirectory)) return complete(new Error('No projects installed, aborting fix, install some projects first by running "os install"'));
 
   projects.list(function (err, list) {
