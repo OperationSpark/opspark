@@ -1,5 +1,5 @@
 /* global describe it expect before beforeEach afterEach */
-'doneuse strict';
+'use strict';
 
 require('mocha');
 require('should');
