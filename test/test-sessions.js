@@ -19,7 +19,7 @@ const changeCase = require('change-case');
 
 const fakeHelpers = require('./helpers/fakeHelpers');
 
-const { dummySession, dummySessions, dummyProjectsDirectory } = require('./helpers/dummyData');
+const { dummySession, dummySessions } = require('./helpers/dummyData');
 
 const sessions = proxyquire('../controller/sessions', {
   './helpers': fakeHelpers,
@@ -32,66 +32,53 @@ const sessions = proxyquire('../controller/sessions', {
 describe('projects', function () {
   describe('#listSessions()', function () {
     it('should return array of session names', function () {
-      const name = changeCase.titleCase(dummySession.cohort);
-      const result = [name, name, name];
+      const name1 = changeCase.titleCase(dummySessions[0].cohort);
+      const name2 = changeCase.titleCase(dummySessions[1].cohort);
+      const name3 = changeCase.titleCase(dummySessions[2].cohort);
+      const result = [name1, name2, name3];
       const sessionsList = sessions.listSessions(dummySessions);
       expect(sessionsList).to.eql(result);
     });
   });
 
-  xdescribe('#selectProject()', function () {
-    it('should select project', function (done) {
-      bddStdin(bddStdin.keys.left, '\n', 'y\n');
-      sessions.selectProject({ session: dummySession, projectAction: 'install' })
-        .then(function (project) {
-          expect(project).to.be.an.object;
-          expect(project.name).to.equal('Function Master');
-          expect(project._id).to.exist;
-          expect(project._session).to.exist;
-          expect(project.desc).to.exist;
-          expect(project.url).to.exist;
-          done();
-        });
+  describe('#pluckSession()', function () {
+    it('should pluck desired session', function () {
+      const name = changeCase.titleCase(dummySessions[0].cohort);
+      const pluckedSession = sessions.pluckSession(name, dummySessions);
+      expect(pluckedSession).to.eql(dummySessions[0]);
     });
 
-    it('should select correct project', function (done) {
-      bddStdin(bddStdin.keys.left, bddStdin.keys.down, '\n', 'y\n');
-      sessions.selectProject({ session: dummySession, projectAction: 'install' })
-        .then(function (project) {
-          expect(project).to.be.an.object;
-          expect(project.name).to.equal('Matchy');
-          expect(project._id).to.exist;
-          expect(project._session).to.exist;
-          expect(project.desc).to.exist;
-          expect(project.url).to.exist;
-          done();
-        });
+    it('should pluck desired session', function () {
+      const name = changeCase.titleCase(dummySessions[1].cohort);
+      const pluckedSession = sessions.pluckSession(name, dummySessions);
+      expect(pluckedSession).to.eql(dummySessions[1]);
+    });
+
+    it('should pluck desired session', function () {
+      const name = changeCase.titleCase(dummySessions[2].cohort);
+      const pluckedSession = sessions.pluckSession(name, dummySessions);
+      expect(pluckedSession).to.eql(dummySessions[2]);
     });
   });
 
-  xdescribe('#pluckSessions()', function () {
-    it('should install project', function (done) {
-      sessions.installProject(dummySession.PROJECT[2])
-        .then(function (project) {
-          expect(project).to.be.an.object;
-          expect(project.name).to.equal('Matchy');
-          expect(project._id).to.exist;
-          expect(project._session).to.exist;
-          expect(project.desc).to.exist;
-          expect(project.url).to.exist;
+  describe('#selectSession()', function () {
+    it('should select session', function (done) {
+      bddStdin(bddStdin.keys.left, '\n', 'y\n');
+      sessions.selectSession(JSON.stringify(dummySessions))
+        .then(function (response) {
+          console.log(response);
+          expect(response).to.be.an.object;
+          expect(response.session).to.eql(dummySessions[0]);
           done();
         });
     });
 
-    it('should install project', function (done) {
-      sessions.installProject(dummySession.PROJECT[3])
-        .then(function (project) {
-          expect(project).to.be.an.object;
-          expect(project.name).to.equal('Function Master');
-          expect(project._id).to.exist;
-          expect(project._session).to.exist;
-          expect(project.desc).to.exist;
-          expect(project.url).to.exist;
+    it('should select correct session', function (done) {
+      bddStdin(bddStdin.keys.left, bddStdin.keys.down, '\n', 'y\n');
+      sessions.selectSession(JSON.stringify(dummySessions))
+        .then(function (response) {
+          expect(response).to.be.an.object;
+          expect(response.session).to.eql(dummySessions[1]);
           done();
         });
     });
