@@ -82,7 +82,6 @@ function createGist({ project, stats }) {
     console.log('Creating gist. . .'.yellow);
     const cmd = createGistHelper(content, github.grabLocalLogin(), github.grabLocalAuthToken());
     exec(cmd, function (err, stdout, stderr) {
-      console.log(stdout);
       const gist = JSON.parse(stdout);
       if (err) rej(err);
       console.log('Gist created!'.green);
@@ -99,7 +98,6 @@ function ensureGistExists({ project, gist, tries }) {
       console.log(`Ensuring gist exists. . . Attempt ${tries}`.yellow);
       const cmd = readGistHelper(gist.files['grade.txt'].raw_url);
       exec(cmd, function (err, stdout, stderr) {
-        console.log(stdout);
         if (err) {
           rej(err);
         } else if (stdout === '404: Not Found') {
@@ -119,12 +117,11 @@ function deleteGist(url) {
     console.log('Deleting gist. . .'.yellow);
     const cmd = deleteGistHelper(github.grabLocalLogin(), github.grabLocalAuthToken(), url);
     exec(cmd, function (err, stdout, stderr) {
-      console.log(stdout);
       if (err) {
         rej(err);
       }
       console.log('Gist deleted!'.green);
-      res();
+      res(url);
     });
   });
 }
