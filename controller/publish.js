@@ -1,5 +1,3 @@
-'use strict';
-
 const child = require('./child');
 const github = require('./github');
 const Promise = require('bluebird');

@@ -1,5 +1,3 @@
-'use strict';
-
 require('colors');
 const _ = require('lodash');
 const inquirer = require('inquirer');

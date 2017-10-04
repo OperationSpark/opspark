@@ -1,5 +1,3 @@
-'use strict';
-
 var
   config = require('../config').pair,
   _ = require('lodash'),

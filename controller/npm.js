@@ -1,5 +1,3 @@
-'use strict';
-
 const _ = require('lodash');
 const inquirer = require('inquirer');
 const changeCase = require('change-case');

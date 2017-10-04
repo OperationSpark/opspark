@@ -1,5 +1,3 @@
-'use strict';
-
 require('colors');
 const rp = require('request-promise');
 

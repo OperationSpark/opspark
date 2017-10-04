@@ -1,7 +1,4 @@
-'use strict';
-
 require('colors');
-
 const janitor = require('./janitor');
 const github = require('./github');
 const greenlight = require('./greenlight');

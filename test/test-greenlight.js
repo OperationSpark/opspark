@@ -1,6 +1,4 @@
 /* global describe it expect before beforeEach afterEach after */
-'use strict';
-
 require('mocha');
 require('should');
 require('colors');
