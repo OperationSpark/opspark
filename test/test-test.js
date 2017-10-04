@@ -43,6 +43,10 @@ describe('test', function () {
     rimraf(projectsDirectory, () => done());
   });
 
+  afterEach(function () {
+    if (console.log.restore) console.log.restore();
+  });
+
   describe('#grabTests()', function () {
     it('should install tests', function (done) {
       const project = dummySession.PROJECT[0];
@@ -75,7 +79,7 @@ describe('test', function () {
   });
 
   describe('#runTests()', function () {
-    const log = sinon.spy(console, 'log');
+
     const project = dummySession.PROJECT[1];
 
     const passTests = proxyquire('../controller/test', {
@@ -97,14 +101,6 @@ describe('test', function () {
         home: fakeHelpers.home,
       },
     }).runTests;
-
-    afterEach(function () {
-      log.reset();
-    });
-
-    after(function () {
-      log.restore();
-    });
 
     it('should run tests and find pass', function (done) {
       passTests(project)
@@ -135,6 +131,7 @@ describe('test', function () {
     });
 
     it('should log correct stats', function (done) {
+      const log = sinon.spy(console, 'log');
       passTests(project)
         .then(function (result) {
           const stats = result.parsedStdout.stats;
@@ -147,6 +144,7 @@ describe('test', function () {
     });
 
     it('should log correct stats', function (done) {
+      const log = sinon.spy(console, 'log');
       failTests(project)
         .then(function (result) {
           const stats = result.parsedStdout.stats;

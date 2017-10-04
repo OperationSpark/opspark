@@ -1,4 +1,4 @@
-/* global describe it expect before beforeEach afterEach */
+/* global describe it expect before beforeEach afterEach after */
 'use strict';
 
 require('mocha');
@@ -18,6 +18,10 @@ const fakeHelpers = require('./helpers/fakeHelpers.js');
 const { dummyAuth, dummyUser, dummyProject, dummyGistGood, dummyGistBad, dummySessions } = require('./helpers/dummyData.js');
 
 describe('greenlight', function () {
+  afterEach(function () {
+    if (console.log.restore) console.log.restore();
+  });
+
   describe('#getSessions()', function () {
     it('should return sessions for enrolled student', function (done) {
       const greenlight = proxyquire('../controller/greenlight', {
@@ -51,17 +55,8 @@ describe('greenlight', function () {
   });
 
   describe('#sendGrade()', function () {
-    let log;
-
-    beforeEach(function () {
-      log = sinon.spy(console, 'log');
-    });
-
-    afterEach(function () {
-      log.reset();
-    });
-
     it('should receive good response', function (done) {
+      const log = sinon.spy(console, 'log');
       const message = 'Project saved!';
       const greenlight = proxyquire('../controller/greenlight', {
         './github': fakeHelpers,
@@ -81,6 +76,7 @@ describe('greenlight', function () {
     });
 
     it('should receive good response', function (done) {
+      const log = sinon.spy(console, 'log');
       const message = 'Project saved for Liv!';
       const greenlight = proxyquire('../controller/greenlight', {
         './github': fakeHelpers,
@@ -100,6 +96,7 @@ describe('greenlight', function () {
     });
 
     it('should receive bad response', function (done) {
+      const log = sinon.spy(console, 'log');
       const reason = 'Bad credentials!';
       const details = 'This failed!';
       const greenlight = proxyquire('../controller/greenlight', {
