@@ -35,6 +35,6 @@ module.exports.downloadProjectTests = (url, token, directory) => `mkdir ${direct
 
 module.exports.downloadProjectPackage = (url, token, directory) => `touch ${directory}/package.json`;
 
-module.exports.makeTestPass = () => dummyTestPass;
+module.exports.makeTestPass = () => `echo '${dummyTestPass}'`;
 
-module.exports.makeTestFail = () => dummyTestFail;
+module.exports.makeTestFail = () => `echo '${dummyTestFail}'`;

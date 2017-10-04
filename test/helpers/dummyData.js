@@ -107,140 +107,58 @@ module.exports.dummySessions = [
 
 module.exports.dummyTestFail = `{
   "stats": {
-    "suites": 4,
     "tests": 4,
     "passes": 0,
     "pending": 0,
-    "failures": 4,
-    "start": "2017-10-04T00:25:51.541Z",
-    "end": "2017-10-04T00:25:51.573Z",
-    "duration": 32
+    "failures": 4
   },
   "pending": [],
   "failures": [
     {
-      "title": "Should take an object, if this object has a noises array return them as a string separated by a space, if there are no noises return 'there are no noises'",
-      "fullTitle": "Function Master maybeNoises() Should take an object, if this object has a noises array return them as a string separated by a space, if there are no noises return 'there are no noises'",
-      "duration": 0,
-      "currentRetry": 0,
+      "fullTitle": "Test 1",
       "err": {
-        "message": "expected undefined to equal 'bark woof squeak growl'",
-        "showDiff": false,
-        "expected": "bark woof squeak growl",
-        "stack": "AssertionError: expected undefined to equal 'bark woof squeak growl'\n    at Context.<anonymous> (test/index.spec.js:76:16)"
+        "message": "Error message",
+        "stack": "Trace"
       }
     },
     {
-      "title": "Should take a string of words and a word and return true if <word> is in <string of words>, otherwise return false.",
-      "fullTitle": "Function Master hasWord() Should take a string of words and a word and return true if <word> is in <string of words>, otherwise return false.",
-      "duration": 1,
-      "currentRetry": 0,
+      "fullTitle": "Test 2",
       "err": {
-        "message": "expected undefined to equal true",
-        "showDiff": true,
-        "expected": true,
-        "stack": "AssertionError: expected undefined to equal true\n    at Function.assert.strictEqual (node_modules/chai/lib/chai/interface/assert.js:178:32)\n    at Context.<anonymous> (test/index.spec.js:85:16)"
+        "message": "Error message",
+        "stack": "Trace"
       }
     },
     {
-      "title": "Should take an object and return its values in an array",
-      "fullTitle": "Function Master objectValues() Should take an object and return its values in an array",
-      "duration": 3,
-      "currentRetry": 0,
+      "fullTitle": "Test 3",
       "err": {
-        "message": "expected undefined to deeply equal [ 'one', 'two', 'crayons', 'dangle' ]",
-        "showDiff": true,
-        "expected": [
-          "one",
-          "two",
-          "crayons",
-          "dangle"
-        ],
-        "stack": "AssertionError: expected undefined to deeply equal [ 'one', 'two', 'crayons', 'dangle' ]\n    at Function.assert.deepEqual (node_modules/chai/lib/chai/interface/assert.js:216:32)\n    at Context.<anonymous> (test/index.spec.js:20:16)"
+        "message": "Error message",
+        "stack": "Trace"
       }
     },
     {
-      "title": "Should take an object and return all its keys in a string each separated with a space",
-      "fullTitle": "Function Master keysToString() Should take an object and return all its keys in a string each separated with a space",
-      "duration": 0,
-      "currentRetry": 0,
+      "fullTitle": "Test 4",
       "err": {
-        "message": "expected undefined to equal 'a b ponies dingle'",
-        "showDiff": false,
-        "expected": "a b ponies dingle",
-        "stack": "AssertionError: expected undefined to equal 'a b ponies dingle'\n    at Context.<anonymous> (test/index.spec.js:27:16)"
+        "message": "Error message",
+        "stack": "Trace"
       }
-    },
+    }
   ],
   "passes": []
 }`;
 
 module.exports.dummyTestPass = `{
   "stats": {
-    "suites": 4,
     "tests": 4,
     "passes": 4,
     "pending": 0,
-    "failures": 0,
-    "start": "2017-10-04T00:25:51.541Z",
-    "end": "2017-10-04T00:25:51.573Z",
-    "duration": 32
+    "failures": 0
   },
   "pending": [],
   "failures": [],
   "passes": [
-    {
-      "title": "Should take an object, if this object has a noises array return them as a string separated by a space, if there are no noises return 'there are no noises'",
-      "fullTitle": "Function Master maybeNoises() Should take an object, if this object has a noises array return them as a string separated by a space, if there are no noises return 'there are no noises'",
-      "duration": 0,
-      "currentRetry": 0,
-      "err": {
-        "message": "expected undefined to equal 'bark woof squeak growl'",
-        "showDiff": false,
-        "expected": "bark woof squeak growl",
-        "stack": "AssertionError: expected undefined to equal 'bark woof squeak growl'\n    at Context.<anonymous> (test/index.spec.js:76:16)"
-      }
-    },
-    {
-      "title": "Should take a string of words and a word and return true if <word> is in <string of words>, otherwise return false.",
-      "fullTitle": "Function Master hasWord() Should take a string of words and a word and return true if <word> is in <string of words>, otherwise return false.",
-      "duration": 1,
-      "currentRetry": 0,
-      "err": {
-        "message": "expected undefined to equal true",
-        "showDiff": true,
-        "expected": true,
-        "stack": "AssertionError: expected undefined to equal true\n    at Function.assert.strictEqual (node_modules/chai/lib/chai/interface/assert.js:178:32)\n    at Context.<anonymous> (test/index.spec.js:85:16)"
-      }
-    },
-    {
-      "title": "Should take an object and return its values in an array",
-      "fullTitle": "Function Master objectValues() Should take an object and return its values in an array",
-      "duration": 3,
-      "currentRetry": 0,
-      "err": {
-        "message": "expected undefined to deeply equal [ 'one', 'two', 'crayons', 'dangle' ]",
-        "showDiff": true,
-        "expected": [
-          "one",
-          "two",
-          "crayons",
-          "dangle"
-        ],
-        "stack": "AssertionError: expected undefined to deeply equal [ 'one', 'two', 'crayons', 'dangle' ]\n    at Function.assert.deepEqual (node_modules/chai/lib/chai/interface/assert.js:216:32)\n    at Context.<anonymous> (test/index.spec.js:20:16)"
-      }
-    },
-    {
-      "title": "Should take an object and return all its keys in a string each separated with a space",
-      "fullTitle": "Function Master keysToString() Should take an object and return all its keys in a string each separated with a space",
-      "duration": 0,
-      "currentRetry": 0,
-      "err": {
-        "message": "expected undefined to equal 'a b ponies dingle'",
-        "showDiff": false,
-        "expected": "a b ponies dingle",
-        "stack": "AssertionError: expected undefined to equal 'a b ponies dingle'\n    at Context.<anonymous> (test/index.spec.js:27:16)"
-      }
-    },
+    { "fullTitle": "Test 1" },
+    { "fullTitle": "Test 2" },
+    { "fullTitle": "Test 3" },
+    { "fullTitle": "Test 4" }
   ]
 }`;

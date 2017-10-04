@@ -74,13 +74,88 @@ describe('test', function () {
     });
   });
 
-  describe.skip('#runTests()', function () {
-    it('should run tests', function () {
+  describe('#runTests()', function () {
+    const log = sinon.spy(console, 'log');
+    const project = dummySession.PROJECT[1];
 
+    const passTests = proxyquire('../controller/test', {
+      './helpers': {
+        makeTestScript: fakeHelpers.makeTestPass,
+      },
+      './github': fakeHelpers,
+      './env': {
+        home: fakeHelpers.home,
+      },
+    }).runTests;
+
+    const failTests = proxyquire('../controller/test', {
+      './helpers': {
+        makeTestScript: fakeHelpers.makeTestFail,
+      },
+      './github': fakeHelpers,
+      './env': {
+        home: fakeHelpers.home,
+      },
+    }).runTests;
+
+    afterEach(function () {
+      log.reset();
     });
 
-    it('should select correct session', function () {
+    after(function () {
+      log.restore();
+    });
 
+    it('should run tests and find pass', function (done) {
+      passTests(project)
+        .then(function (result) {
+          const stats = result.parsedStdout.stats;
+          expect(result.project).to.exist;
+          expect(result.parsedStdout).to.exist;
+          expect(stats.tests).to.equal(4);
+          expect(stats.passes).to.equal(4);
+          expect(stats.pending).to.equal(0);
+          expect(stats.failures).to.equal(0);
+          done();
+        });
+    });
+
+    it('should run tests and find failure', function (done) {
+      failTests(project)
+        .then(function (result) {
+          const stats = result.parsedStdout.stats;
+          expect(result.project).to.exist;
+          expect(result.parsedStdout).to.exist;
+          expect(stats.tests).to.equal(4);
+          expect(stats.passes).to.equal(0);
+          expect(stats.pending).to.equal(0);
+          expect(stats.failures).to.equal(4);
+          done();
+        });
+    });
+
+    it('should log correct stats', function (done) {
+      passTests(project)
+        .then(function (result) {
+          const stats = result.parsedStdout.stats;
+          expect(log.calledWith(' Total tests:    4  '.bgBlack.white)).to.be.true;
+          expect(log.calledWith(' Passing tests:  4  '.bgBlue.white)).to.be.true;
+          expect(log.calledWith(' Pending tests:  0  '.bgYellow.black)).to.be.true;
+          expect(log.calledWith(' Failing tests:  0  '.bgRed.white)).to.be.true;
+          done();
+        });
+    });
+
+    it('should log correct stats', function (done) {
+      failTests(project)
+        .then(function (result) {
+          const stats = result.parsedStdout.stats;
+          expect(log.calledWith(' Total tests:    4  '.bgBlack.white)).to.be.true;
+          expect(log.calledWith(' Passing tests:  0  '.bgBlue.white)).to.be.true;
+          expect(log.calledWith(' Pending tests:  0  '.bgYellow.black)).to.be.true;
+          expect(log.calledWith(' Failing tests:  4  '.bgRed.white)).to.be.true;
+          done();
+        });
     });
   });
 

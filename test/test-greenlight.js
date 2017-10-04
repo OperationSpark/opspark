@@ -58,7 +58,7 @@ describe('greenlight', function () {
     });
 
     afterEach(function () {
-      log.restore();
+      log.reset();
     });
 
     it('should receive good response', function (done) {
