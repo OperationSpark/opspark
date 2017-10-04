@@ -1,5 +1,5 @@
 const fs = require('fs');
-const { dummyUser, dummyAuth, dummyGistGood } = require('./dummyData');
+const { dummyUser, dummyAuth, dummyGistGood, dummyTestResults } = require('./dummyData');
 
 module.exports.home = () => './test/files';
 
@@ -34,3 +34,5 @@ module.exports.downloadProject = (url, token, directory) => `mkdir ${directory} 
 module.exports.downloadProjectTests = (url, token, directory) => `mkdir ${directory}/test ${directory}/node_modules`;
 
 module.exports.downloadProjectPackage = (url, token, directory) => `touch ${directory}/package.json`;
+
+module.exports.makeTestScript = () => dummyTestResults;
