@@ -21,7 +21,7 @@ describe('greenlight', function () {
   afterEach(function () {
     if (console.log.restore) console.log.restore();
   });
-
+ 
   describe('#getSessions()', function () {
     it('should return sessions for enrolled student', function (done) {
       const greenlight = proxyquire('../controller/greenlight', {
@@ -67,7 +67,7 @@ describe('greenlight', function () {
           });
         }),
       });
-      greenlight.sendGrade({ gist: dummyGistGood, project: dummyProject })
+      greenlight.sendGrade({ gist: JSON.parse(dummyGistGood), project: dummyProject })
         .then(function () {
           expect(log.callCount).to.equal(1);
           expect(log.calledWith(message.blue)).to.be.true;
@@ -87,7 +87,7 @@ describe('greenlight', function () {
           });
         }),
       });
-      greenlight.sendGrade({ gist: dummyGistGood, project: dummyProject })
+      greenlight.sendGrade({ gist: JSON.parse(dummyGistGood), project: dummyProject })
         .then(function () {
           expect(log.callCount).to.equal(1);
           expect(log.calledWith(message.blue)).to.be.true;
@@ -129,9 +129,9 @@ describe('greenlight', function () {
           });
         }),
       });
-      greenlight.sendGrade({ gist: dummyGistGood, project: dummyProject })
+      greenlight.sendGrade({ gist: JSON.parse(dummyGistGood), project: dummyProject })
         .then(function (res) {
-          expect(res).to.equal(dummyGistGood.url);
+          expect(res).to.equal(JSON.parse(dummyGistGood).url);
           done();
         });
     });
