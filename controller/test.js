@@ -131,9 +131,12 @@ function displayResults({ parsedStdout }) {
         console.log(`> > > ${errorInfo}`.grey);
         console.log(`> > > ${stackLineTwo}`.grey);
       });
+      res({ pass: false });
     } else {
       console.log('You did it! 100% complete, now please run'.green, 'os submit'.red);
+      res({ pass: true });
     }
-    res();
   });
 }
+
+module.exports.displayResults = displayResults;
