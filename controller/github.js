@@ -291,7 +291,6 @@ function deleteToken({ username, password }) {
     const cmd = deleteGithubToken(username, password, config.userAgent, grabLocalAuthID());
     exec(cmd, function (err, stdout, stderr) {
       if (stdout.indexOf('message') > -1) return rej(stdout);
-      console.log(stdout);
       res(stdout);
     });
   });

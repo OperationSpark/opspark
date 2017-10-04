@@ -247,7 +247,6 @@ function installBower(projectDirectory, complete) {
   console.log('Installing bower components, please wait...'.green);
   exec(`cd ${projectDirectory} && bower install -F`, function (err, stdout) {
     if (err) throw err;
-    console.log(stdout);
     console.log('Bower components installed for project %s!'.green, projectDirectory);
     complete();
   });
