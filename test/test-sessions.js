@@ -29,7 +29,7 @@ const sessions = proxyquire('../controller/sessions', {
   },
 });
 
-describe('projects', function () {
+describe('sessions', function () {
   describe('#listSessions()', function () {
     it('should return array of session names', function () {
       const name1 = changeCase.titleCase(dummySessions[0].cohort);
