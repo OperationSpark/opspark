@@ -52,3 +52,7 @@ module.exports.deleteGistHelper = function (username, token, url) {
 module.exports.readGistHelper = function (url) {
   return `curl ${url}`;
 };
+
+module.exports.makeTestScript = function (directory) {
+  return `npm test --prefix ${directory}`;
+}

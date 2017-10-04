@@ -11,7 +11,7 @@ const github = require('./github');
 const greenlight = require('./greenlight');
 const sessions = require('./sessions');
 const projects = require('./projects');
-const { downloadProjectTests, downloadProjectPackage } = require('./helpers');
+const { downloadProjectTests, downloadProjectPackage, makeTestScript } = require('./helpers');
 
 const rootDirectory = `${env.home()}/workspace`;
 const projectsDirectory = `${rootDirectory}/projects`;
@@ -51,7 +51,6 @@ function grabTests(project) {
     console.log(`Downloading tests for ${name}. . .`.yellow);
     const directory = `${projectsDirectory}/${name}`;
     const cmd = downloadProjectTests(project.url, github.grabLocalAuthToken(), directory);
-    console.log(cmd);
     const pckgCmd = downloadProjectPackage(project.url, github.grabLocalAuthToken(), directory);
     if (fs.existsSync(`${directory}/test`)) {
       console.log('Skipping tests.'.green);
@@ -90,7 +89,7 @@ function runTests(project) {
     const name = changeCase.paramCase(project.name);
     console.log('Running tests. . .'.yellow);
     const directory = `${projectsDirectory}/${name}/`;
-    const cmd = `npm test --prefix ${directory}`;
+    const cmd = makeTestScript(directory);
     exec(cmd, function (err, stdout, stderr) {
       if (stderr) {
         rej(stderr);
