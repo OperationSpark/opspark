@@ -121,11 +121,13 @@ function displayResults({ parsedStdout }) {
       const failures = parsedStdout.failures;
       failures.forEach(function (currentTest, i) {
         const whichTest = currentTest.fullTitle;
+        const message = currentTest.err.message;
         const stack = currentTest.err.stack.split('\n');
         const stackLineOne = stack[0];
         const stackLineTwo = stack[1];
         const errorInfo = stackLineOne.slice(stackLineOne.indexOf(':'));
         console.log(`${i + 1}) ${whichTest}`.red.bold.underline);
+        console.log(`> > > ${message}`.red);
         console.log(`> > > ${errorInfo}`.grey);
         console.log(`> > > ${stackLineTwo}`.grey);
       });
