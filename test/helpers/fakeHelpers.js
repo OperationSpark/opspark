@@ -23,7 +23,7 @@ module.exports.grabLocalAuthID = () => `echo ${dummyAuth.id}`;
 
 module.exports.grabLocalAuthToken = () => `echo ${dummyAuth.token}`;
 
-module.exports.createGistHelper = () => `echo ${dummyGistGood}`;
+module.exports.createGistHelper = () => `echo '${dummyGistGood}'`;
 
 module.exports.deleteGistHelper = () => `echo ${dummyUser}`;
 
