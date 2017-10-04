@@ -87,7 +87,7 @@ describe('projects', function () {
 
   describe('#selectProject()', function () {
     it('should select project', function (done) {
-      bddStdin(bddStdin.keys.left, '\n', 'y\n');
+      bddStdin(bddStdin.keys.left, bddStdin.keys.left, '\n', 'y\n');
       projects.selectProject({ session: dummySession, projectAction: 'install' })
         .then(function (project) {
           expect(project).to.be.an.object;
