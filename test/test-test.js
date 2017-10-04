@@ -19,7 +19,7 @@ const changeCase = require('change-case');
 
 const fakeHelpers = require('./helpers/fakeHelpers');
 
-const { dummySession, dummySessions } = require('./helpers/dummyData');
+const { dummySession, dummySessions, dummyTestPass, dummyTestFail } = require('./helpers/dummyData');
 
 const projects = proxyquire('../controller/projects', {
   './env': {
@@ -159,9 +159,19 @@ describe('test', function () {
     });
   });
 
-  describe.skip('#displayResults()', function () {
-    it('should display results as specified', function () {
-      
+  describe('#displayResults()', function () {
+    it('should fail with failing results', function () {
+      test.displayResults({ parsedStdout: JSON.parse(dummyTestFail) })
+        .then(function ({ pass }) {
+          expect(pass).to.be.false;
+        });
+    });
+
+    it('should pass with passing results', function () {
+      test.displayResults({ parsedStdout: JSON.parse(dummyTestPass) })
+        .then(function ({ pass }) {
+          expect(pass).to.be.true;
+        });
     });
   });
 });
