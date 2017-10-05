@@ -10,7 +10,7 @@ module.exports = function () {
   console.log('Beginning install process!'.blue);
   projects.action = 'install';
   github.getCredentials()
-    .catch(janitor.error('Failure getting credentials'.red))
+    .catch(janitor.error('Incorrect credentials'.red))
     .then(greenlight.getSessions)
     .catch(janitor.error('Failure getting sessions'.red))
     .then(sessions.selectSession)

@@ -11,7 +11,7 @@ module.exports.error = function (message) {
   return function (error) {
     console.error(message);
     throw new Error(error);
-    process.exitCode = 1;
+    // process.exitCode = 1;
   };
 };
 

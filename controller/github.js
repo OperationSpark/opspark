@@ -10,6 +10,7 @@ const exec = require('child_process').exec;
 
 const env = require('./env');
 const config = require('../config');
+const janitor = require('./janitor');
 const { createGithubToken, deleteGithubToken, readGithubAuths, checkGithubAuth, createClient, getClient } = require('./helpers');
 
 const applicationDirectory = `${env.home()}/opspark`;
@@ -35,7 +36,8 @@ function getCredentials() {
       res(creds);
     } else {
       authorizeUser()
-        .then(user => res(user));
+        .then(user => res(user))
+        .catch(err => rej(err));
     }
   });
 }
@@ -43,20 +45,17 @@ function getCredentials() {
 module.exports.getCredentials = getCredentials;
 
 function authorizeUser() {
-  return new Promise(function (res, rej) {
-    promptForUserInfo()
-      .then(obtainAndWriteAuth)
-      .then(obtainAndWriteUser)
-      .then(() => {
-        const creds = {
-          login: grabLocalLogin(),
-          id: grabLocalUserID(),
-          token: grabLocalAuthToken()
-        };
-        res(creds);
-      })
-      .catch(err => res(err));
-  });
+  return promptForUserInfo()
+    .then(obtainAndWriteAuth)
+    .then(obtainAndWriteUser)
+    .then(() => {
+      const creds = {
+        login: grabLocalLogin(),
+        id: grabLocalUserID(),
+        token: grabLocalAuthToken()
+      };
+      return creds;
+    });
 }
 
 module.exports.authorizeUser = authorizeUser;
