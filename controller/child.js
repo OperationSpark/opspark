@@ -1,10 +1,5 @@
-'use strict';
-
-var
-  fs = require('fs'),
-  exec = require('child_process').exec,
-  spawn = require('child_process').spawn,
-  Promise = require('bluebird');
+const exec = require('child_process').exec;
+// const Promise = require('bluebird');
 
 function execute(command) {
   return new Promise(function (resolve, reject) {

@@ -2,24 +2,22 @@
 
 'use strict';
 
-var
-  publish = require('./controller/publish'),
-  config = require('./config.json'),
-  init = require('./controller/init'),
-  github = require('./controller/github'),
-  greenlight = require('./controller/greenlight'),
-  npm = require('./controller/npm'),
-  projects = require('./controller/projects'),
-  test = require('./controller/test'),
-  submit = require('./controller/submit'),
-  janitor = require('./controller/janitor'),
-  pair = require('./controller/pair'),
-  handshake = require('./controller/handshake'),
-  appRoot = require('app-root-path'),
-  program = require('commander');
+const program = require('commander');
+
+const init = require('./controller/init');
+const github = require('./controller/github');
+const install = require('./controller/install');
+const npm = require('./controller/npm');
+const test = require('./controller/test');
+const submit = require('./controller/submit');
+const publish = require('./controller/publish');
+const shelve = require('./controller/shelve');
+const uninstall = require('./controller/uninstall');
+const janitor = require('./controller/janitor');
+const pair = require('./controller/pair');
 
 program
-  .version('2.1.0');
+  .version('2.3.0');
 
 program
   .command('login')
@@ -27,14 +25,14 @@ program
   .action(init.login);
 
 program
-  .command('init-hs')
-  .description('Connect workspace with Greenlight to provide the neccessary projects for whichever class the student is taking.')
-  .action(handshake);
+  .command('auth')
+  .description('Obtain list of authorizations for github.')
+  .action(github.listAuths);
 
 program
-  .command('init-pf')
-  .description('Initialize your portfolio.html with the JavaScript necessary to dynamically add portfolio projects as list items to the unordered-list with the id of portfolio.')
-  .action(initPortfolio);
+  .command('logout')
+  .description('Will clear any local authorizations from the user\'s workspace. The user will be asked to authorize next time they trip the need.')
+  .action(github.deauthorizeUser);
 
 program
   .command('init-ws')
@@ -42,32 +40,16 @@ program
   .action(init.website);
 
 program
+  .command('init-pf')
+  .description('Initialize your portfolio.html with the JavaScript necessary to dynamically add portfolio projects as list items to the unordered-list with the id of portfolio.')
+  .action(initPortfolio);
+
+program
   .option('-t, --test', 'Keep test files')
   .option('-m, --master', 'Keep master files')
   .command('install')
   .description('List installable projects.')
-  .action(projects.install);
-
-program
-  .command('shelve')
-  .description('Save previous work in a project in order to begin anew.')
-  .action(projects.shelve);
-
-program
-  .command('uninstall')
-  .description('Remove an installed project.')
-  .action(projects.uninstall);
-
-program
-  .option('-m, --master', 'Keep master files')
-  .command('pairup')
-  .description('Installs a project for pair programming. The workspace owner will be asked to provide the GitHub username of their partner.')
-  .action(pairup);
-
-program
-  .command('pairdown')
-  .description('Downloads and installs a project from the GitHub Pages repository of the student with whom the using student paired. Will fail if project is already installed.')
-  .action(pairdown);
+  .action(install);
 
 program
   .command('npm')
@@ -90,9 +72,25 @@ program
   .action(submit.submit);
 
 program
-  .command('logout')
-  .description('Will clear any local authorizations from the user\'s workspace. The user will be asked to authorize next time they trip the need.')
-  .action(github.deauthorize);
+  .command('publish [message]')
+  .description('Pushes all branches to the users GitHub pages repository at <username>.github.io by serially invoking:\ngit add -A\ngit commit -m"update website"\ngit push"\nOptional commit message defaults to "update website".')
+  .action(function (message) {
+    const commitMessage = message ? message : 'update website';
+    publish.all(commitMessage)
+      .then(function (result) {
+        console.log(result);
+      });
+  });
+
+program
+  .command('shelve')
+  .description('Save previous work in a project in order to begin anew.')
+  .action(shelve);
+
+program
+  .command('uninstall')
+  .description('Remove an installed project.')
+  .action(uninstall);
 
 program
   .command('fix')
@@ -100,15 +98,15 @@ program
   .action(fix);
 
 program
-  .command('publish [message]')
-  .description('Pushes all branches to the users GitHub pages repository at <username>.github.io by serially invoking:\ngit add -A\ngit commit -m"update website"\ngit push"\nOptional commit message defaults to "update website".')
-  .action(function (message) {
-    message = message ? message : 'update website';
-    publish.all(message)
-      .then(function (result) {
-        console.log(result);
-      });
-  });
+  .option('-m, --master', 'Keep master files')
+  .command('pairup')
+  .description('Installs a project for pair programming. The workspace owner will be asked to provide the GitHub username of their partner.')
+  .action(pairup);
+
+program
+  .command('pairdown')
+  .description('Downloads and installs a project from the GitHub Pages repository of the student with whom the using student paired. Will fail if project is already installed.')
+  .action(pairdown);
 
 program.parse(process.argv);
 

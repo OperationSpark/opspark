@@ -32,10 +32,11 @@ bower_components
 
 # Might end up having this dir because of tests
 /projects
-portfolio.html
+# portfolio.html
 index.html
 .DS_Store
 
 .dev
 files.json
 project-lock.json
+test/files/workspace/projects

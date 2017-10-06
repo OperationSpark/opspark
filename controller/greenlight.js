@@ -1,112 +1,54 @@
-'use strict';
+require('colors');
+const rp = require('request-promise');
 
-var
-  config = require('../config'),
-  _ = require('lodash'),
-  util = require('util'),
-  Q = require('q'),
-  fsJson = require('fs-json')(),
-  changeCase = require('change-case'),
-  async = require('async'),
-  github = require('./github'),
-  submit = require('./submit'),
-  program = require('commander'),
-  inquirer = require('inquirer'),
-  colors = require('colors'),
-  fs = require('fs'),
-  url = require('url'),
-  exec = require('child_process').exec,
-  request = require('request'),
-  rp = require('request-promise'),
-  mkdirp = require('mkdirp'),
-  rimraf = require('rimraf'),
-  cancelOption = '[cancel]',
-  env = require('./env'),
-  rootDirectory = `${env.home()}/workspace`,
-  projectEntriesPath = `${rootDirectory}/projects/projects.json`;
+const github = require('./github');
 
-function getSessions(auth, complete) {
+// TODO: Switch URI for live version
+const LOCALHOST = 'http://localhost:3000';
+const GREENLIGHT = 'https://greenlight.operationspark.org';
+const URI = GREENLIGHT;
+
+module.exports.URI = URI;
+
+function getSessions({ id }) {
+  console.log('Grabbing enrolled sessions. . .'.yellow);
   const options = {
     method: 'GET',
-    // TODO: Switch URI for live version
-    uri: 'https://greenlight.operationspark.org/api/os/install',
-    // uri: 'http://localhost:3000/api/os/install',
+    uri: `${URI}/api/os/install`,
     qs: {
-      id: github.grabLocalID(),
+      id,
     },
   };
-  rp(options)
-    .then(res => complete(JSON.parse(res)))
-    .catch(err => console.error('upload failed:', err));
+  return rp(options);
 }
 
 module.exports.getSessions = getSessions;
 
-function listEnrolledClasses(classes, complete) {
-  const names = _.map(classes, 'name');
-  const cohorts = _.map(classes, 'cohort');
-  const namesWithCohorts = _.map(classes, function (e) {
-    return `${e.name}: ${e.cohort.split('-').slice(1).join(' ')}`;
-  });
-  if (complete) {
-    complete(names);
-  }
-}
-
-module.exports.listEnrolledClasses = listEnrolledClasses;
-
-function get() {
-  const options = {
-    method: 'GET',
-    // TODO: Switch URI for live version
-    uri: 'https://greenlight.operationspark.org/api/os/install',
-    // uri: 'http://localhost:3000/api/os/install',
-    qs: {
-      id: github.grabLocalID(),
-    },
-  };
-  rp(options)
-    .then(res => {
-      console.log(res);
-      const r = JSON.parse(res);
-      var x = _.map(r, 'name');
-      console.log(x);
-    })
-    .catch(err => console.error('upload failed:', err));
-}
-
-module.exports.get = get;
-
-function grade(project, gist) {
+function sendGrade({ gist, project }) {
   const body = {
-    id: github.grabLocalID().toString(),
+    id: github.grabLocalUserID().toString(),
     requirementId: project._id,
     sessionId: project._session,
     url: gist.files['grade.txt'].raw_url,
   };
 
   const options = {
+    body,
     method: 'POST',
-    // TODO: Switch URI for live version
-    uri: 'https://greenlight.operationspark.org/api/os/grade',
-    // uri: 'http://localhost:3000/api/os/grade',
-    body: body,
+    uri: `${URI}/api/os/grade`,
     json: true,
   };
-  rp(options)
-    .then(res => {
-      if (res.status === 200) {
-        console.log(res.message.blue);
+
+  return rp(options)
+    .then((response) => {
+      if (response.status === 200) {
+        console.log(response.message.blue);
       } else {
-        console.log(res.reason.red);
-        console.log(res.details.red);
+        console.log(response.reason.red);
+        console.log(response.details.red);
       }
-      submit.deleteGist(gist.url);
-    })
-    .catch(err => {
-      console.error('upload failed:'.red, err);
-      submit.deleteGist(gist.url);
+      return gist.url;
     });
 }
 
-module.exports.grade = grade;
+module.exports.sendGrade = sendGrade;

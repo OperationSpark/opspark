@@ -12,6 +12,9 @@ module.exports = {
         "comma-dangle": ["error", "always"],
 
         // disable rules from base configurations
+        "no-underscore-dangle": "off",
+        "no-unused-expressions": "off",
+        "no-unused-vars": "off",
         "comma-dangle": "off",
         "no-console": "off",
         "no-use-before-define": "off",

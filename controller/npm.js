@@ -1,12 +1,11 @@
-'use strict';
-
 const _ = require('lodash');
+const inquirer = require('inquirer');
 const changeCase = require('change-case');
+const exec = require('child_process').exec;
+
+const env = require('./env');
 const greenlight = require('./greenlight');
 const projects = require('./projects');
-const inquirer = require('inquirer');
-const exec = require('child_process').exec;
-const env = require('./env');
 
 const rootDirectory = `${env.home()}/workspace`;
 const projectsDirectory = `${rootDirectory}/projects`;
@@ -20,7 +19,7 @@ const projectsDirectory = `${rootDirectory}/projects`;
  * Project is installed!
  */
 
-const chooseProject = function(action, complete) {
+const chooseProject = function (action, complete) {
   greenlight.getSessions(null, function (sessions) {
     greenlight.listEnrolledClasses(sessions, function (classes) {
       projects.selectClass(classes, action, function (err, className) {
@@ -130,6 +129,6 @@ const startProject = function (project) {
   const cmd = `${enterDirectory} && npm start`;
   exec(cmd, function (err) {
     if (err) return console.log('error:'.red, err);
-    console.log('Going going going. . .'.green);
+    console.log('Going going going. . .'.yellow);
   });
 };
