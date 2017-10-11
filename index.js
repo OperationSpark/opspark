@@ -17,7 +17,7 @@ const janitor = require('./controller/janitor');
 const pair = require('./controller/pair');
 
 program
-  .version('2.3.0');
+  .version('2.3.1');
 
 program
   .command('login')
