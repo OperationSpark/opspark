@@ -78,7 +78,7 @@ function createGist({ project, stats }) {
   content = JSON.stringify(content);
   return new Promise(function (res, rej) {
     console.log('Creating gist. . .'.yellow);
-    const cmd = createGistHelper(content, github.grabLocalLogin(), github.grabLocalAuthToken());
+    const cmd = createGistHelper(github.grabLocalLogin(), github.grabLocalAuthToken(), content);
     exec(cmd, function (err, stdout, stderr) {
       const gist = JSON.parse(stdout);
       if (err) rej(err);
