@@ -77,7 +77,7 @@ function listProjects(session, listAction) {
   if (listAction === 'install') {
     testableProjects = _.difference(mappedProjects, files);
   } else {
-    testableProjects = _.intersection(mappedProjects, files);
+    testableProjects = mappedProjects;
   }
   return projects
     .reduce(function (seed, project) {

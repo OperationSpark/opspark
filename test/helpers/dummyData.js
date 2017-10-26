@@ -47,6 +47,7 @@ module.exports.dummyGistBad = {
 const dummySession = {
   sessionId: 'Dnw6SEou4hYxBMpZP',
   name: 'Bootcamp',
+  title: 'Bootcamp 28 Aug 2017 6pm',
   cohort: 'bootcamp-28-aug-2017-6-pm',
   PROJECT: [
     {
@@ -81,6 +82,7 @@ module.exports.dummySession = dummySession;
 const dummySession2 = {
   sessionId: '6uBQDL8A7Yq7qSgJa',
   name: 'Prep',
+  title: 'Prep 18 Sep 2017 9am',
   cohort: 'prep-18-sep-2017-9-am',
   PROJECT: [],
 };
@@ -88,6 +90,7 @@ const dummySession2 = {
 const dummySession3 = {
   sessionId: 'cdvvyXikGpuEoSErx',
   name: 'Fundamentals of Software Development',
+  title: 'Fundamentals of Software Development 20 Sep 2017 4pm',
   cohort: 'fundamentals-of-software-development-20-sep-2017-4-pm',
   PROJECT: [
     {
