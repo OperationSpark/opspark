@@ -14,7 +14,7 @@ function submit() {
   projects.action = 'submit';
   github.getCredentials()
     .catch(janitor.error('Failure getting credentials'.red))
-    .then(greenlight.getSessions)
+    .then(greenlight.getGradable)
     .catch(janitor.error('Failure getting sessions'.red))
     .then(sessions.selectSession)
     .catch(janitor.error('Failure selecting session'.red))
