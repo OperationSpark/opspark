@@ -24,6 +24,20 @@ function getSessions({ id }) {
 
 module.exports.getSessions = getSessions;
 
+function getGradable({ id }) {
+  console.log('Grabbing enrolled sessions. . .'.yellow);
+  const options = {
+    method: 'GET',
+    uri: `${URI}/api/os/submit`,
+    qs: {
+      id,
+    },
+  };
+  return rp(options);
+}
+
+module.exports.getGradable = getGradable;
+
 function sendGrade({ gist, project }) {
   const body = {
     id: github.grabLocalUserID().toString(),

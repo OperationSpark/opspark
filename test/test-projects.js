@@ -80,7 +80,7 @@ describe('projects', function () {
 
     it('should list projects properly when not installing', function () {
       const projectsList = projects.listProjects(dummySession, 'test');
-      const result = [dummySession.PROJECT[1], dummySession.PROJECT[0]];
+      const result = [dummySession.PROJECT[3], dummySession.PROJECT[2], dummySession.PROJECT[1], dummySession.PROJECT[0]];
       expect(projectsList).to.eql(result);
     });
   });

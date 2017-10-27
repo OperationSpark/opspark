@@ -28,32 +28,21 @@ const sessions = proxyquire('../controller/sessions', {
 });
 
 describe('sessions', function () {
-  describe('#listSessions()', function () {
-    it('should return array of session names', function () {
-      const name1 = changeCase.titleCase(dummySessions[0].cohort);
-      const name2 = changeCase.titleCase(dummySessions[1].cohort);
-      const name3 = changeCase.titleCase(dummySessions[2].cohort);
-      const result = [name1, name2, name3];
-      const sessionsList = sessions.listSessions(dummySessions);
-      expect(sessionsList).to.eql(result);
-    });
-  });
-
   describe('#pluckSession()', function () {
     it('should pluck desired session', function () {
-      const name = changeCase.titleCase(dummySessions[0].cohort);
+      const name = dummySessions[0].title;
       const pluckedSession = sessions.pluckSession(name, dummySessions);
       expect(pluckedSession).to.eql(dummySessions[0]);
     });
 
     it('should pluck desired session', function () {
-      const name = changeCase.titleCase(dummySessions[1].cohort);
+      const name = dummySessions[1].title;
       const pluckedSession = sessions.pluckSession(name, dummySessions);
       expect(pluckedSession).to.eql(dummySessions[1]);
     });
 
     it('should pluck desired session', function () {
-      const name = changeCase.titleCase(dummySessions[2].cohort);
+      const name = dummySessions[2].title;
       const pluckedSession = sessions.pluckSession(name, dummySessions);
       expect(pluckedSession).to.eql(dummySessions[2]);
     });

@@ -8,33 +8,18 @@ const projects = require('./projects');
 
 const cancelOption = '[cancel]';
 
-function listSessions(sessions) {
-  console.log('Grabbing sessions. . .'.yellow);
-  const sessionNames = _.map(sessions, session =>
-    changeCase.titleCase(session.cohort)
-  );
-  const resolve = {
-    sessions,
-    sessionNames
-  };
-  return sessionNames;
-}
-
-module.exports.listSessions = listSessions;
-
-function pluckSession(cohort, sessions) {
-  const dashCohort = changeCase.paramCase(cohort);
+function pluckSession(title, sessions) {
   const sessionsArray = _.map(sessions, session => session);
   return sessionsArray.reduce(function (result, current) {
-    return current.cohort === dashCohort ? current : result;
-  });
+    return current.title === title ? current : result;
+  }, null);
 }
 
 module.exports.pluckSession = pluckSession;
 
 function selectSession(sessions) {
   const parsedSessions = JSON.parse(sessions);
-  const sessionNames = listSessions(parsedSessions);
+  const sessionNames = _.map(parsedSessions, session => session.title);
   return new Promise(function (res, rej) {
     waterfall([
       function (next) {
