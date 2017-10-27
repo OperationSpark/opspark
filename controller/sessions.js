@@ -8,20 +8,7 @@ const projects = require('./projects');
 
 const cancelOption = '[cancel]';
 
-// function listSessions(sessions) {
-//   console.log('Grabbing sessions. . .'.yellow);
-//   const sessionNames = _.map(sessions, session =>
-//     // changeCase.titleCase(session.cohort)
-//     session.title
-//   );
-//   console.log(sessionNames);
-//   return sessionNames;
-// }
-
-// module.exports.listSessions = listSessions;
-
 function pluckSession(title, sessions) {
-  // const title = changeCase.paramCase(title);
   const sessionsArray = _.map(sessions, session => session);
   return sessionsArray.reduce(function (result, current) {
     return current.title === title ? current : result;
