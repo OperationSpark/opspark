@@ -38,7 +38,7 @@ module.exports.downloadProjectTests = function (url, token, directory) {
 };
 
 module.exports.downloadProjectPackage = function (url, token, directory) {
-  return `svn export ${url}/trunk/package.json --password ${token} ${directory}/package.json`;
+  return `svn export ${url}/trunk/package.json --password ${token} ${directory}/package.json && svn export ${url}/trunk/.npmrc --password ${token} ${directory}/.npmrc`;
 };
 
 module.exports.createGistHelper = function (username, token, content) {
