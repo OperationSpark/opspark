@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 # This installs nvm
-curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.4/install.sh | bash
+# curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.4/install.sh | bash
 # This sets a variable
-export NVM_DIR="$HOME/.nvm"
+# export NVM_DIR="$HOME/.nvm"
 # This loads nvm
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+# [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
 # This loads nvm bash_completion
-[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
+# [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
 # This installs version 6 of node
 nvm install 6
 # This sets version 6 of node as the default
