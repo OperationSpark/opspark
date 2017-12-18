@@ -24,7 +24,7 @@
     "url": "https://github.com/OperationSpark/opspark/issues"
   },
   "homepage": "https://github.com/OperationSpark/opspark",
-  "preferGlobal": "true",
+  "preferGlobal": true,
   "bin": {
     "opspark": "index.js",
     "os": "index.js"
