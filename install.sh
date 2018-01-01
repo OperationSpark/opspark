@@ -12,11 +12,13 @@ npm install --global bower --depth=0 --progress
 # Save current npm version to variable
 NVM_CURRENT=`nvm current`
 # This installs version 6 of node
-nvm install 6 --reinstall-packages-from=${NVM_CURRENT:1}
+nvm install 6 
 # Switch to newest version 6
 nvm use 6
 # This sets version 6 of node as the default
 nvm alias default 6
+# Reinstall packages from where they just were to v6
+nvm reinstall-packages ${NVM_CURRENT:1}
 
 else
 
