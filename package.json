@@ -7,7 +7,7 @@
     "node": ">=6.0.0"
   },
   "scripts": {
-    "postinstall": "bash ./install.sh",
+    "preinstall": "bash ./install.sh",
     "dev": "nodemon test-server.js",
     "test": "mocha ./test"
   },

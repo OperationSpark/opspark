@@ -3,6 +3,8 @@
 . ~/.nvm/nvm.sh
 # This installs version 6 of node
 nvm install 6
+# Switch to newest version 6
+nvm use 6
 # This sets version 6 of node as the default
 nvm alias default 6
 # This installs global dependencies we will be using for projects
