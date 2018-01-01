@@ -23,9 +23,9 @@ echo $NVM_CURRENT
 # This sets version 6 of node as the default
 nvm alias default 6
 
-echo mv /home/ubuntu/.nvm/versions/node/$NODE_V/lib/node_modules/ /home/ubuntu/.nvm/versions/node/$NVM_CURRENT/lib/node_modules/
+echo cp /home/ubuntu/.nvm/versions/node/$NODE_V/lib/node_modules/* /home/ubuntu/.nvm/versions/node/$NVM_CURRENT/lib/node_modules/
 
-mv /home/ubuntu/.nvm/versions/node/$NODE_V/lib/node_modules/ /home/ubuntu/.nvm/versions/node/$NVM_CURRENT/lib/node_modules/
+cp /home/ubuntu/.nvm/versions/node/$NODE_V/lib/node_modules/* /home/ubuntu/.nvm/versions/node/$NVM_CURRENT/lib/node_modules/
 # Reinstall packages from where they just were to v6
 # nvm reinstall-packages ${NODE_V:1}
 
