@@ -48,9 +48,9 @@ module.exports.portfolio = portfolio;
  * website project, and initialize the portfolio.html file so teachers
  * or developers can get up to speed quickly.
  */
-module.exports.website = function (next) {
+module.exports.website = function(next){
   console.log('Initializing website project, please wait...'.green);
-  installWebsiteFiles(function (err) {
+  installWebsiteFiles(function(err) {
     if (err) return console.log(err);
     portfolio();
     typeof next === 'function' && next(null);
@@ -58,18 +58,18 @@ module.exports.website = function (next) {
 };
 
 function installWebsiteFiles(next) {
-  const rootDirectory = './';
-  const numFiles = configWebsite.url.length;
-  const downloaded = 0;
-  configWebsite.url.forEach(function (fileUrl) {
-    const filename = url.parse(fileUrl).pathname.split('/').pop();
-    let message = `Downloading ${filename}, please wait...`;
+  var rootDirectory = './';
+  var numFiles = configWebsite.url.length;
+  var downloaded = 0;
+  configWebsite.url.forEach(function(fileUrl){
+    var filename = url.parse(fileUrl).pathname.split('/').pop();
+    var message = 'Downloading ' + filename + ', please wait...';
     console.log(message.green);
     console.log(fileUrl);
-    const wget = `wget -nc -P ${rootDirectory} ${fileUrl}`;
-    const child = exec(wget, function (err, stdout, stderr) {
+    var wget = 'wget -nc -P ' + rootDirectory + ' ' + fileUrl;
+    var child = exec(wget, function(err, stdout, stderr) {
       if (err) return next(err);
-      message = `${filename} downloaded to ${rootDirectory}`;
+      message = filename + ' downloaded to ' + rootDirectory;
       console.log(message.green);
       if (++downloaded === numFiles) {
         console.log('All website files downloaded.'.green);
