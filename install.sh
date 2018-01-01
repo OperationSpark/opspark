@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # Save current npm version to variable
 NODE_V=`node -v`
+echo $NODE_V
 # Check if npm version is 6
 if [ ${NODE_V:1:1} != 6 ]
 then
@@ -11,6 +12,7 @@ npm install --global bower --depth=0 --progress
 . ~/.nvm/nvm.sh
 # Save current npm version to variable
 NVM_CURRENT=`nvm current`
+echo $NVM_CURRENT
 # This installs version 6 of node
 nvm install 6 
 # Switch to newest version 6
