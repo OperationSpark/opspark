@@ -20,7 +20,7 @@ nvm use 6
 # This sets version 6 of node as the default
 nvm alias default 6
 # Reinstall packages from where they just were to v6
-nvm reinstall-packages ${NVM_CURRENT:1}
+nvm reinstall-packages ${NODE_V:1}
 
 else
 
