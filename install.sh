@@ -1,40 +1,16 @@
 #!/usr/bin/env bash
-# Save current npm version to variable
+# Save current npm version to variable, ex v6.11.2
 NODE_V=`node -v`
-echo $NODE_V
+
 # Check if npm version is 6
 if [ ${NODE_V:1:1} != 6 ]
-
 then
-
-echo "Must update Node version. . ."
-# This installs global dependencies we will be using for projects
-npm install --global bower --depth=0 --progress
-# Source nvm for sub-shell
-. ~/.nvm/nvm.sh
-# This installs version 6 of node
-nvm install 6 
-# Switch to newest version 6
-nvm use 6
-# Save current npm version to variable
-NVM_CURRENT=`nvm current`
-
-echo $NVM_CURRENT
-# This sets version 6 of node as the default
-nvm alias default 6
-
-echo cp /home/ubuntu/.nvm/versions/node/$NODE_V/lib/node_modules/* /home/ubuntu/.nvm/versions/node/$NVM_CURRENT/lib/node_modules/
-
-cp /home/ubuntu/.nvm/versions/node/$NODE_V/lib/node_modules/* /home/ubuntu/.nvm/versions/node/$NVM_CURRENT/lib/node_modules/
-# Reinstall packages from where they just were to v6
-# nvm reinstall-packages ${NODE_V:1}
-
+echo -e "\n\e[31mYour current version of Node is $NODE_V, which is not compatible with opspark.\n"
+echo -e "Please \e[1m\e[34mupdate to (at least) Node version 6 using NVM \e[0m\e[31mand reinstall opspark.\n"
+echo -e "Opspark WILL NOT WORK even if it is installed with this version of Node.\n"
+pkill -9 -P $PPID
 else
-
-echo "Node version good to go!"
-
+echo -e "\e[32mNode version good to go!"
 npm install --global bower --depth=0 --progress
-
-fi
-
 echo "Great! Have fun using OpSpark!"
+fi
