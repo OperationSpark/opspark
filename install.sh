@@ -11,7 +11,7 @@ echo -e "Please \e[1m\e[34mupdate to (at least) Node version 6 using NVM \e[0m\e
 echo -e "Opspark WILL NOT WORK even if it is installed with this version of Node.\n"
 pkill -9 -P $PPID
 else
-echo -e "\e[32mNode version good to go!"
+echo -e "\e[32mNode $NODE_V, good to go!"
 npm install --global bower --depth=0 --progress
 echo "Great! Have fun using OpSpark!"
 fi
