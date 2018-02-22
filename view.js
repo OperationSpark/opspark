@@ -11,7 +11,10 @@ function inquireForInput(message, complete) {
     inquirer.prompt([{
         type: 'input',
         name: 'input',
-        message: message}],
+        message: message,
+        validate: function(input) {
+          return input.trim().length !== 0;
+        }}],
         function(response) {
             confirmInquire(response.input, function(err, confirmed) {
                 if (err) return inquireForInput(message, complete);
