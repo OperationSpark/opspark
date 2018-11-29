@@ -88,6 +88,7 @@ describe('test', function () {
       './env': {
         home: fakeHelpers.home,
       },
+      './reporter': fakeHelpers.reportPass,
     }).runTests;
 
     const failTests = proxyquire('../controller/test', {
@@ -98,14 +99,15 @@ describe('test', function () {
       './env': {
         home: fakeHelpers.home,
       },
+      './reporter': fakeHelpers.reportFail,
     }).runTests;
 
     it('should run tests and find pass', function (done) {
       passTests(project)
         .then(function (result) {
-          const stats = result.parsedStdout.stats;
+          const stats = result.testResults.stats;
           expect(result.project).to.exist;
-          expect(result.parsedStdout).to.exist;
+          expect(result.testResults).to.exist;
           expect(stats.tests).to.equal(4);
           expect(stats.passes).to.equal(4);
           expect(stats.pending).to.equal(0);
@@ -117,9 +119,9 @@ describe('test', function () {
     it('should run tests and find failure', function (done) {
       failTests(project)
         .then(function (result) {
-          const stats = result.parsedStdout.stats;
+          const stats = result.testResults.stats;
           expect(result.project).to.exist;
-          expect(result.parsedStdout).to.exist;
+          expect(result.testResults).to.exist;
           expect(stats.tests).to.equal(4);
           expect(stats.passes).to.equal(0);
           expect(stats.pending).to.equal(0);
@@ -132,7 +134,7 @@ describe('test', function () {
       const log = sinon.spy(console, 'log');
       passTests(project)
         .then(function (result) {
-          const stats = result.parsedStdout.stats;
+          const stats = result.testResults.stats;
           expect(log.calledWith(' Total tests:    4  '.bgBlack.white)).to.be.true;
           expect(log.calledWith(' Passing tests:  4  '.bgBlue.white)).to.be.true;
           expect(log.calledWith(' Pending tests:  0  '.bgYellow.black)).to.be.true;
@@ -145,7 +147,7 @@ describe('test', function () {
       const log = sinon.spy(console, 'log');
       failTests(project)
         .then(function (result) {
-          const stats = result.parsedStdout.stats;
+          const stats = result.testResults.stats;
           expect(log.calledWith(' Total tests:    4  '.bgBlack.white)).to.be.true;
           expect(log.calledWith(' Passing tests:  0  '.bgBlue.white)).to.be.true;
           expect(log.calledWith(' Pending tests:  0  '.bgYellow.black)).to.be.true;
@@ -157,17 +159,13 @@ describe('test', function () {
 
   describe('#displayResults()', function () {
     it('should fail with failing results', function () {
-      test.displayResults({ parsedStdout: JSON.parse(dummyTestFail) })
-        .then(function ({ pass }) {
-          expect(pass).to.be.false;
-        });
+      const { pass } = test.displayResults({ testResults: JSON.parse(dummyTestFail) });
+      expect(pass).to.be.false;
     });
 
     it('should pass with passing results', function () {
-      test.displayResults({ parsedStdout: JSON.parse(dummyTestPass) })
-        .then(function ({ pass }) {
-          expect(pass).to.be.true;
-        });
+      const { pass } = test.displayResults({ testResults: JSON.parse(dummyTestPass) });
+      expect(pass).to.be.true;
     });
   });
 });

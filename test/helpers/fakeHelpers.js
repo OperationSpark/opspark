@@ -38,3 +38,7 @@ module.exports.downloadProjectPackage = (url, token, directory) => `touch ${dire
 module.exports.makeTestPass = () => `echo '${dummyTestPass}'`;
 
 module.exports.makeTestFail = () => `echo '${dummyTestFail}'`;
+
+module.exports.reportPass = () => new Promise(res => res(JSON.parse(dummyTestPass)));
+
+module.exports.reportFail = () => new Promise(res => res(JSON.parse(dummyTestFail)));
