@@ -33,7 +33,7 @@ module.exports.downloadProject = (url, token, directory) => `mkdir ${directory} 
 
 module.exports.downloadProjectTests = (url, token, directory) => `mkdir ${directory}/test ${directory}/node_modules`;
 
-module.exports.downloadProjectPackage = (url, token, directory) => `touch ${directory}/package.json`;
+module.exports.downloadProjectPackage = (url, token, directory) => `echo {} > ${directory}/package.json`;
 
 module.exports.makeTestPass = () => `echo '${dummyTestPass}'`;
 
