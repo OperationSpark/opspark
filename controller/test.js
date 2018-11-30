@@ -10,7 +10,13 @@ const greenlight = require('./greenlight');
 const sessions = require('./sessions');
 const projects = require('./projects');
 const report = require('./reporter');
-const { downloadProjectTests, downloadProjectPackage, makeTestScript } = require('./helpers');
+const {
+  downloadProjectTests,
+  downloadProjectPackage,
+  installProjectDependencies,
+  removeProjectTests,
+  execAsync,
+} = require('./helpers');
 
 const rootDirectory = `${env.home()}/workspace`;
 const projectsDirectory = `${rootDirectory}/projects`;
@@ -75,30 +81,40 @@ function grabTests(project) {
 module.exports.grabTests = grabTests;
 
 
-// Creates command to enter project directory
-// Creates command to run tests
-// Command has been everything from 'npm run test', to literally the
-// script in 'npm run test', to this current version with absolute directory
-// May need --use_strict tag, but that throws an error (exit with code 9, unknown argument)
-// when used with other commands
-// If error, runs postTestCleanup to delete new directories so students can't have them
-// If no error, calls postTestCleanup function
+// Creates command to install deps (`npm install`)
+// Creates command to remove deps (`rm -rf`)
+// > Install deps
+// > Run tests
+// > Log total/passing/pending/failing
+// > If error, remove test directory and re-throw error
+// > If no error, remove test directory and resolve with tests
 function runTests(project) {
   const name = changeCase.paramCase(project.name);
-  const directory = `${projectsDirectory}/${name}/test/`;
-
+  const directory = `${projectsDirectory}/${name}`;
+  const testDirectory = `${directory}/test/`;
+  
+  const installProjectDependenciesCmd = installProjectDependencies(directory);
+  const removeProjectTestsCmd = removeProjectTests(directory);
+  
   console.log('Running tests. . .'.yellow);
 
-  return report(directory).then((testResults) => {
-    const { tests, passes, pending, failures } = testResults.stats;
-      
-    console.log(` Total tests:    ${tests}  `.bgBlack.white);
-    console.log(` Passing tests:  ${passes}  `.bgBlue.white);
-    console.log(` Pending tests:  ${pending}  `.bgYellow.black);
-    console.log(` Failing tests:  ${failures}  `.bgRed.white);
-
-    return { project, testResults };
-  });
+  return Promise.resolve()
+    .then(() => execAsync(installProjectDependenciesCmd))
+    .then(() => report(testDirectory))
+    .then((testResults) => {
+      const { tests, passes, pending, failures } = testResults.stats;
+        
+      console.log(` Total tests:    ${tests}  `.bgBlack.white);
+      console.log(` Passing tests:  ${passes}  `.bgBlue.white);
+      console.log(` Pending tests:  ${pending}  `.bgYellow.black);
+      console.log(` Failing tests:  ${failures}  `.bgRed.white);
+  
+      return { project, testResults };
+    })
+    .catch(error => execAsync(removeProjectTestsCmd)
+      .then(() => Promise.reject(error)))
+    .then(projectResults => execAsync(removeProjectTestsCmd)
+      .then(() => projectResults));
 }
 
 module.exports.runTests = runTests;

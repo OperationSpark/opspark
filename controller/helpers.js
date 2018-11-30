@@ -1,4 +1,14 @@
 const octonode = require('octonode');
+const exec = require('child_process').exec;
+
+module.exports.execAsync = function execAsync(cmd) {
+  return new Promise((res, rej) => {
+    exec(cmd, (err, stdout, stderr) => {
+      if (err) return rej(err);
+      return res(stdout, stderr);
+    });
+  });
+};
 
 module.exports.createClient = function (token) {
   return octonode.client(token);
@@ -30,11 +40,12 @@ module.exports.checkGithubAuth = function (token, userAgent) {
 };
 
 module.exports.downloadProject = function (url, token, directory) {
-  return `svn co ${url}/trunk --password ${token} ${directory}`;
+  console.log(`svn co ${url}/branches/os-grading --password ${token} ${directory}`);
+  return `svn co ${url}/branches/os-grading --password ${token} ${directory}`;
 };
 
 module.exports.downloadProjectTests = function (url, token, directory) {
-  return `svn export ${url}/trunk/test --password ${token} ${directory}/test`;
+  return `svn export ${url}/branches/os-grading/test --password ${token} ${directory}/test`;
 };
 
 module.exports.downloadProjectPackage = function (url, token, directory) {
@@ -53,6 +64,10 @@ module.exports.readGistHelper = function (url) {
   return `curl ${url}`;
 };
 
-module.exports.makeTestScript = function (directory) {
-  return `npm test --prefix ${directory}`;
-}
+module.exports.installProjectDependencies = function(directory) {
+  return `npm install --prefix ${directory} --loglevel=error`;
+};
+
+module.exports.removeProjectTests = function(directory) {
+  return `rm -rf ${directory}/test`;
+};
