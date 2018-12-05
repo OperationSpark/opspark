@@ -92,29 +92,29 @@ function runTests(project) {
   const name = changeCase.paramCase(project.name);
   const directory = `${projectsDirectory}/${name}`;
   const testDirectory = `${directory}/test/`;
-  
-  const installProjectDependenciesCmd = installProjectDependencies(directory);
-  const removeProjectTestsCmd = removeProjectTests(directory);
-  
+
+  const installProjectDependencies = () => execAsync(installProjectDependencies(directory));
+  const removeProjectTests = () => execAsync(removeProjectTests(directory))
+
   console.log('Running tests. . .'.yellow);
 
   return Promise.resolve()
-    .then(() => execAsync(installProjectDependenciesCmd))
+    .then(() => installProjectDependencies())
     .then(() => report(testDirectory))
     .then((testResults) => {
       const { tests, passes, pending, failures } = testResults.stats;
-        
+
       console.log(` Total tests:    ${tests}  `.bgBlack.white);
       console.log(` Passing tests:  ${passes}  `.bgBlue.white);
       console.log(` Pending tests:  ${pending}  `.bgYellow.black);
       console.log(` Failing tests:  ${failures}  `.bgRed.white);
-  
+
       return { project, testResults };
     })
-    .catch(error => execAsync(removeProjectTestsCmd)
-      .then(() => Promise.reject(error)))
-    .then(projectResults => execAsync(removeProjectTestsCmd)
-      .then(() => projectResults));
+    .then(
+      testResults => removeProjectTests().then(() => testResults),
+      error => removeProjectTests().then(() => Promise.reject(error)),
+    );
 }
 
 module.exports.runTests = runTests;
@@ -137,10 +137,10 @@ function displayResults({ testResults }) {
     });
 
     return { pass: false };
-  } else {
-    console.log('You did it! 100% complete, now please run'.green, 'os submit'.red);
-    return { pass: true };
   }
+
+  console.log('You did it! 100% complete, now please run'.green, 'os submit'.red);
+  return { pass: true };
 }
 
 module.exports.displayResults = displayResults;
