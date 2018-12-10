@@ -113,7 +113,7 @@ function runTests(project) {
     })
     .then(
       testResults => removeProjectTests().then(() => testResults),
-      error => removeProjectTests().then(() => Promise.reject(error)),
+      error => removeProjectTests().then(() => Promise.reject(error))
     );
 }
 
