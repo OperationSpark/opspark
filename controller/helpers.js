@@ -63,10 +63,10 @@ module.exports.readGistHelper = function (url) {
   return `curl ${url}`;
 };
 
-module.exports.installProjectDependencies = function(directory) {
+module.exports.installProjectDependenciesCmd = function(directory) {
   return `npm install --prefix ${directory} --loglevel=error`;
 };
 
-module.exports.removeProjectTests = function(directory) {
+module.exports.removeProjectTestsCmd = function(directory) {
   return `rm -rf ${directory}/test`;
 };

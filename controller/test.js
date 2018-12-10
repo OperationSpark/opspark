@@ -13,8 +13,8 @@ const report = require('./reporter');
 const {
   downloadProjectTests,
   downloadProjectPackage,
-  installProjectDependencies,
-  removeProjectTests,
+  installProjectDependenciesCmd,
+  removeProjectTestsCmd,
   execAsync,
 } = require('./helpers');
 
@@ -93,8 +93,8 @@ function runTests(project) {
   const directory = `${projectsDirectory}/${name}`;
   const testDirectory = `${directory}/test/`;
 
-  const installProjectDependencies = () => execAsync(installProjectDependencies(directory));
-  const removeProjectTests = () => execAsync(removeProjectTests(directory))
+  const installProjectDependencies = () => execAsync(installProjectDependenciesCmd(directory));
+  const removeProjectTests = () => execAsync(removeProjectTestsCmd(directory))
 
   console.log('Running tests. . .'.yellow);
 
