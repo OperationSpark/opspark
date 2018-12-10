@@ -9,7 +9,14 @@ const github = require('./github');
 const greenlight = require('./greenlight');
 const sessions = require('./sessions');
 const projects = require('./projects');
-const { downloadProjectTests, downloadProjectPackage, makeTestScript } = require('./helpers');
+const report = require('./reporter');
+const {
+  downloadProjectTests,
+  downloadProjectPackage,
+  installProjectDependenciesCmd,
+  removeProjectTestsCmd,
+  execAsync,
+} = require('./helpers');
 
 const rootDirectory = `${env.home()}/workspace`;
 const projectsDirectory = `${rootDirectory}/projects`;
@@ -74,67 +81,66 @@ function grabTests(project) {
 module.exports.grabTests = grabTests;
 
 
-// Creates command to enter project directory
-// Creates command to run tests
-// Command has been everything from 'npm run test', to literally the
-// script in 'npm run test', to this current version with absolute directory
-// May need --use_strict tag, but that throws an error (exit with code 9, unknown argument)
-// when used with other commands
-// If error, runs postTestCleanup to delete new directories so students can't have them
-// If no error, calls postTestCleanup function
+// Creates command to install deps (`npm install`)
+// Creates command to remove deps (`rm -rf`)
+// > Install deps
+// > Run tests
+// > Log total/passing/pending/failing
+// > If error, remove test directory and re-throw error
+// > If no error, remove test directory and resolve with tests
 function runTests(project) {
-  return new Promise(function (res, rej) {
-    const name = changeCase.paramCase(project.name);
-    console.log('Running tests. . .'.yellow);
-    const directory = `${projectsDirectory}/${name}/`;
-    const cmd = makeTestScript(directory);
-    exec(cmd, function (err, stdout, stderr) {
-      if (stderr) {
-        rej(stderr);
-      }
-      // The split variable MUST have EXACTLY TWO spaces before "stats"
-      const split = `{
-  "stats": {`;
-      const index = stdout.indexOf(split);
-      if (index === -1) {
-        console.log('There was an error.'.red, err);
-      } else {
-        const parsedStdout = JSON.parse(stdout.slice(index));
-        const stats = parsedStdout.stats;
-        console.log(` Total tests:    ${stats.tests}  `.bgBlack.white);
-        console.log(` Passing tests:  ${stats.passes}  `.bgBlue.white);
-        console.log(` Pending tests:  ${stats.pending}  `.bgYellow.black);
-        console.log(` Failing tests:  ${stats.failures}  `.bgRed.white);
-        res({ project, parsedStdout });
-      }
-    });
-  });
+  const name = changeCase.paramCase(project.name);
+  const directory = `${projectsDirectory}/${name}`;
+  const testDirectory = `${directory}/test/`;
+
+  const installProjectDependencies = () => execAsync(installProjectDependenciesCmd(directory));
+  const removeProjectTests = () => execAsync(removeProjectTestsCmd(directory))
+
+  console.log('Running tests. . .'.yellow);
+
+  return Promise.resolve()
+    .then(() => installProjectDependencies())
+    .then(() => report(testDirectory))
+    .then((testResults) => {
+      const { tests, passes, pending, failures } = testResults.stats;
+
+      console.log(` Total tests:    ${tests}  `.bgBlack.white);
+      console.log(` Passing tests:  ${passes}  `.bgBlue.white);
+      console.log(` Pending tests:  ${pending}  `.bgYellow.black);
+      console.log(` Failing tests:  ${failures}  `.bgRed.white);
+
+      return { project, testResults };
+    })
+    .then(
+      testResults => removeProjectTests().then(() => testResults),
+      error => removeProjectTests().then(() => Promise.reject(error))
+    );
 }
 
 module.exports.runTests = runTests;
 
-function displayResults({ parsedStdout }) {
-  return new Promise(function (res) {
-    if (parsedStdout.stats.failures > 0) {
-      const failures = parsedStdout.failures;
-      failures.forEach(function (currentTest, i) {
-        const whichTest = currentTest.fullTitle;
-        const message = currentTest.err.message;
-        const stack = currentTest.err.stack.split('\n');
-        const stackLineOne = stack[0];
-        const stackLineTwo = stack[1];
-        const errorInfo = stackLineOne.slice(stackLineOne.indexOf(':'));
-        console.log(`${i + 1}) ${whichTest}`.red.bold.underline);
-        console.log(`> > > ${message}`.red);
-        console.log(`> > > ${errorInfo}`.grey);
-        console.log(`> > > ${stackLineTwo}`.grey);
-      });
-      res({ pass: false });
-    } else {
-      console.log('You did it! 100% complete, now please run'.green, 'os submit'.red);
-      res({ pass: true });
-    }
-  });
+function displayResults({ testResults }) {
+  if (testResults.stats.failures > 0) {
+    const { failures } = testResults;
+
+    failures.forEach((currentTest, i) => {
+      const whichTest = currentTest.fullTitle;
+      const message = currentTest.err.message;
+      const stack = currentTest.err.stack.split('\n');
+      const stackLineOne = stack[0];
+      const stackLineTwo = stack[1];
+      const errorInfo = stackLineOne.slice(stackLineOne.indexOf(':'));
+      console.log(`${i + 1}) ${whichTest}`.red.bold.underline);
+      console.log(`> > > ${message}`.red);
+      console.log(`> > > ${errorInfo}`.grey);
+      console.log(`> > > ${stackLineTwo}`.grey);
+    });
+
+    return { pass: false };
+  }
+
+  console.log('You did it! 100% complete, now please run'.green, 'os submit'.red);
+  return { pass: true };
 }
 
 module.exports.displayResults = displayResults;

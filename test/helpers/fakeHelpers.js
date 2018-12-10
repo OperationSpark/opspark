@@ -33,8 +33,13 @@ module.exports.downloadProject = (url, token, directory) => `mkdir ${directory} 
 
 module.exports.downloadProjectTests = (url, token, directory) => `mkdir ${directory}/test ${directory}/node_modules`;
 
-module.exports.downloadProjectPackage = (url, token, directory) => `touch ${directory}/package.json`;
+// package.json must be parse-able, so echoing an empty object into it
+module.exports.downloadProjectPackage = (url, token, directory) => `echo {} > ${directory}/package.json`;
 
 module.exports.makeTestPass = () => `echo '${dummyTestPass}'`;
 
 module.exports.makeTestFail = () => `echo '${dummyTestFail}'`;
+
+module.exports.reportPass = () => Promise.resolve(JSON.parse(dummyTestPass));
+
+module.exports.reportFail = () => Promise.resolve(JSON.parse(dummyTestFail));

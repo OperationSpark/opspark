@@ -1,4 +1,14 @@
 const octonode = require('octonode');
+const exec = require('child_process').exec;
+
+module.exports.execAsync = function execAsync(cmd) {
+  return new Promise((res, rej) => {
+    exec(cmd, (err, stdout, stderr) => {
+      if (err) return rej(err);
+      return res(stdout, stderr);
+    });
+  });
+};
 
 module.exports.createClient = function (token) {
   return octonode.client(token);
@@ -53,6 +63,10 @@ module.exports.readGistHelper = function (url) {
   return `curl ${url}`;
 };
 
-module.exports.makeTestScript = function (directory) {
-  return `npm test --prefix ${directory}`;
-}
+module.exports.installProjectDependenciesCmd = function(directory) {
+  return `npm install --prefix ${directory} --loglevel=error`;
+};
+
+module.exports.removeProjectTestsCmd = function(directory) {
+  return `rm -rf ${directory}/test`;
+};
