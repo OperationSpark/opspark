@@ -60,7 +60,7 @@
     "eslint": "^4.1.1",
     "eslint-config-airbnb-base": "^11.2.0",
     "eslint-plugin-import": "^2.6.1",
-    "mocha": "^2.2.1",
+    "mocha": "^5.2.0",
     "mock-stdin": "^0.3.0",
     "mockery": "^1.4.0",
     "proxyquire": "^1.5.0",
