@@ -3,6 +3,7 @@
 'use strict';
 
 const program = require('commander');
+const pjson = require('./package.json');
 
 const init = require('./controller/init');
 const github = require('./controller/github');
@@ -16,8 +17,9 @@ const uninstall = require('./controller/uninstall');
 const janitor = require('./controller/janitor');
 const pair = require('./controller/pair');
 
+
 program
-  .version('2.4.7');
+  .version(pjson.version);
 
 program
   .command('login')
