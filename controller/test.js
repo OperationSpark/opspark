@@ -109,7 +109,7 @@ function runTests(project) {
       console.log(` Pending tests:  ${pending}  `.bgYellow.black);
       console.log(` Failing tests:  ${failures}  `.bgRed.white);
 
-      return { project, testResults };
+      return { project, parsedStdout: testResults };
     })
     .then(
       testResults => removeProjectTests().then(() => testResults),
