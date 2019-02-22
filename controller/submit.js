@@ -40,8 +40,8 @@ function submit() {
 
 module.exports.submit = submit;
 
-function checkGrade({ project, parsedStdout }) {
-  const stats = parsedStdout.stats;
+function checkGrade({ project, testResults }) {
+  const { stats } = testResults;
   return new Promise(function (res, rej) {
     if (stats.passes < (stats.tests / 2)) {
       rej(`You have not passed all tests for ${project.name}! Must be have finished at least 50% to submit. Canceling submit.`.red);

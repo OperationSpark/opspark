@@ -35,7 +35,7 @@ describe('submit', function () {
 
   describe('#checkGrade()', function () {
     it('should resolve if passing grade', function (done) {
-      submit.checkGrade({ project, parsedStdout: testPass })
+      submit.checkGrade({ project, testResults: testPass })
         .then(function (resolve) {
           expect(resolve.project).to.eql(project);
           done();
@@ -43,7 +43,7 @@ describe('submit', function () {
     });
 
     it('should reject if failing grade', function (done) {
-      submit.checkGrade({ project, parsedStdout: testFail })
+      submit.checkGrade({ project, testResults: testFail })
         .catch(function (message) {
           expect(message).to.equal(`You have not passed all tests for ${project.name}! Must be have finished at least 50% to submit. Canceling submit.`.red);
           done();
