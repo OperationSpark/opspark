@@ -27,8 +27,8 @@ const projects = proxyquire('../controller/projects', {
 });
 
 const readAndParse = path => JSON.parse(fs.readFileSync(path));
-const projectsDirectory = './test/files/workspace/projects';
-const projectEntriesPath = './test/files/workspace/projects/projects.json';
+const projectsDirectory = './test/files/environment/projects';
+const projectEntriesPath = './test/files/environment/projects/projects.json';
 
 describe('projects', function () {
   describe('#ensureProjectsDirectory()', function () {

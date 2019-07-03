@@ -7,7 +7,7 @@ const env = require('./env');
 const greenlight = require('./greenlight');
 const projects = require('./projects');
 
-const rootDirectory = `${env.home()}/workspace`;
+const rootDirectory = `${env.home()}/environment`;
 const projectsDirectory = `${rootDirectory}/projects`;
 
 /**

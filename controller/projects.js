@@ -14,7 +14,7 @@ const env = require('./env');
 const github = require('./github');
 const { downloadProject } = require('./helpers');
 
-const rootDirectory = `${env.home()}/workspace`;
+const rootDirectory = `${env.home()}/environment`;
 const projectEntriesPath = `${rootDirectory}/projects/projects.json`;
 const projectsDirectory = `${rootDirectory}/projects`;
 const cancelOption = '[cancel]';

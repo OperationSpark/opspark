@@ -4,7 +4,7 @@ const _ = require('lodash');
 const env = require('./env');
 const projects = require('./projects');
 
-const root = `${env.home()}/workspace`;
+const root = `${env.home()}/environment`;
 const projectsDirectory = `${root}/projects`;
 
 module.exports.error = function (message) {
