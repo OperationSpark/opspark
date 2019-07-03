@@ -50,7 +50,7 @@ describe('init', function () {
       var spy = sinon.spy(console, 'log');
       spy.withArgs(config.portfolio.help.portfolioScriptTagExists.red);
 
-      var filepath = 'test/files/environment/temp-portfolio.html';
+        var filepath = 'test/files/environment/temp-portfolio.html';
       var html = fs.readFileSync(filepath, 'utf8');
       expect(html).to.have.string(init.jQueryCdnScript);
       expect(html).to.have.string(init.portfolioScript);
