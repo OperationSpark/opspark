@@ -18,7 +18,7 @@ const {
   execAsync,
 } = require('./helpers');
 
-const rootDirectory = `${env.home()}/workspace`;
+const rootDirectory = `${env.home()}/environment`;
 const projectsDirectory = `${rootDirectory}/projects`;
 
 // Start of test command

@@ -33,8 +33,8 @@ const test = proxyquire('../controller/test', {
   },
 });
 
-const projectsDirectory = './test/files/workspace/projects';
-const projectEntriesPath = './test/files/workspace/projects/projects.json';
+const projectsDirectory = './test/files/environment/projects';
+const projectEntriesPath = './test/files/workenvironmentspace/projects/projects.json';
 
 describe('test', function () {
   before(function (done) {
