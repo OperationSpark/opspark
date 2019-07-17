@@ -2,12 +2,15 @@ const _ = require('lodash');
 const inquirer = require('inquirer');
 const changeCase = require('change-case');
 const exec = require('child_process').exec;
+const fs = require('fs');
 
 const env = require('./env');
 const greenlight = require('./greenlight');
 const projects = require('./projects');
 
-const rootDirectory = `${env.home()}/workspace`;
+const githubMatch = /[\w]+\.github\.io/;
+const githubDir = fs.readdirSync(`${env.home()}/environment`).filter(path => githubMatch.test(path))[0];
+const rootDirectory = `${env.home()}/environment/${githubDir}`;
 const projectsDirectory = `${rootDirectory}/projects`;
 
 /**

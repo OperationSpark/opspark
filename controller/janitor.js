@@ -3,9 +3,10 @@ const fs = require('fs');
 const _ = require('lodash');
 const env = require('./env');
 const projects = require('./projects');
-
-const root = `${env.home()}/workspace`;
-const projectsDirectory = `${root}/projects`;
+const githubMatch = /[\w]+\.github\.io/;
+const githubDir = fs.readdirSync(`${env.home()}/environment`).filter(path => githubMatch.test(path))[0];
+const root = `${env.home()}/environment`;
+const projectsDirectory = `${root}/${githubDir}/projects`;
 
 module.exports.error = function (message) {
   return function (error) {
