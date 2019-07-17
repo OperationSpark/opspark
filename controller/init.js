@@ -16,6 +16,7 @@ const jQueryCdnScript = '    <script src=\"https://ajax.googleapis.com/ajax/libs
 const portfolioScript = "        <script id=\"portfolioScript\">$(document).ready(function() {$.getJSON('projects/projects.json').then(function(data) { data.projects.forEach(function(project){ $('#portfolio').append('<li><a href=\"projects/' + project.name + '/\">' + project.title + ' : ' + project.description + '</a></li>'); }); }); });</script>\n    </body>";
 require('colors');
 
+
 module.exports.jQueryCdnScript = jQueryCdnScript;
 module.exports.portfolioScript = portfolioScript;
 
@@ -27,7 +28,7 @@ function login() {
 module.exports.login = login;
 
 function portfolio(filepath) {
-  filepath = (filepath ? filepath : configPortfolio.filepath);
+  filepath = (filepath ? filepath : `${env.home()}/environment/${githubDir}`);
   if (!fs.existsSync(filepath)) return console.log(configPortfolio.help.incomplete.red);
   const html = fs.readFileSync(filepath, 'utf8');
   const $ = cheerio.load(html);
@@ -55,7 +56,7 @@ module.exports.website = function(next){
   console.log('Initializing website project, please wait...'.green);
   installWebsiteFiles(function(err) {
     if (err) return console.log(err);
-    portfolio();
+    portfolio(`${env.home()}/environment${githubDir}`);
     typeof next === 'function' && next(null);
   });
 };
