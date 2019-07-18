@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>John Fraboni</title>
+        <link href='https://fonts.googleapis.com/css?family=Roboto:900,900italic,400italic,400' rel='stylesheet' type='text/css'>
+        <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
+        <link rel="stylesheet" href="css/local.css" type="text/css" />
+        <link rel="stylesheet" type="text/css" href="css/portfolio.css">
+        <script src="bower_components/vendee/vendee.js"></script>
+    </head>
+    <body>
+        <div class="container">
+            <nav id="nav"></nav>
+            <div class="main">
+                <h1>Portfolio</h1>
+                <ul id="portfolio" class="portfolio">
+                </ul>
+            </div>
+        </div>
+        <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+        <script id="portfolioScript">$(document).ready(function() {$.getJSON('projects/projects.json').then(function(data) { data.projects.forEach(function(project){ $('#portfolio').append('<li><a href="projects/' + project.name + '/">' + project.title + ' : ' + project.description + '</a></li>'); }); }); });</script>
+    </body>
+</html>

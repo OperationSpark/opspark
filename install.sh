@@ -13,5 +13,7 @@ pkill -9 -P $PPID
 else
 echo -e "\e[32mNode $NODE_V, good to go!"
 npm install --global bower --depth=0 --progress
+npm install --global mocha
+sudo apt-get install subversion
 echo "Great! Have fun using OpSpark!"
 fi
