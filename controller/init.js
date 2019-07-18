@@ -28,7 +28,7 @@ function login() {
 module.exports.login = login;
 
 function portfolio(filepath) {
-  filepath = (filepath ? filepath : `${env.home()}/environment/${githubDir}`);
+  filepath = (filepath ? filepath : `${env.home()}/environment/${githubDir}/${configPortfolio.filepath}`);
   if (!fs.existsSync(filepath)) return console.log(configPortfolio.help.incomplete.red);
   const html = fs.readFileSync(filepath, 'utf8');
   const $ = cheerio.load(html);
@@ -56,13 +56,13 @@ module.exports.website = function(next){
   console.log('Initializing website project, please wait...'.green);
   installWebsiteFiles(function(err) {
     if (err) return console.log(err);
-    portfolio(`${env.home()}/environment${githubDir}`);
+    portfolio();
     typeof next === 'function' && next(null);
   });
 };
 
 function installWebsiteFiles(next) {
-  var rootDirectory = './';
+  var rootDirectory = `${env.home()}/environment/${githubDir}/`;
   var numFiles = configWebsite.url.length;
   var downloaded = 0;
   configWebsite.url.forEach(function(fileUrl){
