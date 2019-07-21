@@ -6,7 +6,7 @@ const mocha = require('mocha');
 const should = require('should');
 const colors = require('colors');
 const init = require('../controller/init');
-const tempPortfolioPath = 'test/files/environment/temp-portfolio.html';
+const tempPortfolioPath = 'test/files/environment/andyn190.github.io/temp-portfolio.html';
 
 describe('init', function () {
   afterEach(function () {
@@ -28,14 +28,14 @@ describe('init', function () {
     it('should bail with improperly id\'ed <ul> help message if <ul> with id portfolio not found in portfolio.html', function (done) {
       var spy = sinon.spy(console, 'log');
       spy.withArgs(config.portfolio.help.noPortfolioList.red);
-      init.portfolio('test/files/environment/no-portfolio-list-portfolio.html');
+      init.portfolio('test/files/environment/andyn190.github.io/no-portfolio-list-portfolio.html');
       assert(spy.withArgs(config.portfolio.help.noPortfolioList.red).calledOnce);
       done();
     });
 
     it('should load portfolio and replace end-body-tag with jQuery-cdn-script, portfolio-script and end-body-tag', function (done) {
       // for the test, make a copy of a pre-initialized portfolio.html //
-      fs.copySync('test/files/environment/portfolio.html', tempPortfolioPath);
+      fs.copySync('test/files/environment/andyn190.github.io/portfolio.html', tempPortfolioPath);
 
       var html = fs.readFileSync(tempPortfolioPath, 'utf8');
       expect(html).to.not.have.string(init.jQueryCdnScript);
@@ -50,7 +50,7 @@ describe('init', function () {
       var spy = sinon.spy(console, 'log');
       spy.withArgs(config.portfolio.help.portfolioScriptTagExists.red);
 
-        var filepath = 'test/files/environment/temp-portfolio.html';
+        var filepath = 'test/files/environment/andyn190.github.io/temp-portfolio.html';
       var html = fs.readFileSync(filepath, 'utf8');
       expect(html).to.have.string(init.jQueryCdnScript);
       expect(html).to.have.string(init.portfolioScript);
@@ -64,10 +64,9 @@ describe('init', function () {
   describe('website', function () {
     it('should download files listed in config.website.url, the portfolio.html file should include a <ul> with an id of portfolio, and the portfolio.html should be initialized', function (done) {
       init.website(function (err) {
-        assert.isTrue(fs.existsSync('index.html'), 'We should have index.html in the root directory!');
-        assert.isTrue(fs.existsSync('portfolio.html'), 'We should have portfolio.html in the root directory!');
-
-        var html = fs.readFileSync('portfolio.html', 'utf8');
+        assert.isTrue(fs.existsSync('test/files/environment/andyn190.github.io/index.html'), 'We should have index.html in the root directory!');
+        assert.isTrue(fs.existsSync('test/files/environment/andyn190.github.io/portfolio.html'), 'We should have portfolio.html in the root directory!');
+        var html = fs.readFileSync('test/files/environment/andyn190.github.io/portfolio.html', 'utf8');
         expect(html).to.have.string(init.jQueryCdnScript);
         expect(html).to.have.string(init.portfolioScript);
 

@@ -27,4 +27,12 @@ describe('env', function () {
       done();
     });
   });
+
+  describe('#githubDir()', function () {
+    it('should return the github directory of the current user', function (done) {
+      const githubDir = env.githubDir();
+      expect(githubDir).to.equal('andyn190.github.io');
+      done();
+    });
+  });
 });

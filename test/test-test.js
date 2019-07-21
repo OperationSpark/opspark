@@ -33,7 +33,7 @@ const test = proxyquire('../controller/test', {
   },
 });
 
-const projectsDirectory = './test/files/environment/projects';
+const projectsDirectory = './test/files/environment/andyn190.github.io/projects';
 const projectEntriesPath = './test/files/workenvironmentspace/projects/projects.json';
 
 describe('test', function () {
@@ -53,7 +53,7 @@ describe('test', function () {
       expect(fs.existsSync(`${path}/test`)).to.be.false;
       projects.ensureProjectsDirectory();
       fs.mkdirSync(path);
-      fs.writeFileSync(`${path}/package.json`, '{}');
+      fs.writeFileSync(`${path}/package.json`, '{}');s
       test.grabTests(project)
         .then(function () {
           expect(fs.existsSync(`${path}/test`)).to.be.true;

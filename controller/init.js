@@ -60,16 +60,16 @@ module.exports.website = function(next){
 };
 
 function installWebsiteFiles(next) {
-  var rootDirectory = `${env.home()}/environment/${env.githubDir()}/`;
-  var numFiles = configWebsite.url.length;
-  var downloaded = 0;
-  configWebsite.url.forEach(function(fileUrl){
-    var filename = url.parse(fileUrl).pathname.split('/').pop();
-    var message = 'Downloading ' + filename + ', please wait...';
+  const rootDirectory = `${env.home()}/environment/${env.githubDir()}/`;
+  const numFiles = configWebsite.url.length;
+  let downloaded = 0;
+  configWebsite.url.forEach(function (fileUrl) {
+    const filename = url.parse(fileUrl).pathname.split('/').pop();
+    let message = 'Downloading ' + filename + ', please wait...';
     console.log(message.green);
     console.log(fileUrl);
-    var wget = 'wget -nc -P ' + rootDirectory + ' ' + fileUrl;
-    var child = exec(wget, function(err, stdout, stderr) {
+    const wget = 'wget -nc -P ' + rootDirectory + ' ' + fileUrl;
+    const child = exec(wget, function(err, stdout, stderr) {
       if (err) return next(err);
       message = filename + ' downloaded to ' + rootDirectory;
       console.log(message.green);
