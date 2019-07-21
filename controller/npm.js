@@ -8,9 +8,7 @@ const env = require('./env');
 const greenlight = require('./greenlight');
 const projects = require('./projects');
 
-const githubMatch = /[\w]+\.github\.io/;
-const githubDir = fs.readdirSync(`${env.home()}/environment`).filter(path => githubMatch.test(path))[0];
-const rootDirectory = `${env.home()}/environment/${githubDir}`;
+const rootDirectory = `${env.home()}/environment/${env.githubDir()}`;
 const projectsDirectory = `${rootDirectory}/projects`;
 
 /**

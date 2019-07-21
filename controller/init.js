@@ -9,8 +9,6 @@ const janitor = require('./janitor');
 const github = require('./github');
 const configWebsite = require('../config.json').website;
 const configPortfolio = require('../config.json').portfolio;
-const githubMatch = /[\w]+\.github\.io/;
-const githubDir = fs.readdirSync(`${env.home()}/environment`).filter(path => githubMatch.test(path))[0];
 
 const jQueryCdnScript = '    <script src=\"https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js\"></script>\n';
 const portfolioScript = "        <script id=\"portfolioScript\">$(document).ready(function() {$.getJSON('projects/projects.json').then(function(data) { data.projects.forEach(function(project){ $('#portfolio').append('<li><a href=\"projects/' + project.name + '/\">' + project.title + ' : ' + project.description + '</a></li>'); }); }); });</script>\n    </body>";
@@ -28,7 +26,7 @@ function login() {
 module.exports.login = login;
 
 function portfolio(filepath) {
-  filepath = (filepath ? filepath : `${env.home()}/environment/${githubDir}/${configPortfolio.filepath}`);
+  filepath = (filepath ? filepath : `${env.home()}/environment/${env.githubDir()}/${configPortfolio.filepath}`);
   if (!fs.existsSync(filepath)) return console.log(configPortfolio.help.incomplete.red);
   const html = fs.readFileSync(filepath, 'utf8');
   const $ = cheerio.load(html);
@@ -62,7 +60,7 @@ module.exports.website = function(next){
 };
 
 function installWebsiteFiles(next) {
-  var rootDirectory = `${env.home()}/environment/${githubDir}/`;
+  var rootDirectory = `${env.home()}/environment/${env.githubDir()}/`;
   var numFiles = configWebsite.url.length;
   var downloaded = 0;
   configWebsite.url.forEach(function(fileUrl){

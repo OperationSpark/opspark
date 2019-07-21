@@ -14,9 +14,7 @@ const env = require('./env');
 const github = require('./github');
 const { downloadProject } = require('./helpers');
 
-const githubMatch = /[\w]+\.github\.io/;
-const githubPath = fs.readdirSync(`${env.home()}/environment`).filter(path => githubMatch.test(path));
-const rootDirectory = `${env.home()}/environment/${githubPath}`;
+const rootDirectory = `${env.home()}/environment/${env.githubDir()}`;
 const projectEntriesPath = `${rootDirectory}/projects/projects.json`;
 const projectsDirectory = `${rootDirectory}/projects`;
 const cancelOption = '[cancel]';
