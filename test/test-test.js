@@ -53,7 +53,7 @@ describe('test', function () {
       expect(fs.existsSync(`${path}/test`)).to.be.false;
       projects.ensureProjectsDirectory();
       fs.mkdirSync(path);
-      fs.writeFileSync(`${path}/package.json`, '{}');s
+      fs.writeFileSync(`${path}/package.json`, '{}');
       test.grabTests(project)
         .then(function () {
           expect(fs.existsSync(`${path}/test`)).to.be.true;

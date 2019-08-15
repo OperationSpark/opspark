@@ -6,6 +6,7 @@ const mocha = require('mocha');
 const should = require('should');
 const colors = require('colors');
 const init = require('../controller/init');
+
 const tempPortfolioPath = 'test/files/environment/andyn190.github.io/temp-portfolio.html';
 
 describe('init', function () {

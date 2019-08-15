@@ -1,6 +1,7 @@
 require('colors');
 const fs = require('fs');
 const url = require('url');
+const path = require('path');
 const cheerio = require('cheerio');
 const exec = require('child_process').exec;
 const env = require('./env');
@@ -13,6 +14,7 @@ const configPortfolio = require('../config.json').portfolio;
 const jQueryCdnScript = '    <script src=\"https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js\"></script>\n';
 const portfolioScript = "        <script id=\"portfolioScript\">$(document).ready(function() {$.getJSON('projects/projects.json').then(function(data) { data.projects.forEach(function(project){ $('#portfolio').append('<li><a href=\"projects/' + project.name + '/\">' + project.title + ' : ' + project.description + '</a></li>'); }); }); });</script>\n    </body>";
 require('colors');
+const ON_C9 = !!process.env.C9_PROJECT;
 
 
 module.exports.jQueryCdnScript = jQueryCdnScript;
@@ -26,7 +28,10 @@ function login() {
 module.exports.login = login;
 
 function portfolio(filepath) {
-  filepath = (filepath ? filepath : `${env.home()}/environment/${env.githubDir()}/${configPortfolio.filepath}`);
+  if (ON_C9 && !filepath) {
+    filepath = `${env.home()}/environment/${env.githubDir()}/${configPortfolio.filepath}`;
+  }
+  console.log(`${fs.readdirSync(__dirname)}: this is the filePath: ${filepath}`);
   if (!fs.existsSync(filepath)) return console.log(configPortfolio.help.incomplete.red);
   const html = fs.readFileSync(filepath, 'utf8');
   const $ = cheerio.load(html);
@@ -60,7 +65,10 @@ module.exports.website = function(next){
 };
 
 function installWebsiteFiles(next) {
-  const rootDirectory = `${env.home()}/environment/${env.githubDir()}/`;
+  let rootDirectory = path.join(__dirname, `../test/files/environment/${env.githubDir()}`);
+  if (ON_C9) {
+    rootDirectory = `${env.home()}/environment/${env.githubDir()}/`;
+  }
   const numFiles = configWebsite.url.length;
   let downloaded = 0;
   configWebsite.url.forEach(function (fileUrl) {
