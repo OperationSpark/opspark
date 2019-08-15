@@ -71,8 +71,8 @@ describe('init', function () {
         expect(html).to.have.string(init.jQueryCdnScript);
         expect(html).to.have.string(init.portfolioScript);
 
-        fs.unlinkSync('index.html');
-        fs.unlinkSync('portfolio.html');
+        fs.unlinkSync('test/files/environment/andyn190.github.io/index.html');
+        fs.unlinkSync('test/files/environment/andyn190.github.io/portfolio.html');
         done();
       });
     });

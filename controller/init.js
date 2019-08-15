@@ -31,7 +31,6 @@ function portfolio(filepath) {
   if (ON_C9 && !filepath) {
     filepath = `${env.home()}/environment/${env.githubDir()}/${configPortfolio.filepath}`;
   }
-  console.log(`${fs.readdirSync(__dirname)}: this is the filePath: ${filepath}`);
   if (!fs.existsSync(filepath)) return console.log(configPortfolio.help.incomplete.red);
   const html = fs.readFileSync(filepath, 'utf8');
   const $ = cheerio.load(html);
@@ -55,11 +54,11 @@ module.exports.portfolio = portfolio;
  * website project, and initialize the portfolio.html file so teachers
  * or developers can get up to speed quickly.
  */
-module.exports.website = function(next){
+module.exports.website = function (next) {
   console.log('Initializing website project, please wait...'.green);
-  installWebsiteFiles(function(err) {
+  installWebsiteFiles(function(err, filepath) {
     if (err) return console.log(err);
-    portfolio();
+    portfolio(`${filepath}/${configPortfolio.filepath}`);
     typeof next === 'function' && next(null);
   });
 };
@@ -83,7 +82,7 @@ function installWebsiteFiles(next) {
       console.log(message.green);
       if (++downloaded === numFiles) {
         console.log('All website files downloaded.'.green);
-        next(null);
+        next(null, rootDirectory);
       }
     });
   });
