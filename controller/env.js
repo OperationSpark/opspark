@@ -8,5 +8,5 @@ module.exports.hostname = function () {
   return os.hostname();
 };
 
-module.exports.cloud9User = process.env.C9_USER;
+module.exports.cloud9User = !!process.env.C9_USER;
 

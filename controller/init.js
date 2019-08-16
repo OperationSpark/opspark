@@ -8,6 +8,7 @@ const janitor = require('./janitor');
 const github = require('./github');
 const configWebsite = require('../config.json').website;
 const configPortfolio = require('../config.json').portfolio;
+const { home, cloud9User } = require('./env');
 
 const jQueryCdnScript = '    <script src=\"https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js\"></script>\n';
 const portfolioScript = "        <script id=\"portfolioScript\">$(document).ready(function() {$.getJSON('projects/projects.json').then(function(data) { data.projects.forEach(function(project){ $('#portfolio').append('<li><a href=\"projects/' + project.name + '/\">' + project.title + ' : ' + project.description + '</a></li>'); }); }); });</script>\n    </body>";
@@ -59,6 +60,11 @@ module.exports.website = function(next){
 
 function installWebsiteFiles(next) {
   var rootDirectory = './';
+  if (cloud9User) {
+    const githubDir = fs.readdirSync(`${home()}/environment`)
+      .filter(dir => /[\w]+\.github\.io/.test(dir))[0];
+    rootDirectory = `${home()}/environment/${githubDir}`;
+  }
   var numFiles = configWebsite.url.length;
   var downloaded = 0;
   configWebsite.url.forEach(function(fileUrl){

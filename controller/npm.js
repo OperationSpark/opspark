@@ -1,13 +1,19 @@
 const _ = require('lodash');
+const fs = require('fs');
 const inquirer = require('inquirer');
 const changeCase = require('change-case');
 const exec = require('child_process').exec;
 
-const env = require('./env');
+const { home, cloud9User } = require('./env');
 const greenlight = require('./greenlight');
 const projects = require('./projects');
 
-const rootDirectory = `${env.home()}/environment`;
+let rootDirectory = `${home()}/environment`;
+if (cloud9User) {
+  const githubDir = fs.readdirSync(`${home()}/environment`)
+    .filter(dir => /[\w]+\.github\.io/.test(dir))[0];
+  rootDirectory = `${home()}/environment/${githubDir}`;
+}
 const projectsDirectory = `${rootDirectory}/projects`;
 
 /**

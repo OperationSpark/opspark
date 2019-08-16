@@ -13,6 +13,7 @@ const { waterfall, series } = require('async');
 const { home, cloud9User } = require('./env');
 const github = require('./github');
 const { downloadProject } = require('./helpers');
+
 let rootDirectory = `${home()}/environment`;
 if (cloud9User) {
   const githubDir = fs.readdirSync(`${home()}/environment`)
