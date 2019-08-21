@@ -5,8 +5,9 @@ const { home, codenvyUser } = require('./env');
 const projects = require('./projects');
 
 let root = `${home()}/environment`;
-if (codenvyUser) {
-  root = `${codenvyUser}/`;
+if (true) {
+console.log(process.env.CHE_PROJECTS_ROOT);
+  root = `${process.env.CHE_PROJECTS_ROOT}/`;
   const githubDir = fs.readdirSync(`${root}/`)
     .filter(dir => /[\w]+\.github\.io/.test(dir))[0];
   root = `${root}/${githubDir}`;

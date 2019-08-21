@@ -14,7 +14,14 @@ const env = require('./env');
 const github = require('./github');
 const { downloadProject } = require('./helpers');
 
-const rootDirectory = `${env.home()}/environment`;
+let rootDirectory = `${env.home()}/environment`;
+
+if (env.codenvyUser) {
+  rootDirectory = `${process.env.CHE_PROJECTS_ROOT}`;
+  const githubDir = fs.readdirSync(`${rootDirectory}/`)
+    .filter(dir => /[\w]+\.github\.io/.test(dir))[0];
+  rootDirectory = `${rootDirectory}/${githubDir}`;
+}
 const projectEntriesPath = `${rootDirectory}/projects/projects.json`;
 const projectsDirectory = `${rootDirectory}/projects`;
 const cancelOption = '[cancel]';
