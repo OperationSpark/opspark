@@ -7,3 +7,5 @@ module.exports.home = function getUserHome() {
 module.exports.hostname = function () {
   return os.hostname();
 };
+
+module.exports.codenvyUser = process.env.CHE_PROJECTS_ROOT;

@@ -1,10 +1,17 @@
 require('colors');
 const fs = require('fs');
 const _ = require('lodash');
-const env = require('./env');
+const { home, codenvyUser } = require('./env');
 const projects = require('./projects');
 
-const root = `${env.home()}/environment`;
+let root = `${home()}/environment`;
+if (codenvyUser) {
+  root = `${codenvyUser}/`;
+  const githubDir = fs.readdirSync(`${root}/`)
+    .filter(dir => /[\w]+\.github\.io/.test(dir))[0];
+  root = `${root}/${githubDir}`;
+}
+
 const projectsDirectory = `${root}/projects`;
 
 module.exports.error = function (message) {
