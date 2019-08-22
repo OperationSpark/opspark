@@ -54,7 +54,9 @@ module.exports.website = function (next) {
   installWebsiteFiles(function(err) {
     if (err) return console.log(err);
     if (codenvyUser) {
-      portfolio(`${codenvyUser}/${configPortfolio.filepath}`);
+      const githubDir = fs.readdirSync(`${codenvyUser}/`)
+        .filter(dir => /[\w]+\.github\.io/.test(dir))[0];
+      portfolio(`${codenvyUser}/${githubDir}/${configPortfolio.filepath}`);
     }
     portfolio();
     typeof next === 'function' && next(null);
