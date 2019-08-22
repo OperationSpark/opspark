@@ -17,7 +17,7 @@ const { downloadProject } = require('./helpers');
 let rootDirectory = `${env.home()}/environment`;
 
 if (env.codenvyUser) {
-  rootDirectory = `${process.env.CHE_PROJECTS_ROOT}`;
+  rootDirectory = `${env.codenvyUser}`;
   const githubDir = fs.readdirSync(`${rootDirectory}/`)
     .filter(dir => /[\w]+\.github\.io/.test(dir))[0];
   rootDirectory = `${rootDirectory}/${githubDir}`;

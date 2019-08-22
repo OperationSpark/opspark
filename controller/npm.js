@@ -1,4 +1,5 @@
 const _ = require('lodash');
+const fs = require('fs');
 const inquirer = require('inquirer');
 const changeCase = require('change-case');
 const exec = require('child_process').exec;
@@ -7,7 +8,13 @@ const env = require('./env');
 const greenlight = require('./greenlight');
 const projects = require('./projects');
 
-const rootDirectory = `${env.home()}/environment`;
+let rootDirectory = `${env.home()}/environment`;
+if (env.codenvyUser) {
+  rootDirectory = `${env.codenvyUser}`;
+  const githubDir = fs.readdirSync(`${rootDirectory}/`)
+    .filter(dir => /[\w]+\.github\.io/.test(dir))[0];
+  rootDirectory = `${rootDirectory}/${githubDir}`;
+}
 const projectsDirectory = `${rootDirectory}/projects`;
 
 /**

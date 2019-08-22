@@ -18,7 +18,13 @@ const {
   execAsync,
 } = require('./helpers');
 
-const rootDirectory = `${env.home()}/environment`;
+let rootDirectory = `${env.home()}/environment`;
+if (env.codenvyUser) {
+  rootDirectory = `${env.codenvyUser}`;
+  const githubDir = fs.readdirSync(`${rootDirectory}/`)
+    .filter(dir => /[\w]+\.github\.io/.test(dir))[0];
+  rootDirectory = `${rootDirectory}/${githubDir}`;
+}
 const projectsDirectory = `${rootDirectory}/projects`;
 
 // Start of test command

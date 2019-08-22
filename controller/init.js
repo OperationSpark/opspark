@@ -6,6 +6,7 @@ const exec = require('child_process').exec;
 
 const janitor = require('./janitor');
 const github = require('./github');
+const { codenvyUser } = require('./env');
 const configWebsite = require('../config.json').website;
 const configPortfolio = require('../config.json').portfolio;
 
@@ -48,17 +49,26 @@ module.exports.portfolio = portfolio;
  * website project, and initialize the portfolio.html file so teachers
  * or developers can get up to speed quickly.
  */
-module.exports.website = function(next){
+module.exports.website = function (next) {
   console.log('Initializing website project, please wait...'.green);
   installWebsiteFiles(function(err) {
     if (err) return console.log(err);
+    if (codenvyUser) {
+      portfolio(`${codenvyUser}/${configPortfolio.filepath}`);
+    }
     portfolio();
     typeof next === 'function' && next(null);
   });
 };
 
 function installWebsiteFiles(next) {
-  var rootDirectory = './';
+  let rootDirectory = './';
+  if (codenvyUser) {
+    rootDirectory = `${codenvyUser}`;
+    const githubDir = fs.readdirSync(`${rootDirectory}/`)
+      .filter(dir => /[\w]+\.github\.io/.test(dir))[0];
+    rootDirectory = `${rootDirectory}/${githubDir}`;
+  }
   var numFiles = configWebsite.url.length;
   var downloaded = 0;
   configWebsite.url.forEach(function(fileUrl){
