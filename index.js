@@ -3,6 +3,7 @@
 'use strict';
 
 const program = require('commander');
+const fs = require('fs');
 const pjson = require('./package.json');
 
 const init = require('./controller/init');
@@ -127,7 +128,13 @@ function pairdown() {
 }
 
 function initPortfolio() {
+  if (process.env.C9_USER) {
+     const githubDir = fs.readdirSync(`${process.env[(process.platform === 'win32') ? 'USERPROFILE' : 'HOME']}/environment`).filter(dir => /[\w]+\.github\.io/.test(dir))[0];
+      init.portfolio(`${process.env[(process.platform === 'win32') ? 'USERPROFILE' : 'HOME']}/environment/${githubDir}/portfolio.html`);
+      return;
+  }
   init.portfolio();
+  return;
 }
 
 function fix() {
