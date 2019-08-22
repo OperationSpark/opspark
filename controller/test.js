@@ -3,7 +3,7 @@ const fs = require('fs');
 const changeCase = require('change-case');
 const exec = require('child_process').exec;
 
-const env = require('./env');
+const { home, cloud9User } = require('./env');
 const janitor = require('./janitor');
 const github = require('./github');
 const greenlight = require('./greenlight');
@@ -18,7 +18,12 @@ const {
   execAsync,
 } = require('./helpers');
 
-const rootDirectory = `${env.home()}/environment`;
+let rootDirectory = `${home()}/environment`;
+if (cloud9User) {
+  const githubDir = fs.readdirSync(`${home()}/environment`)
+    .filter(dir => /[\w]+\.github\.io/.test(dir))[0];
+  rootDirectory = `${home()}/environment/${githubDir}`;
+}
 const projectsDirectory = `${rootDirectory}/projects`;
 
 // Start of test command
