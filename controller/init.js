@@ -8,10 +8,19 @@ const janitor = require('./janitor');
 const github = require('./github');
 const configWebsite = require('../config.json').website;
 const configPortfolio = require('../config.json').portfolio;
+const { home, cloud9User } = require('./env');
 
 const jQueryCdnScript = '    <script src=\"https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js\"></script>\n';
 const portfolioScript = "        <script id=\"portfolioScript\">$(document).ready(function() {$.getJSON('projects/projects.json').then(function(data) { data.projects.forEach(function(project){ $('#portfolio').append('<li><a href=\"projects/' + project.name + '/\">' + project.title + ' : ' + project.description + '</a></li>'); }); }); });</script>\n    </body>";
 require('colors');
+
+let rootDirectory = './';
+
+if (cloud9User) {
+  const githubDir = fs.readdirSync(`${home()}/environment`)
+    .filter(dir => /[\w]+\.github\.io/.test(dir))[0];
+  rootDirectory = `${home()}/environment/${githubDir}`;
+}
 
 module.exports.jQueryCdnScript = jQueryCdnScript;
 module.exports.portfolioScript = portfolioScript;
@@ -42,23 +51,28 @@ function portfolio(filepath) {
 }
 module.exports.portfolio = portfolio;
 
-// TODO : Consider changing invocation routes from index.js to a switch, by this, we can intercept the commander program object instead of having to test for typeof function for async callbacks //
+// TODO : Consider changing invocation routes from index.js to a switch,
+// by this, we can intercept the commander program object instead of having
+// to test for typeof function for async callbacks //
 /*
  * Will download all files required to kickstart the Operation Spark
  * website project, and initialize the portfolio.html file so teachers
  * or developers can get up to speed quickly.
  */
-module.exports.website = function(next){
+module.exports.website = function (next) {
   console.log('Initializing website project, please wait...'.green);
   installWebsiteFiles(function(err) {
     if (err) return console.log(err);
-    portfolio();
+    if (cloud9User) {
+      portfolio(`${rootDirectory}/${configPortfolio.filepath}`);
+    } else {
+      portfolio();
+    }
     typeof next === 'function' && next(null);
   });
 };
 
 function installWebsiteFiles(next) {
-  var rootDirectory = './';
   var numFiles = configWebsite.url.length;
   var downloaded = 0;
   configWebsite.url.forEach(function(fileUrl){
