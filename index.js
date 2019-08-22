@@ -3,6 +3,7 @@
 'use strict';
 
 const program = require('commander');
+const fs = require('fs');
 const pjson = require('./package.json');
 
 const init = require('./controller/init');
@@ -127,6 +128,11 @@ function pairdown() {
 }
 
 function initPortfolio() {
+  if (process.env.CHE_PROJECTS_ROOT) {
+    const githubDir = fs.readdirSync(`${process.env.CHE_PROJECTS_ROOT}/`)
+      .filter(dir => /[\w]+\.github\.io/.test(dir))[0];
+    init.portfolio(`${process.env.CHE_PROJECTS_ROOT}/${githubDir}/portfolio.html`);
+  }
   init.portfolio();
 }
 
