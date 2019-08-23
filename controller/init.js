@@ -8,18 +8,23 @@ const janitor = require('./janitor');
 const github = require('./github');
 const configWebsite = require('../config.json').website;
 const configPortfolio = require('../config.json').portfolio;
-const { home, cloud9User } = require('./env');
+const { home, cloud9User, codenvyUser } = require('./env');
 
 const jQueryCdnScript = '    <script src=\"https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js\"></script>\n';
 const portfolioScript = "        <script id=\"portfolioScript\">$(document).ready(function() {$.getJSON('projects/projects.json').then(function(data) { data.projects.forEach(function(project){ $('#portfolio').append('<li><a href=\"projects/' + project.name + '/\">' + project.title + ' : ' + project.description + '</a></li>'); }); }); });</script>\n    </body>";
 require('colors');
 
 let rootDirectory = './';
+let githubDir;
 
 if (cloud9User) {
-  const githubDir = fs.readdirSync(`${home()}/environment`)
+  githubDir = fs.readdirSync(`${home()}/environment`)
     .filter(dir => /[\w]+\.github\.io/.test(dir))[0];
   rootDirectory = `${home()}/environment/${githubDir}`;
+} else if (codenvyUser) {
+  rootDirectory = codenvyUser;
+  githubDir = fs.readdirSync(`${codenvyUser}/`).filter(dir => /[\w]+\.github\.io/.test(dir))[0];
+  rootDirectory = `${rootDirectory}/${githubDir}`;
 }
 
 module.exports.jQueryCdnScript = jQueryCdnScript;
@@ -32,8 +37,7 @@ function login() {
 }
 module.exports.login = login;
 
-function portfolio(filepath) {
-  filepath = (filepath ? filepath : configPortfolio.filepath);
+function portfolio(filepath = configPortfolio.filepath) {
   if (!fs.existsSync(filepath)) return console.log(configPortfolio.help.incomplete.red);
   const html = fs.readFileSync(filepath, 'utf8');
   const $ = cheerio.load(html);
@@ -61,9 +65,10 @@ module.exports.portfolio = portfolio;
  */
 module.exports.website = function (next) {
   console.log('Initializing website project, please wait...'.green);
-  installWebsiteFiles(function(err) {
+  installWebsiteFiles(function (err) {
     if (err) return console.log(err);
-    if (cloud9User) {
+    // check if rootDirectory is relative path
+    if (rootDirectory !== './') {
       portfolio(`${rootDirectory}/${configPortfolio.filepath}`);
     } else {
       portfolio();
@@ -73,15 +78,15 @@ module.exports.website = function (next) {
 };
 
 function installWebsiteFiles(next) {
-  var numFiles = configWebsite.url.length;
-  var downloaded = 0;
-  configWebsite.url.forEach(function(fileUrl){
-    var filename = url.parse(fileUrl).pathname.split('/').pop();
-    var message = 'Downloading ' + filename + ', please wait...';
+  const numFiles = configWebsite.url.length;
+  let downloaded = 0;
+  configWebsite.url.forEach(function (fileUrl) {
+    const filename = url.parse(fileUrl).pathname.split('/').pop();
+    let message = 'Downloading ' + filename + ', please wait...';
     console.log(message.green);
     console.log(fileUrl);
-    var wget = 'wget -nc -P ' + rootDirectory + ' ' + fileUrl;
-    var child = exec(wget, function(err, stdout, stderr) {
+    const wget = 'wget -nc -P ' + rootDirectory + ' ' + fileUrl;
+    const child = exec(wget, function (err, stdout, stderr) {
       if (err) return next(err);
       message = filename + ' downloaded to ' + rootDirectory;
       console.log(message.green);

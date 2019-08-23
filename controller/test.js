@@ -3,7 +3,7 @@ const fs = require('fs');
 const changeCase = require('change-case');
 const exec = require('child_process').exec;
 
-const { home, cloud9User } = require('./env');
+const { codenvyUser, home, cloud9User } = require('./env');
 const janitor = require('./janitor');
 const github = require('./github');
 const greenlight = require('./greenlight');
@@ -19,10 +19,17 @@ const {
 } = require('./helpers');
 
 let rootDirectory = `${home()}/environment`;
+let githubDir;
+
 if (cloud9User) {
-  const githubDir = fs.readdirSync(`${home()}/environment`)
+  githubDir = fs.readdirSync(rootDirectory)
     .filter(dir => /[\w]+\.github\.io/.test(dir))[0];
   rootDirectory = `${home()}/environment/${githubDir}`;
+} else if (codenvyUser) {
+  rootDirectory = codenvyUser;
+  githubDir = fs.readdirSync(rootDirectory)
+    .filter(dir => /[\w]+\.github\.io/.test(dir))[0];
+  rootDirectory = `${rootDirectory}/${githubDir}`;
 }
 const projectsDirectory = `${rootDirectory}/projects`;
 

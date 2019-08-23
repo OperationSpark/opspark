@@ -6,6 +6,7 @@ const program = require('commander');
 const fs = require('fs');
 const pjson = require('./package.json');
 
+const env = require('./controller/env');
 const init = require('./controller/init');
 const github = require('./controller/github');
 const install = require('./controller/install');
@@ -128,13 +129,16 @@ function pairdown() {
 }
 
 function initPortfolio() {
-  if (process.env.C9_USER) {
-     const githubDir = fs.readdirSync(`${process.env[(process.platform === 'win32') ? 'USERPROFILE' : 'HOME']}/environment`).filter(dir => /[\w]+\.github\.io/.test(dir))[0];
-      init.portfolio(`${process.env[(process.platform === 'win32') ? 'USERPROFILE' : 'HOME']}/environment/${githubDir}/portfolio.html`);
-      return;
+  if (env.cloud9User) {
+    const githubDir = fs.readdirSync(`${env.home()}/environment`).filter(dir => /[\w]+\.github\.io/.test(dir))[0];
+    init.portfolio(`${env.home()}/environment/${githubDir}/portfolio.html`);
+    return;
+  } else if (env.codenvyUser) {
+    const githubDir = fs.readdirSync(`${env.codenvyUser}`).filter(dir => /[\w]+\.github\.io/.test(dir))[0];
+    init.portfolio(`${env.codenvyUser}/${githubDir}/portfolio.html`);
+    return;
   }
   init.portfolio();
-  return;
 }
 
 function fix() {

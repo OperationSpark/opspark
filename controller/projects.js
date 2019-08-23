@@ -10,16 +10,24 @@ const changeCase = require('change-case');
 const exec = require('child_process').exec;
 const { waterfall, series } = require('async');
 
-const { home, cloud9User } = require('./env');
+const { home, cloud9User, codenvyUser } = require('./env');
 const github = require('./github');
 const { downloadProject } = require('./helpers');
 
 let rootDirectory = `${home()}/environment`;
+let githubDir;
+
 if (cloud9User) {
-  const githubDir = fs.readdirSync(`${home()}/environment`)
+  githubDir = fs.readdirSync(`${rootDirectory}`)
     .filter(dir => /[\w]+\.github\.io/.test(dir))[0];
   rootDirectory = `${home()}/environment/${githubDir}`;
+} else if (codenvyUser) {
+  rootDirectory = codenvyUser;
+  githubDir = fs.readdirSync(`${rootDirectory}/`)
+    .filter(dir => /[\w]+\.github\.io/.test(dir))[0];
+  rootDirectory = `${rootDirectory}/${githubDir}`;
 }
+
 const projectEntriesPath = `${rootDirectory}/projects/projects.json`;
 const projectsDirectory = `${rootDirectory}/projects`;
 const cancelOption = '[cancel]';

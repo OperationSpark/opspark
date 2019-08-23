@@ -1,15 +1,22 @@
 require('colors');
 const fs = require('fs');
 const _ = require('lodash');
-const { home, cloud9User } = require('./env');
+const { home, codenvyUser, cloud9User } = require('./env');
 const projects = require('./projects');
 
 let root = `${home()}/environment`;
-if (cloud9User) {
-  const githubDir = fs.readdirSync(`${home()}/environment`)
+let githubDir;
+if (codenvyUser) {
+  root = `${codenvyUser}`;
+  githubDir = fs.readdirSync(`${root}/`)
     .filter(dir => /[\w]+\.github\.io/.test(dir))[0];
-  root = `${home()}/environment/${githubDir}`;
+  root = `${root}/${githubDir}`;
+} else if (cloud9User) {
+  githubDir = fs.readdirSync(`${root}/`)
+    .filter(dir => /[\w]+\.github\.io/.test(dir))[0];
+  root = `${root}/${githubDir}`;
 }
+
 const projectsDirectory = `${root}/projects`;
 
 module.exports.error = function (message) {
