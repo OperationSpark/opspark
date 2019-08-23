@@ -7,10 +7,7 @@ module.exports.home = function getUserHome() {
 module.exports.hostname = function () {
   return os.hostname();
 };
-
-<<<<<<< HEAD
+// codenvy project filePath /projects
 module.exports.codenvyUser = process.env.CHE_PROJECTS_ROOT;
-=======
+// cloud9 user name
 module.exports.cloud9User = !!process.env.C9_USER;
-
->>>>>>> 1bff9e7535c8fcf46b2ef519d8e0ad189e4553a4

@@ -129,12 +129,15 @@ function pairdown() {
 
 function initPortfolio() {
   if (process.env.C9_USER) {
-     const githubDir = fs.readdirSync(`${process.env[(process.platform === 'win32') ? 'USERPROFILE' : 'HOME']}/environment`).filter(dir => /[\w]+\.github\.io/.test(dir))[0];
-      init.portfolio(`${process.env[(process.platform === 'win32') ? 'USERPROFILE' : 'HOME']}/environment/${githubDir}/portfolio.html`);
-      return;
+    const githubDir = fs.readdirSync(`${process.env[(process.platform === 'win32') ? 'USERPROFILE' : 'HOME']}/environment`).filter(dir => /[\w]+\.github\.io/.test(dir))[0];
+    init.portfolio(`${process.env[(process.platform === 'win32') ? 'USERPROFILE' : 'HOME']}/environment/${githubDir}/portfolio.html`);
+    return;
+  } else if (process.env.CHE_PROJECTS_ROOT) {
+    const githubDir = fs.readdirSync(`${process.env.CHE_PROJECTS_ROOT}`).filter(dir => /[\w]+\.github\.io/.test(dir))[0];
+    init.portfolio(`${process.env.CHE_PROJECTS_ROOT}/${githubDir}/portfolio.html`);
+    return;
   }
   init.portfolio();
-  return;
 }
 
 function fix() {

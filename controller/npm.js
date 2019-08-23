@@ -4,16 +4,25 @@ const inquirer = require('inquirer');
 const changeCase = require('change-case');
 const exec = require('child_process').exec;
 
-const { home, cloud9User } = require('./env');
+const { home, cloud9User, codenvyUser } = require('./env');
 const greenlight = require('./greenlight');
 const projects = require('./projects');
 
 let rootDirectory = `${home()}/environment`;
+let githubDir;
 if (cloud9User) {
-  const githubDir = fs.readdirSync(`${home()}/environment`)
+  // if on cloud9, use project root at environment to get github repo
+  githubDir = fs.readdirSync(`${rootDirectory}`)
     .filter(dir => /[\w]+\.github\.io/.test(dir))[0];
-  rootDirectory = `${home()}/environment/${githubDir}`;
+  rootDirectory = `${rootDirectory}/${githubDir}`;
+} else if (codenvyUser) {
+  // else if on codenvy, look for github repo on root from app env
+  rootDirectory = codenvyUser;
+  githubDir = fs.readdirSync(`${rootDirectory}`)
+    .filter(dir => /[\w]+\.github\.io/.test(dir))[0];
+  rootDirectory = `${rootDirectory}/${githubDir}`;
 }
+
 const projectsDirectory = `${rootDirectory}/projects`;
 
 /**
