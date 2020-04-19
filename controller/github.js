@@ -37,7 +37,12 @@ function getCredentials() {
     } else {
       authorizeUser()
         .then(user => res(user))
-        .catch(err => rej(err));
+        .catch(err => {
+          console.error('Error Authorizing user');
+          console.error(JSON.stringify(err));
+          console.error('************');
+          rej(err)
+        });
     }
   });
 }
