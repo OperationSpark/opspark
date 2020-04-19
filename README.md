@@ -160,3 +160,23 @@ For teachers or developers instructing classes, you may choose to install a proj
     os install -m
 
 After selecting and confirming installation, you'll find any master files in the hidden directory of `.master`.
+
+### Authoring Testable Projects
+
+*For automated testing with opspark utility*
+* Tests must be in a `test` directory top level of repo
+  * NOT spec, NOT Test, NOT tests 
+  * `test` directory should also contain a `mocha.opts` file
+* Mocha.opts file MUST have `—reporter json`
+* Other mocha adjustments (timeout, etc) are optional
+If projects update pages dynamically (ex. jQuery) they must be served to run tests
+* Example here https://github.com/livrush/product-project/tree/test
+* `Server.js` (or other named server file) MUST be in `test` directory
+* Running `mocha ./test/products.spec.js` also runs server.js
+* Mocha 3.4.1 seems to run all files in the specified directory, allowing the project to be served, then it is imported into the tests using zombie.
+Script to run tests MUST be input as `npm test` in `package.json`. 
+* Doesn’t matter if it’s mocha/qunit/jasmine/whatever
+* Technically opspark only runs with mocha at the moment, since it gets the results from mocha json reporter.
+* If you need to run multiple scripts, they can all happen in `npm test`.
+`package.json` must be in top level of repo as well
+
