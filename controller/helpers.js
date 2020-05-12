@@ -40,7 +40,7 @@ module.exports.checkGithubAuth = function (token, userAgent) {
 };
 
 module.exports.downloadProject = function (url, token, directory) {
-  return `svn co ${url}/trunk --password ${token} ${directory}`;
+  return `svn co ${url}/ --password ${token} ${directory}`;
 };
 
 module.exports.downloadProjectTests = function (url, token, directory) {
