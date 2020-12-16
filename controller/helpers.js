@@ -70,3 +70,7 @@ module.exports.installProjectDependenciesCmd = function(directory) {
 module.exports.removeProjectTestsCmd = function(directory) {
   return `rm -rf ${directory}/test`;
 };
+
+module.exports.getGithubID = function (token) {
+  return `curl -H "Accept: application/vnd.github.v3+json" -H "Authorization: Bearer ${token}" https://api.github.com/user`;
+};

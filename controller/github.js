@@ -11,7 +11,15 @@ const exec = require('child_process').exec;
 const env = require('./env');
 const config = require('../config');
 const janitor = require('./janitor');
-const { createGithubToken, deleteGithubToken, readGithubAuths, checkGithubAuth, createClient, getClient } = require('./helpers');
+const {
+  createGithubToken,
+  deleteGithubToken,
+  readGithubAuths,
+  checkGithubAuth,
+  createClient,
+  getClient,
+  getGithubID
+} = require('./helpers');
 
 const applicationDirectory = `${env.home()}/opspark`;
 const authFilePath = `${applicationDirectory}/auth`;
@@ -46,8 +54,10 @@ module.exports.getCredentials = getCredentials;
 
 function authorizeUser() {
   return promptForUserInfo()
-    .then(obtainAndWriteAuth)
-    .then(obtainAndWriteUser)
+    // .then(obtainAndWriteAuth)
+    // .then(obtainAndWriteUser)
+    .then(writeAuth)
+    .then(writeUser)
     .then(() => {
       const creds = {
         login: grabLocalLogin(),
@@ -71,9 +81,9 @@ function promptForUserInfo() {
           required: true
         },
         {
-          message: 'Enter your GitHub password',
-          name: 'password',
-          type: 'password',
+          message: 'Enter your GitHub personal token',
+          name: 'token',
+          type: 'token',
           hidden: true,
           conform: () => true,
         }
@@ -92,8 +102,8 @@ function writeAuth(auth) {
   console.log('Writing auth. . .'.yellow);
   return new Promise(function (res, rej) {
     ensureApplicationDirectory();
-    fsJson.saveSync(authFilePath, auth);
-    res(true);
+    fsJson.saveSync(authFilePath, { token: auth.token });
+    res(auth);
   });
 }
 
@@ -120,13 +130,22 @@ function obtainAndWriteAuth({ username, password }) {
 
 module.exports.obtainAndWriteAuth = obtainAndWriteAuth;
 
-function writeUser(user) {
+function writeUser(auth) {
   deleteUser();
   console.log('Writing user. . .'.yellow);
   return new Promise(function (res, rej) {
-    ensureApplicationDirectory();
-    fsJson.saveSync(userFilePath, user);
-    res(user);
+    const cmd = getGithubID(auth.token);
+    exec(cmd, function (err, stdout, stderr) {
+      const { id, message } = JSON.parse(stdout);
+      if (err) {
+        rej(err);
+      } else if (message) {
+        rej(message);
+      }
+      ensureApplicationDirectory();
+      fsJson.saveSync(userFilePath, { id, username: auth.username });
+      res(auth);
+    });
   });
 }
 
@@ -270,7 +289,7 @@ module.exports.grabLocalAuthToken = grabLocalAuthToken;
 function deauthorizeUser() {
   return new Promise(function (res, rej) {
     promptForUserInfo()
-      .then(deleteToken)
+      // .then(deleteAuth)
       .then(deleteUserInfo)
       .then(() => {
         console.log('Successfully logged out!'.blue);
