@@ -135,10 +135,10 @@ describe('test', function () {
       passTests(project)
         .then(function (result) {
           const stats = result.testResults.stats;
-          expect(log.calledWith(' Total tests:    4  '.bgBlack.white)).to.be.true;
-          expect(log.calledWith(' Passing tests:  4  '.bgBlue.white)).to.be.true;
-          expect(log.calledWith(' Pending tests:  0  '.bgYellow.black)).to.be.true;
-          expect(log.calledWith(' Failing tests:  0  '.bgRed.white)).to.be.true;
+          expect(log.calledWith(' Total tests:    4  '.bgBlack().white())).to.be.true;
+          expect(log.calledWith(' Passing tests:  4  '.bgBlue().white())).to.be.true;
+          expect(log.calledWith(' Pending tests:  0  '.bgYellow().black())).to.be.true;
+          expect(log.calledWith(' Failing tests:  0  '.bgRed().white())).to.be.true;
           done();
         });
     });
@@ -148,10 +148,10 @@ describe('test', function () {
       failTests(project)
         .then(function (result) {
           const stats = result.testResults.stats;
-          expect(log.calledWith(' Total tests:    4  '.bgBlack.white)).to.be.true;
-          expect(log.calledWith(' Passing tests:  0  '.bgBlue.white)).to.be.true;
-          expect(log.calledWith(' Pending tests:  0  '.bgYellow.black)).to.be.true;
-          expect(log.calledWith(' Failing tests:  4  '.bgRed.white)).to.be.true;
+          expect(log.calledWith(' Total tests:    4  '.bgBlack().white())).to.be.true;
+          expect(log.calledWith(' Passing tests:  0  '.bgBlue().white())).to.be.true;
+          expect(log.calledWith(' Pending tests:  0  '.bgYellow().black())).to.be.true;
+          expect(log.calledWith(' Failing tests:  4  '.bgRed().white())).to.be.true;
           done();
         });
     });
