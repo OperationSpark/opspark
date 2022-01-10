@@ -1,4 +1,4 @@
-require('colors');
+require('cli-color');
 const fs = require('fs');
 const _ = require('lodash');
 const { home, codenvyUser, cloud9User } = require('./env');
