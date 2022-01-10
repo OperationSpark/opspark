@@ -1,4 +1,4 @@
-require('colors');
+require('cli-color');
 const rp = require('request-promise');
 
 const github = require('./github');

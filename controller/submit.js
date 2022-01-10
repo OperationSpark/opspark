@@ -1,4 +1,4 @@
-require('colors');
+require('cli-color');
 const exec = require('child_process').exec;
 
 const janitor = require('./janitor');

@@ -1,4 +1,4 @@
-require('colors');
+require('cli-color');
 const fs = require('fs');
 const changeCase = require('change-case');
 const exec = require('child_process').exec;

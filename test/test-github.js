@@ -1,7 +1,7 @@
 /* global describe it expect before beforeEach afterEach */
 require('mocha');
 require('should');
-require('colors');
+require('cli-color');
 const _ = require('lodash');
 const util = require('util');
 const fs = require('fs-extra');
@@ -335,7 +335,7 @@ describe('github', function () {
 
   describe('#authorizeUser()', function () {
     github.deleteUserInfo();
-    
+
     it('should return a promise', function () {
       expect(github.authorizeUser()).to.be.an.instanceof(Promise);
     });

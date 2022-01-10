@@ -1,7 +1,7 @@
 /* global describe it expect before beforeEach afterEach after */
 require('mocha');
 require('should');
-require('colors');
+require('cli-color');
 const _ = require('lodash');
 const util = require('util');
 const fs = require('fs-extra');
@@ -19,7 +19,7 @@ describe('greenlight', function () {
   afterEach(function () {
     if (console.log.restore) console.log.restore();
   });
- 
+
   describe('#getSessions()', function () {
     it('should return sessions for enrolled student', function (done) {
       const greenlight = proxyquire('../controller/greenlight', {
