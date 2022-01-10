@@ -134,7 +134,7 @@ const installPackages = function (all, project, pkg) {
   const cmd = `${enterDirectory} && ${installCmd}`;
   exec(cmd, function (err) {
     if (err) return console.log('error:'.red, err);
-    console.log('Successfully installed'.green);
+    console.log('Successfully installed'.green());
   });
 };
 
@@ -144,6 +144,6 @@ const startProject = function (project) {
   const cmd = `${enterDirectory} && npm start`;
   exec(cmd, function (err) {
     if (err) return console.log('error:'.red, err);
-    console.log('Going going going. . .'.yellow);
+    console.log('Going going going. . .'.yellow());
   });
 };

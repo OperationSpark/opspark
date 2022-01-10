@@ -11,7 +11,7 @@ const URI = GREENLIGHT;
 module.exports.URI = URI;
 
 function getSessions({ id }) {
-  console.log('Grabbing enrolled sessions. . .'.yellow);
+  console.log('Grabbing enrolled sessions. . .'.yellow());
   const options = {
     method: 'GET',
     uri: `${URI}/api/os/install`,
@@ -25,7 +25,7 @@ function getSessions({ id }) {
 module.exports.getSessions = getSessions;
 
 function getGradable({ id }) {
-  console.log('Grabbing enrolled sessions. . .'.yellow);
+  console.log('Grabbing enrolled sessions. . .'.yellow());
   const options = {
     method: 'GET',
     uri: `${URI}/api/os/submit`,

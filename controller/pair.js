@@ -19,9 +19,9 @@ module.exports.up = function (complete) {
       github.user(username, function (err, user) {
         if (err) return complete(err);
         projects.list(function (err, list) {
-          if (err) return console.log(err + ''.red);
+          if (err) return console.log(err + ''.red());
           projects.selectProject(list, function (err, project) {
-            if (err) return console.log(err + ''.red);
+            if (err) return console.log(err + ''.red());
             projects.installProject(project, username, function () {
               console.log('You\'ve paired up with %s'.blue, username);
               complete(null);
@@ -78,7 +78,7 @@ function listPartneredProjects(projects) {
     }],
     function (response) {
       if (response.project === cancelOption) {
-        console.log('Installation cancelled, bye bye!'.green);
+        console.log('Installation cancelled, bye bye!'.green());
         process.exit();
       }
       var pairedProject = _.filter(pairedOnProjects, {

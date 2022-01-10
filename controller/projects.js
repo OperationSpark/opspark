@@ -75,7 +75,7 @@ function selectProject({ session, projectAction }) {
 module.exports.selectProject = selectProject;
 
 function listProjects(session, listAction) {
-  console.log('Grabbing projects. . .'.yellow);
+  console.log('Grabbing projects. . .'.yellow());
   const projects = session.PROJECT;
   let files;
   let testableProjects;
@@ -140,7 +140,7 @@ function uninstallProject(project) {
         const name = changeCase.paramCase(project.name);
         const projectDirectory = `${rootDirectory}/projects/${name}`;
         removeProjectEntry(project);
-        console.log('Removing project directory. . .'.red);
+        console.log('Removing project directory. . .'.red());
         exec(`rm -rf ${projectDirectory}`, function () {
           res(project);
         })
@@ -153,7 +153,7 @@ function uninstallProject(project) {
 module.exports.uninstallProject = uninstallProject;
 
 function shelveProject(project) {
-  console.log('Fetching directory. . .'.yellow);
+  console.log('Fetching directory. . .'.yellow());
   return new Promise(function (res, rej) {
     removeProjectEntry(project);
     const name = changeCase.paramCase(project.name);
@@ -166,7 +166,7 @@ function shelveProject(project) {
       return s;
     }, '');
     const cmd = `mv ${path}/${name} ${path}/${underscores}_${name}`;
-    console.log('Shelving project. . .'.yellow);
+    console.log('Shelving project. . .'.yellow());
     exec(cmd, function () {
       res(`${path}/${underscores}_${name}`);
     });
@@ -178,7 +178,7 @@ module.exports.shelveProject = shelveProject;
 function initializeProject(project) {
   const projectName = changeCase.paramCase(project.name);
   const projectDirectory = `${projectsDirectory}/${projectName}`;
-  console.log('Initializing project. . .'.yellow)
+  console.log('Initializing project. . .'.yellow())
   return new Promise(function (res, rej) {
     series(
       [
@@ -238,7 +238,7 @@ function appendProjectEntry(project, pairedWith, complete) {
 module.exports.appendProjectEntry = appendProjectEntry;
 
 function removeProjectEntry(project) {
-  console.log('Removing entry from projects.json. . .'.red);
+  console.log('Removing entry from projects.json. . .'.red());
   const projectEntries = loadOrCreateEntries();
   const index = projectEntries.projects.reduce(function (s, p, i) {
     if (p.name === project.name) {
@@ -248,14 +248,14 @@ function removeProjectEntry(project) {
   }, -1);
   projectEntries.projects.splice(index, 1);
   fsJson.saveSync(projectEntriesPath, projectEntries);
-  console.log('Successfully removed!'.red);
+  console.log('Successfully removed!'.red());
 }
 
 module.exports.removeProjectEntry = removeProjectEntry;
 
 function installBower(projectDirectory, complete) {
   if (!fs.existsSync(`${projectDirectory}/bower.json`)) return complete();
-  console.log('Installing bower components, please wait...'.green);
+  console.log('Installing bower components, please wait...'.green());
   exec(`cd ${projectDirectory} && bower install -F`, function (err, stdout) {
     if (err) throw err;
     console.log('Bower components installed for project %s!'.green, projectDirectory);

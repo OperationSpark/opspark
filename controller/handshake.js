@@ -22,7 +22,7 @@ function readHandshake() {
 // Checks if directory exists and creates if not
 function checkForDirectory(path) {
   if (!fs.existsSync(path)) {
-    console.log('Creating new directory'.yellow);
+    console.log('Creating new directory'.yellow());
     mkdirp.sync(path);
   }
 }
@@ -48,23 +48,23 @@ function storeCreds(body, hash) {
   checkForDirectory(filePath);
 
   if (fs.existsSync(path)) {
-    console.log('Hey, this file is already there!'.red);
+    console.log('Hey, this file is already there!'.red());
     view.inquireForInput('Overwrite file? (y/n)', (err, input) => {
       console.log(input);
       if (err) {
-        console.warn('Something went wrong! Run that code again.'.red);
+        console.warn('Something went wrong! Run that code again.'.red());
       } else if (input.toLowerCase()[0] === 'y') {
-        console.warn('Rewriting. . .'.yellow);
+        console.warn('Rewriting. . .'.yellow());
         fs.writeFileSync(path, JSON.stringify(userInfo));
-        console.warn('All done!'.green);
+        console.warn('All done!'.green());
       } else {
-        console.warn('Exiting without overwrite.'.green);
+        console.warn('Exiting without overwrite.'.green());
       }
     });
   } else {
     console.warn('Writing file. . .');
     fsJson.saveSync(path, JSON.stringify(userInfo));
-    console.warn('All done!'.green);
+    console.warn('All done!'.green());
   }
 }
 

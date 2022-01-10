@@ -37,23 +37,23 @@ const projectsDirectory = `${rootDirectory}/projects`;
 // Runs the listProjectsOf function from projects to select project
 // that user wants to be tested
 function test() {
-  console.log('Beginning test process!'.blue);
+  console.log('Beginning test process!'.blue());
   projects.action = 'test';
   github.getCredentials()
-    .catch(janitor.error('Failure getting credentials'.red))
+    .catch(janitor.error('Failure getting credentials'.red()))
     .then(greenlight.getGradable)
-    .catch(janitor.error('Failure getting sessions'.red))
+    .catch(janitor.error('Failure getting sessions'.red()))
     .then(sessions.selectSession)
-    .catch(janitor.error('Failure selecting session'.red))
+    .catch(janitor.error('Failure selecting session'.red()))
     .then(projects.selectProject)
-    .catch(janitor.error('Failure selecting project'.red))
+    .catch(janitor.error('Failure selecting project'.red()))
     .then(grabTests)
-    .catch(janitor.error('Failure grabbing tests'.red))
+    .catch(janitor.error('Failure grabbing tests'.red()))
     .then(runTests)
-    .catch(janitor.error('Failure running tests'.red))
+    .catch(janitor.error('Failure running tests'.red()))
     .then(displayResults)
-    .catch(janitor.error('Failure displaying results'.red))
-    .then(() => console.log('Successfully concluded test.'.blue))
+    .catch(janitor.error('Failure displaying results'.red()))
+    .then(() => console.log('Successfully concluded test.'.blue()))
     .catch((err) => { console.error(err); });
 }
 
@@ -70,16 +70,16 @@ function grabTests(project) {
     const cmd = downloadProjectTests(project.url, github.grabLocalAuthToken(), directory);
     const pckgCmd = downloadProjectPackage(project.url, github.grabLocalAuthToken(), directory);
     if (fs.existsSync(`${directory}/test`)) {
-      console.log('Skipping tests.'.green);
+      console.log('Skipping tests.'.green());
       res(project);
     } else {
       exec(cmd, function (error) {
         if (error) return rej(error);
-        console.log('Successfully downloaded tests!'.green);
+        console.log('Successfully downloaded tests!'.green());
         if (!fs.existsSync(`${directory}/package.json`)) {
           console.log(`Downloading Package.json for ${name}. . .`.yellow);
           exec(pckgCmd, function () {
-            console.log('Package.json successfully installed'.green);
+            console.log('Package.json successfully installed'.green());
             res(project);
           });
         } else {
@@ -108,7 +108,7 @@ function runTests(project) {
   const installProjectDependencies = () => execAsync(installProjectDependenciesCmd(directory));
   const removeProjectTests = () => execAsync(removeProjectTestsCmd(directory))
 
-  console.log('Running tests. . .'.yellow);
+  console.log('Running tests. . .'.yellow());
 
   return Promise.resolve()
     .then(() => installProjectDependencies())
@@ -151,7 +151,7 @@ function displayResults({ testResults }) {
     return { pass: false };
   }
 
-  console.log('You did it! 100% complete, now please run'.green, 'os submit'.red);
+  console.log('You did it! 100% complete, now please run'.green, 'os submit'.red());
   return { pass: true };
 }
 

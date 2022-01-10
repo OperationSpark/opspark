@@ -32,7 +32,7 @@ module.exports.portfolioScript = portfolioScript;
 
 function login() {
   github.getCredentials()
-    .then(() => console.log('Have fun!'.blue))
+    .then(() => console.log('Have fun!'.blue()))
     .catch(err => console.error('Failure getting credentials\n'.red, err));
 }
 module.exports.login = login;
@@ -64,7 +64,7 @@ module.exports.portfolio = portfolio;
  * or developers can get up to speed quickly.
  */
 module.exports.website = function (next) {
-  console.log('Initializing website project, please wait...'.green);
+  console.log('Initializing website project, please wait...'.green());
   installWebsiteFiles(function (err) {
     if (err) return console.log(err);
     // check if rootDirectory is relative path
@@ -91,7 +91,7 @@ function installWebsiteFiles(next) {
       message = filename + ' downloaded to ' + rootDirectory;
       console.log(message.green);
       if (++downloaded === numFiles) {
-        console.log('All website files downloaded.'.green);
+        console.log('All website files downloaded.'.green());
         next(null);
       }
     });
