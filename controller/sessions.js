@@ -1,4 +1,4 @@
-require('colors');
+require('../lib/colours');
 const _ = require('lodash');
 const inquirer = require('inquirer');
 const { waterfall } = require('async');

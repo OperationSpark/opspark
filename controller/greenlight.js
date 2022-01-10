@@ -1,4 +1,4 @@
-require('colors');
+require('../lib/colours');
 const rp = require('request-promise');
 
 const github = require('./github');

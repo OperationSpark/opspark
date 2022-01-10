@@ -1,7 +1,7 @@
 /* global describe it expect before beforeEach afterEach */
 require('mocha');
 require('should');
-require('colors');
+require('../lib/colours');
 const fs = require('fs');
 const _ = require('lodash');
 const util = require('util');

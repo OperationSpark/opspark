@@ -1,4 +1,4 @@
-require('colors');
+require('../lib/colours');
 const fs = require('fs');
 const util = require('util');
 const prompt = require('inquirer').prompt;

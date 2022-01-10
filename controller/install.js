@@ -1,4 +1,5 @@
-require('colors');
+
+require('../lib/colours');
 
 const janitor = require('./janitor');
 const github = require('./github');
@@ -7,6 +8,8 @@ const projects = require('./projects');
 const sessions = require('./sessions');
 
 module.exports = function () {
+  console.log('String.prototype', String.prototype);
+
   console.log('Beginning install process!'.blue());
   projects.action = 'install';
   github.getCredentials()

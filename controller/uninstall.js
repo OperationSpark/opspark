@@ -1,4 +1,4 @@
-require('colors');
+require('../lib/colours');
 const janitor = require('./janitor');
 const github = require('./github');
 const greenlight = require('./greenlight');

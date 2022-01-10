@@ -4,9 +4,9 @@ const chai = require('./helpers/chai');
 const sinon = require('sinon');
 const mocha = require('mocha');
 const should = require('should');
-const colors = require('colors');
 const init = require('../controller/init');
 const tempPortfolioPath = 'test/files/environment/temp-portfolio.html';
+require('../lib/colours');
 
 describe('init', function () {
   afterEach(function () {

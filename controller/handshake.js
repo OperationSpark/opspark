@@ -1,4 +1,4 @@
-require('colors');
+require('../lib/colours');
 const fs = require('fs');
 const mkdirp = require('mkdirp');
 const fsJson = require('fs-json')();

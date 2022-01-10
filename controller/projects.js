@@ -1,4 +1,4 @@
-require('colors');
+require('../lib/colours');
 const fs = require('fs');
 const _ = require('lodash');
 const mkdirp = require('mkdirp');

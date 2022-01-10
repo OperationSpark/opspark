@@ -5,11 +5,12 @@ var
   Q = require('q'),
   inquirer = require('inquirer'),
   cancelOption = '[cancel]',
-  colors = require('colors'),
   view = require('../view'),
   github = require('./github'),
   projects = require('./projects'),
   _session;
+
+require('../lib/colours');
 
 // TODO : Promisify
 module.exports.up = function (complete) {

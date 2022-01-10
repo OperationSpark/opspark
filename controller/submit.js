@@ -1,4 +1,4 @@
-require('colors');
+require('../lib/colours');
 const exec = require('child_process').exec;
 
 const janitor = require('./janitor');
