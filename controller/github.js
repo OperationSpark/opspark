@@ -9,7 +9,7 @@ const rp = require('request-promise');
 const exec = require('child_process').exec;
 
 const env = require('./env');
-const config = require('../config');
+const config = require('../config.json');
 const janitor = require('./janitor');
 const {
   createGithubToken,
