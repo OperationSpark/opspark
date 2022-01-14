@@ -1,4 +1,4 @@
-require('colors');
+require('cli-color');
 const _ = require('lodash');
 const inquirer = require('inquirer');
 const { waterfall } = require('async');

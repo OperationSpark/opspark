@@ -5,7 +5,7 @@ var
   Q = require('q'),
   inquirer = require('inquirer'),
   cancelOption = '[cancel]',
-  colors = require('colors'),
+  colors = require('cli-color'),
   view = require('../view'),
   github = require('./github'),
   projects = require('./projects'),
