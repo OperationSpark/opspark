@@ -9,9 +9,17 @@ const rp = require('request-promise');
 const exec = require('child_process').exec;
 
 const env = require('./env');
-const config = require('../config');
+const config = require('../config.json');
 const janitor = require('./janitor');
-const { createGithubToken, deleteGithubToken, readGithubAuths, checkGithubAuth, createClient, getClient } = require('./helpers');
+const {
+  createGithubToken,
+  deleteGithubToken,
+  readGithubAuths,
+  checkGithubAuth,
+  createClient,
+  getClient,
+  getGithubID
+} = require('./helpers');
 
 const applicationDirectory = `${env.home()}/opspark`;
 const authFilePath = `${applicationDirectory}/auth`;
@@ -46,8 +54,8 @@ module.exports.getCredentials = getCredentials;
 
 function authorizeUser() {
   return promptForUserInfo()
-    .then(obtainAndWriteAuth)
-    .then(obtainAndWriteUser)
+    .then(writeAuth)
+    .then(writeUser)
     .then(() => {
       const creds = {
         login: grabLocalLogin(),
@@ -71,9 +79,9 @@ function promptForUserInfo() {
           required: true
         },
         {
-          message: 'Enter your GitHub password',
-          name: 'password',
-          type: 'password',
+          message: 'Enter your GitHub personal token',
+          name: 'token',
+          type: 'token',
           hidden: true,
           conform: () => true,
         }
@@ -92,8 +100,8 @@ function writeAuth(auth) {
   console.log('Writing auth. . .'.yellow);
   return new Promise(function (res, rej) {
     ensureApplicationDirectory();
-    fsJson.saveSync(authFilePath, auth);
-    res(true);
+    fsJson.saveSync(authFilePath, { token: auth.token });
+    res(auth);
   });
 }
 
@@ -120,13 +128,29 @@ function obtainAndWriteAuth({ username, password }) {
 
 module.exports.obtainAndWriteAuth = obtainAndWriteAuth;
 
-function writeUser(user) {
+function writeUser(auth) {
   deleteUser();
   console.log('Writing user. . .'.yellow);
   return new Promise(function (res, rej) {
-    ensureApplicationDirectory();
-    fsJson.saveSync(userFilePath, user);
-    res(user);
+    const cmd = getGithubID(auth.token);
+    exec(cmd, function (err, stdout, stderr) {
+      try {
+        const { id, message } = JSON.parse(stdout);
+        if (err) {
+          rej(err);
+        } else if (message) {
+          rej(message);
+        }
+        ensureApplicationDirectory();
+        fsJson.saveSync(userFilePath, {
+          id,
+          username: auth.username
+        });
+        res(auth);
+      } catch (_err) {
+        return rej(`Non-JSON response:\n${stdout}`);
+      }
+    });
   });
 }
 
@@ -270,7 +294,7 @@ module.exports.grabLocalAuthToken = grabLocalAuthToken;
 function deauthorizeUser() {
   return new Promise(function (res, rej) {
     promptForUserInfo()
-      .then(deleteToken)
+      // .then(deleteAuth)
       .then(deleteUserInfo)
       .then(() => {
         console.log('Successfully logged out!'.blue);
@@ -339,41 +363,3 @@ function getNoteForHost() {
 }
 
 module.exports.getNoteForHost = getNoteForHost;
-
-// module.exports.repo = function (username, repoName, complete) {
-//   getOrCreateClient()
-//     .then(function (client) {
-//       const ghrepo = client.repo(`${username}/${username}.github.io`);
-//       ghrepo.info(function (er, statu, bod, header) {
-//         console.log(bod);
-//         complete(null, bod);
-//       });
-//     })
-//     .catch(err => console.error(err));
-// };
-
-// module.exports.limit = function (complete) {
-//   getOrCreateClient()
-//     .then(function (client) {
-//       client.limit(function (err, left, max) {
-//         if (err) return complete(err);
-//         const message = `GitHub limit: ${left} used of ${max}.`;
-//         complete(null, message);
-//       });
-//     })
-//     .catch(err => console.error(err));
-// };
-
-// function repos(complete) {
-//   // the client also initializes opspark, which isn't very clear -
-//   // perhaps you should refactor to create opspark here, or? //
-//   getOrCreateClient()
-//     .then(function (client) {
-//       _opspark.repos(1, 100, function (repos) {
-//         // if (err) return complete(err);
-//         complete(null, repos);
-//       });
-//     })
-//     .catch(err => console.log(err));
-// }
-// module.exports.repos = repos;
