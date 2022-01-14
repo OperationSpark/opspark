@@ -54,8 +54,6 @@ module.exports.getCredentials = getCredentials;
 
 function authorizeUser() {
   return promptForUserInfo()
-    // .then(obtainAndWriteAuth)
-    // .then(obtainAndWriteUser)
     .then(writeAuth)
     .then(writeUser)
     .then(() => {
@@ -365,41 +363,3 @@ function getNoteForHost() {
 }
 
 module.exports.getNoteForHost = getNoteForHost;
-
-// module.exports.repo = function (username, repoName, complete) {
-//   getOrCreateClient()
-//     .then(function (client) {
-//       const ghrepo = client.repo(`${username}/${username}.github.io`);
-//       ghrepo.info(function (er, statu, bod, header) {
-//         console.log(bod);
-//         complete(null, bod);
-//       });
-//     })
-//     .catch(err => console.error(err));
-// };
-
-// module.exports.limit = function (complete) {
-//   getOrCreateClient()
-//     .then(function (client) {
-//       client.limit(function (err, left, max) {
-//         if (err) return complete(err);
-//         const message = `GitHub limit: ${left} used of ${max}.`;
-//         complete(null, message);
-//       });
-//     })
-//     .catch(err => console.error(err));
-// };
-
-// function repos(complete) {
-//   // the client also initializes opspark, which isn't very clear -
-//   // perhaps you should refactor to create opspark here, or? //
-//   getOrCreateClient()
-//     .then(function (client) {
-//       _opspark.repos(1, 100, function (repos) {
-//         // if (err) return complete(err);
-//         complete(null, repos);
-//       });
-//     })
-//     .catch(err => console.log(err));
-// }
-// module.exports.repos = repos;
