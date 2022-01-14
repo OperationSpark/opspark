@@ -136,15 +136,22 @@ function writeUser(auth) {
   return new Promise(function (res, rej) {
     const cmd = getGithubID(auth.token);
     exec(cmd, function (err, stdout, stderr) {
-      const { id, message } = JSON.parse(stdout);
-      if (err) {
-        rej(err);
-      } else if (message) {
-        rej(message);
+      try {
+        const { id, message } = JSON.parse(stdout);
+        if (err) {
+          rej(err);
+        } else if (message) {
+          rej(message);
+        }
+        ensureApplicationDirectory();
+        fsJson.saveSync(userFilePath, {
+          id,
+          username: auth.username
+        });
+        res(auth);
+      } catch (_err) {
+        return rej(`Non-JSON response:\n${stdout}`);
       }
-      ensureApplicationDirectory();
-      fsJson.saveSync(userFilePath, { id, username: auth.username });
-      res(auth);
     });
   });
 }
