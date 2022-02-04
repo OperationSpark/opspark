@@ -1,4 +1,4 @@
-require('cli-color');
+const clc = require('cli-color');
 const fs = require('fs');
 const util = require('util');
 const prompt = require('inquirer').prompt;
@@ -32,7 +32,7 @@ let _opspark;
 // TODO : consider the "module level" vars, like _client in this implementation, are they necessary.
 
 function getCredentials() {
-  console.log('Getting credentials. . .'.yellow);
+  console.log(clc.yellow('Getting credentials. . .'));
   return new Promise(function (res, rej) {
     if (userInfoExists()) {
       const creds = {
@@ -40,7 +40,7 @@ function getCredentials() {
         id: grabLocalUserID(),
         token: grabLocalAuthToken()
       };
-      console.log('Good to go!'.green);
+      console.log(clc.green('Good to go!'));
       res(creds);
     } else {
       authorizeUser()
@@ -83,7 +83,7 @@ function promptForUserInfo() {
           name: 'token',
           type: 'token',
           hidden: true,
-          conform: () => true,
+          conform: () => true
         }
       ],
       function (user) {
@@ -97,7 +97,7 @@ module.exports.promptForUserInfo = promptForUserInfo;
 
 function writeAuth(auth) {
   deleteAuth();
-  console.log('Writing auth. . .'.yellow);
+  console.log(clc.yellow('Writing auth. . .'));
   return new Promise(function (res, rej) {
     ensureApplicationDirectory();
     fsJson.saveSync(authFilePath, { token: auth.token });
@@ -108,7 +108,7 @@ function writeAuth(auth) {
 module.exports.writeAuth = writeAuth;
 
 function obtainAndWriteAuth({ username, password }) {
-  console.log('Authorizing with GitHub. . .'.yellow);
+  console.log(clc.yellow('Authorizing with GitHub. . .'));
   return new Promise(function (res, rej) {
     const note = getNoteForHost();
     const cmd = createGithubToken(username, password, note);
@@ -117,10 +117,9 @@ function obtainAndWriteAuth({ username, password }) {
       if (_auth.message) {
         rej(_auth);
       } else {
-        console.log('GitHub login succeeded!'.green);
+        console.log(clc.green('GitHub login succeeded!'));
         _auth.username = username;
-        writeAuth(_auth)
-          .then(() => res(_auth));
+        writeAuth(_auth).then(() => res(_auth));
       }
     });
   });
@@ -130,7 +129,7 @@ module.exports.obtainAndWriteAuth = obtainAndWriteAuth;
 
 function writeUser(auth) {
   deleteUser();
-  console.log('Writing user. . .'.yellow);
+  console.log(clc.yellow('Writing user. . .'));
   return new Promise(function (res, rej) {
     const cmd = getGithubID(auth.token);
     exec(cmd, function (err, stdout, stderr) {
@@ -157,7 +156,7 @@ function writeUser(auth) {
 module.exports.writeUser = writeUser;
 
 function obtainAndWriteUser(user) {
-  console.log('Grabbing user. . .'.yellow);
+  console.log(clc.yellow('Grabbing user. . .'));
   return new Promise(function (res, rej) {
     getOrCreateClient()
       .then(function (client) {
@@ -197,8 +196,8 @@ function getOrObtainAuth() {
           if (response.statusCode === 200) {
             res(_auth);
           } else {
-            console.log('Hmm, something\'s not right!'.green);
-            console.log('Let\'s try to login to GitHub again:'.green);
+            console.log(clc.green("Hmm, something's not right!"));
+            console.log(clc.green("Let's try to login to GitHub again:"));
             deleteUserInfo();
             authorizeUser();
           }
@@ -297,7 +296,7 @@ function deauthorizeUser() {
       // .then(deleteAuth)
       .then(deleteUserInfo)
       .then(() => {
-        console.log('Successfully logged out!'.blue);
+        console.log(clc.blue('Successfully logged out!'));
         res(true);
       })
       .catch(err => rej(`${err}`.red));
@@ -307,9 +306,14 @@ function deauthorizeUser() {
 module.exports.deauthorizeUser = deauthorizeUser;
 
 function deleteToken({ username, password }) {
-  console.log('Deleting token. . .'.red);
+  console.log(clc.red('Deleting token. . .'));
   return new Promise(function (res, rej) {
-    const cmd = deleteGithubToken(username, password, config.userAgent, grabLocalAuthID());
+    const cmd = deleteGithubToken(
+      username,
+      password,
+      config.userAgent,
+      grabLocalAuthID()
+    );
     exec(cmd, function (err, stdout, stderr) {
       if (stdout.indexOf('message') > -1) return rej(stdout);
       res(stdout);
@@ -332,7 +336,7 @@ function deleteUser() {
 module.exports.deleteUser = deleteUser;
 
 function deleteUserInfo() {
-  console.log('Deleting files. . .'.red);
+  console.log(clc.red('Deleting files. . .'));
   deleteAuth();
   deleteUser();
 }

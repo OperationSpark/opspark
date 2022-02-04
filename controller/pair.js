@@ -5,7 +5,7 @@ var
   Q = require('q'),
   inquirer = require('inquirer'),
   cancelOption = '[cancel]',
-  colors = require('cli-color'),
+  const clc = require('cli-color'),
   view = require('../view'),
   github = require('./github'),
   projects = require('./projects'),
@@ -19,11 +19,11 @@ module.exports.up = function (complete) {
       github.user(username, function (err, user) {
         if (err) return complete(err);
         projects.list(function (err, list) {
-          if (err) return console.log(err + ''.red);
+          if (err) return console.log(clc.red(err + ''));
           projects.selectProject(list, function (err, project) {
-            if (err) return console.log(err + ''.red);
+            if (err) return console.log(clc.red(err + ''));
             projects.installProject(project, username, function () {
-              console.log('You\'ve paired up with %s'.blue, username);
+              console.log(clc.blue('You\'ve paired up with %s'), username);
               complete(null);
             });
           });
@@ -45,7 +45,7 @@ function down() {
     .then(projects.download)
     .then(function () {
       projects.appendProjectEntry(_session.pairedProject, _session.partnerName, function () {
-        console.log('Sweet! The project you paired on with %s, %s, is now installed!'.green, _session.partnerName, _session.pairedProject.title);
+        console.log(clc.green('Sweet! The project you paired on with %s, %s, is now installed!'), _session.partnerName, _session.pairedProject.title);
       });
     })
     .fail(function (err) {
@@ -78,7 +78,7 @@ function listPartneredProjects(projects) {
     }],
     function (response) {
       if (response.project === cancelOption) {
-        console.log('Installation cancelled, bye bye!'.green);
+        console.log(clc.green('Installation cancelled, bye bye!'));
         process.exit();
       }
       var pairedProject = _.filter(pairedOnProjects, {
