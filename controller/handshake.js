@@ -1,4 +1,4 @@
-require('cli-color');
+const clc = require('cli-color');
 const fs = require('fs');
 const mkdirp = require('mkdirp');
 const fsJson = require('fs-json')();
@@ -22,7 +22,7 @@ function readHandshake() {
 // Checks if directory exists and creates if not
 function checkForDirectory(path) {
   if (!fs.existsSync(path)) {
-    console.log('Creating new directory'.yellow);
+    console.log(clc.yellow('Creating new directory'));
     mkdirp.sync(path);
   }
 }
@@ -48,23 +48,23 @@ function storeCreds(body, hash) {
   checkForDirectory(filePath);
 
   if (fs.existsSync(path)) {
-    console.log('Hey, this file is already there!'.red);
+    console.log(clc.red('Hey, this file is already there!'));
     view.inquireForInput('Overwrite file? (y/n)', (err, input) => {
       console.log(input);
       if (err) {
-        console.warn('Something went wrong! Run that code again.'.red);
+        console.warn(clc.red('Something went wrong! Run that code again.'));
       } else if (input.toLowerCase()[0] === 'y') {
-        console.warn('Rewriting. . .'.yellow);
+        console.warn(clc.yellow('Rewriting. . .'));
         fs.writeFileSync(path, JSON.stringify(userInfo));
-        console.warn('All done!'.green);
+        console.warn(clc.green('All done!'));
       } else {
-        console.warn('Exiting without overwrite.'.green);
+        console.warn(clc.green('Exiting without overwrite.'));
       }
     });
   } else {
     console.warn('Writing file. . .');
     fsJson.saveSync(path, JSON.stringify(userInfo));
-    console.warn('All done!'.green);
+    console.warn(clc.green('All done!'));
   }
 }
 
@@ -74,9 +74,9 @@ function greenlightRequest(hash) {
     method: 'POST',
     url: `${URI}/api/os/verify`,
     body: {
-      authorization: hash,
+      authorization: hash
     },
-    json: true,
+    json: true
   };
   rp(options)
     .then(res => storeCreds(res, hash))

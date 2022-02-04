@@ -1,4 +1,4 @@
-require('cli-color');
+const clc = require('cli-color');
 const fs = require('fs');
 const url = require('url');
 const cheerio = require('cheerio');
@@ -10,20 +10,24 @@ const configWebsite = require('../config.json').website;
 const configPortfolio = require('../config.json').portfolio;
 const { home, cloud9User, codenvyUser } = require('./env');
 
-const jQueryCdnScript = '    <script src=\"https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js\"></script>\n';
-const portfolioScript = "        <script id=\"portfolioScript\">$(document).ready(function() {$.getJSON('projects/projects.json').then(function(data) { data.projects.forEach(function(project){ $('#portfolio').append('<li><a href=\"projects/' + project.name + '/\">' + project.title + ' : ' + project.description + '</a></li>'); }); }); });</script>\n    </body>";
-require('cli-color');
+const jQueryCdnScript =
+  '    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>\n';
+const portfolioScript =
+  "        <script id=\"portfolioScript\">$(document).ready(function() {$.getJSON('projects/projects.json').then(function(data) { data.projects.forEach(function(project){ $('#portfolio').append('<li><a href=\"projects/' + project.name + '/\">' + project.title + ' : ' + project.description + '</a></li>'); }); }); });</script>\n    </body>";
 
 let rootDirectory = './';
 let githubDir;
 
 if (cloud9User) {
-  githubDir = fs.readdirSync(`${home()}/environment`)
+  githubDir = fs
+    .readdirSync(`${home()}/environment`)
     .filter(dir => /[\w]+\.github\.io/.test(dir))[0];
   rootDirectory = `${home()}/environment/${githubDir}`;
 } else if (codenvyUser) {
   rootDirectory = codenvyUser;
-  githubDir = fs.readdirSync(`${codenvyUser}/`).filter(dir => /[\w]+\.github\.io/.test(dir))[0];
+  githubDir = fs
+    .readdirSync(`${codenvyUser}/`)
+    .filter(dir => /[\w]+\.github\.io/.test(dir))[0];
   rootDirectory = `${rootDirectory}/${githubDir}`;
 }
 
@@ -31,26 +35,33 @@ module.exports.jQueryCdnScript = jQueryCdnScript;
 module.exports.portfolioScript = portfolioScript;
 
 function login() {
-  github.getCredentials()
-    .then(() => console.log('Have fun!'.blue))
-    .catch(err => console.error('Failure getting credentials\n'.red, err));
+  github
+    .getCredentials()
+    .then(() => console.log(clc.blue('Have fun!')))
+    .catch(err => console.error(clc.red('Failure getting credentials\n'), err));
 }
 module.exports.login = login;
 
 function portfolio(filepath = configPortfolio.filepath) {
-  if (!fs.existsSync(filepath)) return console.log(configPortfolio.help.incomplete.red);
+  if (!fs.existsSync(filepath))
+    return console.log(configPortfolio.help.incomplete.red);
   const html = fs.readFileSync(filepath, 'utf8');
   const $ = cheerio.load(html);
   const portfolioListTag = $('#portfolio')[0];
-  if (!portfolioListTag) return console.log(configPortfolio.help.noPortfolioList.red);
+  if (!portfolioListTag)
+    return console.log(configPortfolio.help.noPortfolioList.red);
   const portfolioScriptTag = $('#portfolioScript')[0];
-  if (portfolioScriptTag) return console.log(configPortfolio.help.portfolioScriptTagExists.red);
+  if (portfolioScriptTag)
+    return console.log(configPortfolio.help.portfolioScriptTagExists.red);
   const result = html.replace(/<\/body>/g, jQueryCdnScript + portfolioScript);
   try {
     fs.writeFileSync(filepath, result, 'utf8');
     console.log('portfolio.html has been initialized!');
   } catch (err) {
-    console.log('An error occurred while trying to write the portfolioScript to the portfolio.html file: ', err);
+    console.log(
+      'An error occurred while trying to write the portfolioScript to the portfolio.html file: ',
+      err
+    );
   }
 }
 module.exports.portfolio = portfolio;
@@ -64,7 +75,7 @@ module.exports.portfolio = portfolio;
  * or developers can get up to speed quickly.
  */
 module.exports.website = function (next) {
-  console.log('Initializing website project, please wait...'.green);
+  console.log(clc.green('Initializing website project, please wait...'));
   installWebsiteFiles(function (err) {
     if (err) return console.log(err);
     // check if rootDirectory is relative path
@@ -91,7 +102,7 @@ function installWebsiteFiles(next) {
       message = filename + ' downloaded to ' + rootDirectory;
       console.log(message.green);
       if (++downloaded === numFiles) {
-        console.log('All website files downloaded.'.green);
+        console.log(clc.green('All website files downloaded.'));
         next(null);
       }
     });

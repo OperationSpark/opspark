@@ -1,4 +1,4 @@
-require('cli-color');
+const clc = require('cli-color');
 const exec = require('child_process').exec;
 
 const janitor = require('./janitor');
@@ -7,35 +7,42 @@ const greenlight = require('./greenlight');
 const sessions = require('./sessions');
 const projects = require('./projects');
 const test = require('./test');
-const { createGistHelper, deleteGistHelper, readGistHelper } = require('./helpers');
+const {
+  createGistHelper,
+  deleteGistHelper,
+  readGistHelper
+} = require('./helpers');
 
 function submit() {
-  console.log('Beginning submit process!'.blue);
+  console.log(clc.blue('Beginning submit process!'));
   projects.action = 'submit';
-  github.getCredentials()
-    .catch(janitor.error('Failure getting credentials'.red))
+  github
+    .getCredentials()
+    .catch(janitor.error(clc.red('Failure getting credentials')))
     .then(greenlight.getGradable)
-    .catch(janitor.error('Failure getting sessions'.red))
+    .catch(janitor.error(clc.red('Failure getting sessions')))
     .then(sessions.selectSession)
-    .catch(janitor.error('Failure selecting session'.red))
+    .catch(janitor.error(clc.red('Failure selecting session')))
     .then(projects.selectProject)
-    .catch(janitor.error('Failure selecting project'.red))
+    .catch(janitor.error(clc.red('Failure selecting project')))
     .then(test.grabTests)
-    .catch(janitor.error('Failure grabbing tests'.red))
+    .catch(janitor.error(clc.red('Failure grabbing tests')))
     .then(test.runTests)
-    .catch(janitor.error('Failure running tests'.red))
+    .catch(janitor.error(clc.red('Failure running tests')))
     .then(checkGrade)
-    .catch(janitor.error('Failure checking grade'.red))
+    .catch(janitor.error(clc.red('Failure checking grade')))
     .then(createGist)
-    .catch(janitor.error('Failure creating gist'.red))
+    .catch(janitor.error(clc.red('Failure creating gist')))
     .then(ensureGistExists)
-    .catch(janitor.error('Failure ensuring gist exists'.red))
+    .catch(janitor.error(clc.red('Failure ensuring gist exists')))
     .then(greenlight.sendGrade)
-    .catch(janitor.error('Failure grading project'.red))
+    .catch(janitor.error(clc.red('Failure grading project')))
     .then(deleteGist)
-    .catch(janitor.error('Failure deleting gist'.red))
-    .then(() => console.log('Successfully concluded submission.'.blue))
-    .catch((err) => { console.error(err); });
+    .catch(janitor.error(clc.red('Failure deleting gist')))
+    .then(() => console.log(clc.blue('Successfully concluded submission.')))
+    .catch(err => {
+      console.error(err);
+    });
 }
 
 module.exports.submit = submit;
@@ -43,10 +50,16 @@ module.exports.submit = submit;
 function checkGrade({ project, testResults }) {
   const { stats } = testResults;
   return new Promise(function (res, rej) {
-    if (stats.passes < (stats.tests / 2)) {
-      rej(`You have not passed all tests for ${project.name}! Must be have finished at least 50% to submit. Canceling submit.`.red);
+    if (stats.passes < stats.tests / 2) {
+      rej(
+        `You have not passed all tests for ${project.name}! Must be have finished at least 50% to submit. Canceling submit.`
+          .red
+      );
     } else {
-      console.log('Great!'.green, 'Beginning the upload process. . .'.yellow);
+      console.log(
+        clc.green('Great!'),
+        clc.yellow('Beginning the upload process. . .')
+      );
       res({ project, stats });
     }
   });
@@ -62,7 +75,7 @@ function createGist({ project, stats }) {
     type: 'PROJECT',
     tests: stats.tests,
     passes: stats.passes,
-    failures: stats.failures,
+    failures: stats.failures
   };
 
   let content = {
@@ -70,19 +83,23 @@ function createGist({ project, stats }) {
     description: 'Project results',
     files: {
       'grade.txt': {
-        content: JSON.stringify(files),
+        content: JSON.stringify(files)
       }
     }
   };
 
   content = JSON.stringify(content);
   return new Promise(function (res, rej) {
-    console.log('Creating gist. . .'.yellow);
-    const cmd = createGistHelper(github.grabLocalLogin(), github.grabLocalAuthToken(), content);
+    console.log(clc.yellow('Creating gist. . .'));
+    const cmd = createGistHelper(
+      github.grabLocalLogin(),
+      github.grabLocalAuthToken(),
+      content
+    );
     exec(cmd, function (err, stdout, stderr) {
       const gist = JSON.parse(stdout);
       if (err) rej(err);
-      console.log('Gist created!'.green);
+      console.log(clc.green('Gist created!'));
       res({ project, gist, tries: 1 });
     });
   });
@@ -112,13 +129,17 @@ function ensureGistExists({ project, gist, tries }) {
 
 function deleteGist(url) {
   return new Promise(function (res, rej) {
-    console.log('Deleting gist. . .'.yellow);
-    const cmd = deleteGistHelper(github.grabLocalLogin(), github.grabLocalAuthToken(), url);
+    console.log(clc.yellow('Deleting gist. . .'));
+    const cmd = deleteGistHelper(
+      github.grabLocalLogin(),
+      github.grabLocalAuthToken(),
+      url
+    );
     exec(cmd, function (err, stdout, stderr) {
       if (err) {
         rej(err);
       }
-      console.log('Gist deleted!'.green);
+      console.log(clc.green('Gist deleted!'));
       res(url);
     });
   });

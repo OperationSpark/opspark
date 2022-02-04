@@ -1,4 +1,4 @@
-require('cli-color');
+const clc = require('cli-color');
 const _ = require('lodash');
 const inquirer = require('inquirer');
 const { waterfall } = require('async');
@@ -56,7 +56,7 @@ function selectSession(sessions) {
             if (confirm.action) {
               return res({
                 session: pluckSession(response.class, parsedSessions),
-                projectAction: projects.action,
+                projectAction: projects.action
               });
             }
             res(selectSession(sessions));

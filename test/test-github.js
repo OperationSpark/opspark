@@ -1,7 +1,7 @@
 /* global describe it expect before beforeEach afterEach */
 require('mocha');
 require('should');
-require('cli-color');
+const clc = require('cli-color');
 const _ = require('lodash');
 const util = require('util');
 const fs = require('fs-extra');
@@ -21,19 +21,20 @@ const { dummyAuth, dummyUser } = require('./helpers/dummyData');
 const github = proxyquire('../controller/github', {
   './helpers': fakeHelpers,
   './env': {
-    home: fakeHelpers.home,
-  },
+    home: fakeHelpers.home
+  }
 });
 
 const applicationDirectory = './test/files/opspark';
 const authFilePath = `${applicationDirectory}/auth`;
 const userFilePath = `${applicationDirectory}/user`;
 
-
 describe('github', function () {
   describe('#ensureApplicationDirectory()', function () {
     beforeEach(function (done) {
-      rimraf(applicationDirectory, function () { done(); });
+      rimraf(applicationDirectory, function () {
+        done();
+      });
     });
     it('should create directory if none', function (done) {
       expect(fs.existsSync(applicationDirectory)).to.be.false;
@@ -49,18 +50,16 @@ describe('github', function () {
     });
     it('should pipe out user inputs', function (done) {
       bddStdin('Username\nPassword\n');
-      github.promptForUserInfo()
-        .then(function (user) {
-          expect(user.username).to.equal('Username');
-          expect(user.password).to.equal('Password');
-        });
+      github.promptForUserInfo().then(function (user) {
+        expect(user.username).to.equal('Username');
+        expect(user.password).to.equal('Password');
+      });
       bddStdin('livrush\n********\n');
-      github.promptForUserInfo()
-        .then(function (user) {
-          expect(user.username).to.equal('livrush');
-          expect(user.password).to.equal('********');
-          done();
-        });
+      github.promptForUserInfo().then(function (user) {
+        expect(user.username).to.equal('livrush');
+        expect(user.password).to.equal('********');
+        done();
+      });
     });
   });
 
@@ -92,7 +91,9 @@ describe('github', function () {
       github.writeUser(dummyUser);
     });
     afterEach(function (done) {
-      rimraf(applicationDirectory, function () { done(); });
+      rimraf(applicationDirectory, function () {
+        done();
+      });
     });
     it('should return true if directory exists', function (done) {
       expect(github.userInfoExists()).to.be.true;
@@ -102,7 +103,9 @@ describe('github', function () {
 
   describe('#writeAuth()', function () {
     beforeEach(function (done) {
-      rimraf(applicationDirectory, function () { done(); });
+      rimraf(applicationDirectory, function () {
+        done();
+      });
     });
     it('should write auth file', function (done) {
       expect(fs.existsSync(authFilePath)).to.be.false;
@@ -121,7 +124,9 @@ describe('github', function () {
 
   describe('#writeUser()', function () {
     beforeEach(function (done) {
-      rimraf(applicationDirectory, function () { done(); });
+      rimraf(applicationDirectory, function () {
+        done();
+      });
     });
     it('should write user file', function (done) {
       expect(fs.existsSync(userFilePath)).to.be.false;
@@ -147,10 +152,12 @@ describe('github', function () {
       done();
     });
 
-    it('should throw error if file doesn\'t exist', function (done) {
+    it("should throw error if file doesn't exist", function (done) {
       github.deleteUserInfo();
       expect(github.grabLocalUserID).to.throw(Error);
-      expect(github.grabLocalUserID).to.throw(`There is no file at ${userFilePath}.`);
+      expect(github.grabLocalUserID).to.throw(
+        `There is no file at ${userFilePath}.`
+      );
       done();
     });
   });
@@ -164,10 +171,12 @@ describe('github', function () {
       done();
     });
 
-    it('should throw error if file doesn\'t exist', function (done) {
+    it("should throw error if file doesn't exist", function (done) {
       github.deleteUserInfo();
       expect(github.grabLocalLogin).to.throw(Error);
-      expect(github.grabLocalLogin).to.throw(`There is no file at ${userFilePath}.`);
+      expect(github.grabLocalLogin).to.throw(
+        `There is no file at ${userFilePath}.`
+      );
       done();
     });
   });
@@ -181,10 +190,12 @@ describe('github', function () {
       done();
     });
 
-    it('should throw error if file doesn\'t exist', function (done) {
+    it("should throw error if file doesn't exist", function (done) {
       github.deleteUserInfo();
       expect(github.grabLocalAuthID).to.throw(Error);
-      expect(github.grabLocalAuthID).to.throw(`There is no file at ${authFilePath}.`);
+      expect(github.grabLocalAuthID).to.throw(
+        `There is no file at ${authFilePath}.`
+      );
       done();
     });
   });
@@ -198,10 +209,12 @@ describe('github', function () {
       done();
     });
 
-    it('should throw error if file doesn\'t exist', function (done) {
+    it("should throw error if file doesn't exist", function (done) {
       github.deleteUserInfo();
       expect(github.grabLocalAuthToken).to.throw(Error);
-      expect(github.grabLocalAuthToken).to.throw(`There is no file at ${authFilePath}.`);
+      expect(github.grabLocalAuthToken).to.throw(
+        `There is no file at ${authFilePath}.`
+      );
       done();
     });
   });
@@ -215,15 +228,14 @@ describe('github', function () {
       github.writeAuth(dummyAuth);
       github.writeUser(dummyUser);
       expect(github.userInfoExists()).to.be.true;
-      github.getCredentials()
-        .then(function (user) {
-          expect(user.login).to.equal('livrush');
-          expect(user.id).to.equal(23201987);
-          expect(user.token).to.equal('fauxToken');
-          fs.unlinkSync(authFilePath);
-          fs.unlinkSync(userFilePath);
-          done();
-        });
+      github.getCredentials().then(function (user) {
+        expect(user.login).to.equal('livrush');
+        expect(user.id).to.equal(23201987);
+        expect(user.token).to.equal('fauxToken');
+        fs.unlinkSync(authFilePath);
+        fs.unlinkSync(userFilePath);
+        done();
+      });
     });
 
     // it('should call authorizeUser when no credentials exist', function (done) {
@@ -244,10 +256,9 @@ describe('github', function () {
     });
 
     it('should return a response object', function () {
-      github.hasAuthorization()
-        .then(function (res) {
-          expect(res.statusCode).to.equal(200);
-        });
+      github.hasAuthorization().then(function (res) {
+        expect(res.statusCode).to.equal(200);
+      });
     });
   });
 
@@ -259,12 +270,11 @@ describe('github', function () {
     it('should resolve auth object', function (done) {
       github.writeAuth(dummyAuth);
       github.writeUser(dummyUser);
-      github.getOrObtainAuth()
-        .then(function (res) {
-          expect(res).to.eql(dummyAuth);
-          github.deleteUserInfo();
-          done();
-        });
+      github.getOrObtainAuth().then(function (res) {
+        expect(res).to.eql(dummyAuth);
+        github.deleteUserInfo();
+        done();
+      });
     });
   });
 
@@ -276,12 +286,11 @@ describe('github', function () {
     it('should resolve user object', function (done) {
       github.writeAuth(dummyAuth);
       github.writeUser(dummyUser);
-      github.getOrCreateClient()
-        .then(function (res) {
-          expect(res).to.eql(dummyUser);
-          github.deleteUserInfo();
-          done();
-        });
+      github.getOrCreateClient().then(function (res) {
+        expect(res).to.eql(dummyUser);
+        github.deleteUserInfo();
+        done();
+      });
     });
   });
 
@@ -293,19 +302,17 @@ describe('github', function () {
     it('should create auth file', function (done) {
       github.deleteAuth();
       expect(github.authExists()).to.be.false;
-      github.obtainAndWriteAuth(dummyAuth)
-        .then(function () {
-          expect(github.authExists()).to.be.true;
-          done();
-        });
+      github.obtainAndWriteAuth(dummyAuth).then(function () {
+        expect(github.authExists()).to.be.true;
+        done();
+      });
     });
 
     it('should send on auth data', function (done) {
-      github.obtainAndWriteAuth(dummyAuth)
-        .then(function (result) {
-          expect(result).to.eql(dummyAuth);
-          done();
-        });
+      github.obtainAndWriteAuth(dummyAuth).then(function (result) {
+        expect(result).to.eql(dummyAuth);
+        done();
+      });
     });
   });
 
@@ -317,19 +324,17 @@ describe('github', function () {
     it('should create auth file', function (done) {
       github.deleteUser();
       expect(github.userExists()).to.be.false;
-      github.obtainAndWriteUser(dummyUser)
-        .then(function () {
-          expect(github.userExists()).to.be.true;
-          done();
-        });
+      github.obtainAndWriteUser(dummyUser).then(function () {
+        expect(github.userExists()).to.be.true;
+        done();
+      });
     });
 
     it('should send on auth data', function (done) {
-      github.obtainAndWriteUser(dummyUser)
-        .then(function (result) {
-          expect(result).to.eql(dummyUser);
-          done();
-        });
+      github.obtainAndWriteUser(dummyUser).then(function (result) {
+        expect(result).to.eql(dummyUser);
+        done();
+      });
     });
   });
 
@@ -342,12 +347,11 @@ describe('github', function () {
 
     it('should provide creds', function (done) {
       bddStdin('livrush\nPassword\n');
-      github.authorizeUser()
-        .then(function (user) {
-          expect(user.login).to.equal('livrush');
-          expect(user.token).to.equal('fauxToken');
-          done();
-        });
+      github.authorizeUser().then(function (user) {
+        expect(user.login).to.equal('livrush');
+        expect(user.token).to.equal('fauxToken');
+        done();
+      });
     });
   });
 
@@ -395,11 +399,10 @@ describe('github', function () {
 
     it('should return empty line if successful', function (done) {
       bddStdin('livrush\nPassword\n');
-      github.deleteToken(dummyAuth)
-        .then(function (res) {
-          expect(res).to.equal('\n');
-          done();
-        });
+      github.deleteToken(dummyAuth).then(function (res) {
+        expect(res).to.equal('\n');
+        done();
+      });
     });
   });
 
@@ -415,11 +418,10 @@ describe('github', function () {
 
     it('should return empty line if successful', function (done) {
       bddStdin('livrush\nPassword\n');
-      github.deauthorizeUser()
-        .then(function (res) {
-          expect(res).to.equal(true);
-          done();
-        });
+      github.deauthorizeUser().then(function (res) {
+        expect(res).to.equal(true);
+        done();
+      });
     });
   });
 });

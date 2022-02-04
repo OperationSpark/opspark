@@ -1,7 +1,7 @@
 /* global describe it expect before beforeEach afterEach */
 require('mocha');
 require('should');
-require('cli-color');
+const clc = require('cli-color');
 const fs = require('fs');
 const _ = require('lodash');
 const util = require('util');
@@ -23,8 +23,8 @@ const sessions = proxyquire('../controller/sessions', {
   './helpers': fakeHelpers,
   './github': fakeHelpers,
   './env': {
-    home: fakeHelpers.home,
-  },
+    home: fakeHelpers.home
+  }
 });
 
 describe('sessions', function () {
@@ -51,7 +51,8 @@ describe('sessions', function () {
   describe('#selectSession()', function () {
     it('should select session', function (done) {
       bddStdin(bddStdin.keys.left, '\n', 'y\n');
-      sessions.selectSession(JSON.stringify(dummySessions))
+      sessions
+        .selectSession(JSON.stringify(dummySessions))
         .then(function (response) {
           console.log(response);
           expect(response).to.be.an.object;
@@ -62,7 +63,8 @@ describe('sessions', function () {
 
     it('should select correct session', function (done) {
       bddStdin(bddStdin.keys.left, bddStdin.keys.down, '\n', 'y\n');
-      sessions.selectSession(JSON.stringify(dummySessions))
+      sessions
+        .selectSession(JSON.stringify(dummySessions))
         .then(function (response) {
           expect(response).to.be.an.object;
           expect(response.session).to.eql(dummySessions[1]);
