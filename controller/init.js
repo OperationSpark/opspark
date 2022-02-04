@@ -14,7 +14,6 @@ const jQueryCdnScript =
   '    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>\n';
 const portfolioScript =
   "        <script id=\"portfolioScript\">$(document).ready(function() {$.getJSON('projects/projects.json').then(function(data) { data.projects.forEach(function(project){ $('#portfolio').append('<li><a href=\"projects/' + project.name + '/\">' + project.title + ' : ' + project.description + '</a></li>'); }); }); });</script>\n    </body>";
-const clc = require('cli-color');
 
 let rootDirectory = './';
 let githubDir;
