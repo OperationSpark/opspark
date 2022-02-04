@@ -129,10 +129,18 @@ function runTests(project) {
     .then(testResults => {
       const { tests, passes, pending, failures } = testResults.stats;
 
-      console.log(clc.bgBlack.white(` Total tests:    ${tests}  `));
-      console.log(clc.bgBlue.white(` Passing tests:  ${passes}  `));
-      console.log(clc.bgYellow.black(` Pending tests:  ${pending}  `));
-      console.log(clc.bgRed.white(` Failing tests:  ${failures}  `));
+      const getFillStr = n => {
+        const chars = n.toString().length;
+        const fillStr = new Array(5 - chars).fill(' ').join('');
+        return `${n}${fillStr}`;
+      };
+
+      console.log(clc.bgBlue.white(`  Passing tests:  ${getFillStr(passes)}`));
+      console.log(clc.bgRed.white(`  Failing tests:  ${getFillStr(failures)}`));
+      console.log(
+        clc.bgYellow.black(`  Pending tests:  ${getFillStr(pending)}`)
+      );
+      console.log(clc.bgBlack.white(`  Total tests:    ${getFillStr(tests)}`));
 
       return { project, testResults };
     })
