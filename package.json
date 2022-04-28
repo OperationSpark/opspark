@@ -30,7 +30,7 @@
     "os": "index.js"
   },
   "dependencies": {
-    "async": "^0.9.0",
+    "async": "^2.6.4",
     "bdd-stdin": "^0.2.0",
     "bluebird": "^2.9.26",
     "bluebird-q": "^1.0.3",
