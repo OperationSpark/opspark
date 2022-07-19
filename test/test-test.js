@@ -21,7 +21,8 @@ const {
   dummySession,
   dummySessions,
   dummyTestPass,
-  dummyTestFail
+  dummyTestFail,
+  dummyTest75
 } = require('./helpers/dummyData');
 
 const projects = proxyquire('../controller/projects', {
@@ -176,6 +177,13 @@ describe('test', function () {
     it('should fail with failing results', function () {
       const { pass } = test.displayResults({
         testResults: JSON.parse(dummyTestFail)
+      });
+      expect(pass).to.be.false;
+    });
+
+    it('should show the right percent, 75%', function () {
+      const { pass } = test.displayResults({
+        testResults: JSON.parse(dummyTest75)
       });
       expect(pass).to.be.false;
     });

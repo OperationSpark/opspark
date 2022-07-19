@@ -169,6 +169,13 @@ function displayResults({ testResults }) {
       console.log(`> > > ${stackLineTwo}`.grey);
     });
 
+    //part divided by the whole 3/4 = 75%
+    //use math .round to round to the nearest tenth of a percent
+
+    console.log(
+      clc.green(`You have passed ${ 100 * (testResults.stats.passes / testResults.stats.tests) }% of the test.`)
+    )
+
     return { pass: false };
   }
 

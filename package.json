@@ -9,7 +9,11 @@
   "scripts": {
     "postinstall": "bash ./install.sh",
     "dev": "nodemon test-server.js",
-    "test": "mocha ./test"
+    "test": "mocha ./test",
+    "preinstall": "npx npm-force-resolutions"
+  },
+  "resolutions": {
+    "graceful-fs": "^4.2.4"
   },
   "repository": {
     "type": "git",
@@ -47,6 +51,7 @@
     "jquery": "^3.3.1",
     "lodash": "^4.0.0",
     "mkdirp": "^0.5.0",
+    "nodemon": "^2.0.19",
     "octonode": "^0.9.5",
     "process": "^0.11.10",
     "prompt": "^0.2.14",
