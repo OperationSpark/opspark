@@ -189,3 +189,30 @@ module.exports.dummyTest75 = `{
     { "fullTitle": "Test 4" }
   ]
 }`;
+
+module.exports.dummyTest85 = `{
+  "stats": {
+    "tests": 7,
+    "passes": 6,
+    "pending": 0,
+    "failures": 1
+  },
+  "pending": [],
+  "failures": [
+    {
+      "fullTitle": "Test 1",
+      "err": {
+        "message": "Error message",
+        "stack": "Trace"
+      }
+    }
+  ],
+  "passes": [
+    { "fullTitle": "Test 2" },
+    { "fullTitle": "Test 3" },
+    { "fullTitle": "Test 4" },
+    { "fullTitle": "Test 5" },
+    { "fullTitle": "Test 6" },
+    { "fullTitle": "Test 7" }
+  ]
+}`;

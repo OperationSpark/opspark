@@ -170,20 +170,20 @@ function displayResults({ testResults }) {
     });
 
     //part divided by the whole 3/4 = 75%
-    //use math .round to round to the nearest tenth of a percent
-
+    //use math.round to round to the nearest whole percent
+    let grade = Math.round(100 * (testResults.stats.passes / testResults.stats.tests))
     console.log(
-      clc.green(`You have passed ${ 100 * (testResults.stats.passes / testResults.stats.tests) }% of the test.`)
+      clc.green(`You have passed ${grade}% of the test.`)
     )
 
-    return { pass: false };
+    return { pass: false, grade: grade };
   }
 
   console.log(
     clc.green('You did it! 100% complete, now please run'),
     clc.red('os submit')
   );
-  return { pass: true };
+  return { pass: true, grade: 100 };
 }
 
 module.exports.displayResults = displayResults;
