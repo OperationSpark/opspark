@@ -99,7 +99,49 @@ const dummySession3 = {
       desc: 'Fun with functional Functions',
       url: 'https://github.com/operationspark/underpants'
     },
-  ]
+    {
+      _id: "E9C4wcXoKZYA8Dnp9",
+      name: "Circularity",
+      desc: "A motion poem using random number generation and velocity applied to circle shapes...",
+      url: "https://github.com/OperationSpark/circularity",
+    },
+    {
+      _id: "w8Rd3aN7G4ttHDzR8",
+      name: "Runtime",
+      desc: "A side-scroller game featuring our own HalleBot!",
+      url: "https://github.com/OperationSpark/runtime",
+    },
+    {
+      _id: "7RwfPpWenqLXg8Ewt",
+      name: "My First Project!",
+      desc: "A simple project for practicing debugging ",
+      url: "https://github.com/OperationSpark/my-first-project",
+    },
+    {
+      _id: "Xe7HfMW7P5YipdZMc",
+      name: "First Website",
+      desc: "A client-side web project into which we'll install many projects",
+      url: "https://github.com/OperationSpark/first-website",
+    },
+    {
+      _id: "T5LMsegDbMaSr8Z9K",
+      name: "Portfolio Page",
+      desc: "Add a portfolio page to your website project",
+      url: "https://github.com/OperationSpark/portfolio",
+    },
+    {
+      _id: "kpEPmPxBvinQDpp4A",
+      name: "Platformer",
+      desc: "A cannon - dodging, collectible - grabbing adventure game for Halleb0t",
+      url: "https://github.com/OperationSpark/platformer",
+    },
+    {
+      _id: "RbokJGa8sLNeadzcs",
+      name: "Bouncing Box",
+      desc: "A project that gives you a taste of game development on the web ",
+      url: "https://github.com/OperationSpark/bouncing-box",
+    },
+  ],
 };
 
 module.exports.dummySessions = [
