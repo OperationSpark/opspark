@@ -77,7 +77,7 @@ describe("sessions", function () {
     });
   });
 
-  describe.only("#pluckSession()", function () {
+  describe("#pluckSession()", function () {
     it("should pluck desired fsd session", function () {
       console.log(dummySessions);
       const name = dummySessions[2].title;
