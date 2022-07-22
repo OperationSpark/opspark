@@ -128,6 +128,8 @@ This will list commands and optional flags available to you in the `opspark` npm
 For more personable help, tug on the sleeve of one of your awesome Operation Spark developers teaching your bootcamp, or, contact us via our Slack chat group.  If you're not a member of our Slack group, please request an invitation via our website at <a href="operationspark.org">operationspark.org</a>.
 
 ## For Teachers and Developers
+If you have a Windows or Linux Subsystem use the command <npm run web-dev> as the postinstall script does not 
+work for environments outside of Mac.
 
 ### Headstart
 
