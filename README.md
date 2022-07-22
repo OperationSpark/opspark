@@ -1,4 +1,5 @@
 # opspark
+
 A node utility supporting installation and configuration of operation spark projects.
 
 **Table of Contents**
@@ -22,7 +23,7 @@ A node utility supporting installation and configuration of operation spark proj
 
 ## Prerequisites
 
-The `opspark` npm utility is designed to work with the Operation Spark website project, which starts with two lessons that you and your students should complete before installing and using the `opspark` npm utility.  The two prerequisites lessons are:
+The `opspark` npm utility is designed to work with the Operation Spark website project, which starts with two lessons that you and your students should complete before installing and using the `opspark` npm utility. The two prerequisites lessons are:
 
 1. <a href="https://github.com/OperationSpark/first-website/blob/master/README.md" target="_blank">First Website: Available here...</a>
 2. <a href="https://github.com/OperationSpark/portfolio/blob/master/README.md" target="_blank">Portfolio Page: Available here...</a>
@@ -31,7 +32,7 @@ Combined, these two prerequisites website lessons build-out and publish live, a 
 
 The portfolio page is designed to automatically list all Operation Spark projects installed using the `opspark` npm utility.
 
-These subsequent _sub-projects_ are installable through the `opspark` npm utility.  After installing the `opspark` npm utility (see instructions below), you will have access to certain commands via the commandline (again, see instructions below), which will allow you to select the project you want to install from a list of all installable projects.
+These subsequent _sub-projects_ are installable through the `opspark` npm utility. After installing the `opspark` npm utility (see instructions below), you will have access to certain commands via the commandline (again, see instructions below), which will allow you to select the project you want to install from a list of all installable projects.
 
 On selecting a project to install, the project is downloaded and installed in the `projects/projectName` directory in the root directory of your website, and if any bower components are required, they are installed during this process so the student is ready to begin straight away.
 
@@ -61,11 +62,11 @@ If you've completed the portfolio.html lesson (see [Prerequisites](#prerequisite
 
 Running this command will write a few script tags to the `portfolio.html`, allowing installed projects to appear dynamically as new `<li>` entries in the `<ul id="portfolio">` list in the `portfolio.html` page.
 
-It's not necessary to run this command before installing and working on projects - previously installed projets will still show up in the portfolio list after initialization, **but**, it will make working on the live project easier, because _if_ the portfolio page is initialized, the project can be viewed in a browser while in development in Clould9 or locally, by navigating to the portfolio page, and selecting the project from the list.  Student's can then make changes to their code, save, refresh the browser, etc.
+It's not necessary to run this command before installing and working on projects - previously installed projets will still show up in the portfolio list after initialization, **but**, it will make working on the live project easier, because _if_ the portfolio page is initialized, the project can be viewed in a browser while in development in Clould9 or locally, by navigating to the portfolio page, and selecting the project from the list. Student's can then make changes to their code, save, refresh the browser, etc.
 
 ### Installing Projects
 
-1. To get a list of installable projects, run:
+1.  To get a list of installable projects, run:
 
         os install
 
@@ -73,11 +74,11 @@ It's not necessary to run this command before installing and working on projects
 
     <img src="https://raw.githubusercontent.com/OperationSpark/opspark/master/img/list.png">
 
-2. Select the project you want to install using the arrow keys
+2.  Select the project you want to install using the arrow keys
 
-    <img src="https://raw.githubusercontent.com/OperationSpark/opspark/master/img/use-arrow-keys.png">
+<img src="https://raw.githubusercontent.com/OperationSpark/opspark/master/img/use-arrow-keys.png">
 
-3. Once you've selected the project using the arrow keys, press `Return`.  You'll then be asked to confirm:
+3.  Once you've selected the project using the arrow keys, press `Return`. You'll then be asked to confirm:
 
     <img src="https://raw.githubusercontent.com/OperationSpark/opspark/master/img/confirm.png">
 
@@ -91,7 +92,7 @@ It's not necessary to run this command before installing and working on projects
 
 You're ready to roll!
 
-Now, to begin working on our project, typically you will go into the directory of the project you just installed (for example, if you installed the _frabonacci_ project, you'll find it at `projects/frabonacci`), and open the file `index.html`.  Again, if you installed the **frabonacci** project, you'll open the `index.html` file at:
+Now, to begin working on our project, typically you will go into the directory of the project you just installed (for example, if you installed the _frabonacci_ project, you'll find it at `projects/frabonacci`), and open the file `index.html`. Again, if you installed the **frabonacci** project, you'll open the `index.html` file at:
 
     projects/frabonacci/index.html
 
@@ -125,10 +126,13 @@ To see built-in help, you can always run the command:
 
 This will list commands and optional flags available to you in the `opspark` npm utility.
 
-For more personable help, tug on the sleeve of one of your awesome Operation Spark developers teaching your bootcamp, or, contact us via our Slack chat group.  If you're not a member of our Slack group, please request an invitation via our website at <a href="operationspark.org">operationspark.org</a>.
+For more personable help, tug on the sleeve of one of your awesome Operation Spark developers teaching your bootcamp, or, contact us via our Slack chat group. If you're not a member of our Slack group, please request an invitation via our website at <a href="operationspark.org">operationspark.org</a>.
 
 ## For Teachers and Developers
-If you are running node on Windows use the command <npm run web-dev> as the postinstall script does not
+
+## dev setup
+
+If you are running node on Windows use the command <npm run windows-dev> as the postinstall script does not
 work for environments outside of Mac.
 
 ### Headstart
@@ -137,7 +141,7 @@ If you want to get a fast head-start, instead of having to step through the [pre
 
 To do this:
 
-1. If you want to publish the website live on GitHub Pages, as is the pattern with our website project, you will first want to create a GitHub repository, so named for your GitHub username, as in, my-github-username.github.io, and then clone it into a new Clould9 workspace (step 2).  <a href="https://github.com/OperationSpark/first-website/blob/master/README.md" target="_blank">See the instructions to do so in the First Website lesson on setting up the GitHub repository for a GitHub Pages website</a>.
+1.  If you want to publish the website live on GitHub Pages, as is the pattern with our website project, you will first want to create a GitHub repository, so named for your GitHub username, as in, my-github-username.github.io, and then clone it into a new Clould9 workspace (step 2). <a href="https://github.com/OperationSpark/first-website/blob/master/README.md" target="_blank">See the instructions to do so in the First Website lesson on setting up the GitHub repository for a GitHub Pages website</a>.
 
     If you don't want to publish your website, you can skip this step and move on to step 2.
 
@@ -145,19 +149,19 @@ To do this:
 
     If you skipped the optional step 1, the simply create a new Clould9 workspace, using HTML5.
 
-3. Next, once your Clould9 workspace has finished spooling-up, globally install the opspark npm utility by running the command:
+3.  Next, once your Clould9 workspace has finished spooling-up, globally install the opspark npm utility by running the command:
 
         npm install -g opspark
 
-4. Finally, to install and initialize the website files, run the command:
+4.  Finally, to install and initialize the website files, run the command:
 
         os init-ws
 
-This will download a completed version of the `index.html` and `portfolio.html` files, and  initialize the `portfolio.html`.  You will probably want to change the default content and style with your own content, if you're going to publish it, heh, heh!
+This will download a completed version of the `index.html` and `portfolio.html` files, and initialize the `portfolio.html`. You will probably want to change the default content and style with your own content, if you're going to publish it, heh, heh!
 
 ### Keeping Master Files
 
-For teachers or developers instructing classes, you may choose to install a project and keep the .master files, which usually include the fully completed project and sometimes teachers notes.  To to this, run the `os install` command and include the `-m` flag, like so:
+For teachers or developers instructing classes, you may choose to install a project and keep the .master files, which usually include the fully completed project and sometimes teachers notes. To to this, run the `os install` command and include the `-m` flag, like so:
 
     os install -m
 
