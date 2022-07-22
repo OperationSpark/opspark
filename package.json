@@ -8,8 +8,13 @@
   },
   "scripts": {
     "postinstall": "bash ./install.sh",
+    "windows-dev": "dos2unix ./install.sh",
     "dev": "nodemon test-server.js",
-    "test": "mocha ./test"
+    "test": "mocha ./test",
+    "preinstall": "npx npm-force-resolutions"
+  },
+  "resolutions": {
+    "graceful-fs": "^4.2.9"
   },
   "repository": {
     "type": "git",
@@ -40,6 +45,7 @@
     "cli-color": "^2.0.1",
     "cli-view": "^1.0.0",
     "commander": "^2.11.0",
+    "cross-env": "^7.0.3",
     "express": "^4.15.3",
     "fs-extra": "^0.18.0",
     "fs-json": "^0.1.2",
