@@ -7,8 +7,8 @@
     "node": ">=6.0.0"
   },
   "scripts": {
-    "build": "cross-env NODE_ENV=test",
-    "postinstall": "dos2unix ./install.sh",
+    "macinstall": "bash ./install.sh",
+    "linuxinstall": "dos2unix ./install.sh",
     "dev": "nodemon test-server.js",
     "test": "mocha ./test",
     "preinstall": "npx npm-force-resolutions"
