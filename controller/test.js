@@ -137,10 +137,8 @@ function runTests(project) {
 
       console.log(clc.bgBlue.white(`  Passing tests:  ${getFillStr(passes)}`));
       console.log(clc.bgRed.white(`  Failing tests:  ${getFillStr(failures)}`));
-      console.log(
-        clc.bgYellow.black(`  Pending tests:  ${getFillStr(pending)}`)
-      );
-      console.log(clc.bgBlack.white(`  Total tests:    ${getFillStr(tests)}`));
+      console.log(clc.bgYellow.black(`  Pending tests:  ${getFillStr(pending)}`));
+      console.log(clc.bgBlack.white(`  Total tests:  ${getFillStr(tests)}`));
 
       return { project, testResults };
     })

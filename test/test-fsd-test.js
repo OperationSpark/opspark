@@ -23,6 +23,7 @@ const {
   dummyTestPass,
   dummyTestFail
 } = require('./helpers/dummyData');
+const { runTests } = require('../controller/test');
 
 const projects = proxyquire('../controller/projects', {
   './env': {
@@ -51,16 +52,16 @@ describe('test', function () {
     if (console.log.restore) console.log.restore();
   });
 
-  describe.only('#grabTests()-fsd', function () {
+  describe('#grabTests()-fsd', function () {
     it('should install tests', function (done) {
         console.log(dummySessions[2]);
-      const project = dummySessions[2].PROJECT[7];
+      const project = dummySessions[2].PROJECT[1];
       const name = changeCase.paramCase(project.name);
       const path = `${projectsDirectory}/${name}`;
       expect(fs.existsSync(`${path}/test`)).to.be.false;
       projects.ensureProjectsDirectory();
       fs.mkdirSync(path);
-      fs.writeFileSync(`${path}/package.json`, '{}');
+      // fs.writeFileSync(`${path}/package.json`, '{}');
       test.grabTests(project).then(function () {
         expect(fs.existsSync(`${path}/test`)).to.be.true;
         done();
@@ -68,7 +69,7 @@ describe('test', function () {
     });
 
     it('should install package.json if necessary', function (done) {
-      const project = dummySessions[2].PROJECT[7];
+      const project = dummySessions[2].PROJECT[1];
       const name = changeCase.paramCase(project.name);
       const path = `${projectsDirectory}/${name}`;
       expect(fs.existsSync(`${path}/package.json`)).to.be.false;
@@ -81,8 +82,8 @@ describe('test', function () {
     });
   });
 
-  describe('#runTests()', function () {
-    const project = dummySession.PROJECT[1];
+  describe.only('#runTests()', function () {
+    const project = dummySessions[2].PROJECT[1];
 
     const passTests = proxyquire('../controller/test', {
       './helpers': {
@@ -107,14 +108,23 @@ describe('test', function () {
     }).runTests;
 
     it('should run tests and find pass', function (done) {
-      passTests(project).then(function (result) {
+      test.grabTests(project)
+      .then(() => console.log('test-help-me-please'))
+      .catch(err => console.log(err));
+      test.runTests(project)
+      .then(result => {
         const stats = result.testResults.stats;
+        console.log(result)
         expect(result.project).to.exist;
         expect(result.testResults).to.exist;
         expect(stats.tests).to.equal(4);
         expect(stats.passes).to.equal(4);
         expect(stats.pending).to.equal(0);
         expect(stats.failures).to.equal(0);
+        done();
+      })
+      .catch(err => {
+        console.log(err);
         done();
       });
     });
