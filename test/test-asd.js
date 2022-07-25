@@ -14,9 +14,7 @@ const changeCase = require('change-case');
 
 const fakeHelpers = require('./helpers/fakeHelpers');
 
-const {
-  dummySessionAsd,
-} = require('./helpers/dummyData');
+const { dummySessionAsd } = require('./helpers/dummyData');
 
 const projects = proxyquire('../controller/projects', {
   './env': {
@@ -36,7 +34,7 @@ const projectsDirectory = './test/files/environment/projects';
 
 describe('test', function () {
   before(function (done) {
-    rimraf(projectsDirectory, () => done());
+    rimraf(projectsDirectory, done);
   });
 
   afterEach(function () {
@@ -44,185 +42,46 @@ describe('test', function () {
   });
 
   // Should install tests for the selected project
-  describe.only('#grabTests()', function () {
-    it('should install scratch-pad tests', function (done) {
-      const project = dummySessionAsd.PROJECT[0];
-      const name = changeCase.paramCase(project.name);
-      const path = `${projectsDirectory}/${name}`;
-      expect(fs.existsSync(`${path}/test`)).to.be.false;
-      projects.ensureProjectsDirectory();
-      fs.mkdirSync(path);
-      fs.writeFileSync(`${path}/package.json`, '{}');
-      test.grabTests(project).then(function () {
-        expect(fs.existsSync(`${path}/test`)).to.be.true;
-        done();
+  describe('#grabTests()', function () {
+    dummySessionAsd.PROJECT.forEach((project) => {
+      it(`should install tests for ${project.name}`, function (done) {
+        const name = changeCase.paramCase(project.name);
+        const path = `${projectsDirectory}/${name}`;
+        expect(fs.existsSync(`${path}/test`)).to.be.false;
+        projects.ensureProjectsDirectory();
+        fs.mkdirSync(path);
+        fs.writeFileSync(`${path}/package.json`, '{}');
+        test.grabTests(project).then(function () {
+          expect(fs.existsSync(`${path}/test`)).to.be.true;
+          done();
+        });
       });
     });
+  });
 
-    it('should install studies tests', function (done) {
-      const project = dummySessionAsd.PROJECT[1];
-      const name = changeCase.paramCase(project.name);
-      const path = `${projectsDirectory}/${name}`;
-      expect(fs.existsSync(`${path}/test`)).to.be.false;
-      projects.ensureProjectsDirectory();
-      fs.mkdirSync(path);
-      fs.writeFileSync(`${path}/package.json`, '{}');
-      test.grabTests(project).then(function () {
-        expect(fs.existsSync(`${path}/test`)).to.be.true;
-        done();
-      });
-    });
-
-    it('should install matchy tests', function (done) {
-      const project = dummySessionAsd.PROJECT[2];
-      const name = changeCase.paramCase(project.name);
-      const path = `${projectsDirectory}/${name}`;
-      expect(fs.existsSync(`${path}/test`)).to.be.false;
-      projects.ensureProjectsDirectory();
-      fs.mkdirSync(path);
-      fs.writeFileSync(`${path}/package.json`, '{}');
-      test.grabTests(project).then(function () {
-        expect(fs.existsSync(`${path}/test`)).to.be.true;
-        done();
-      });
-    });
-
-    it('should install function-master tests', function (done) {
-      const project = dummySessionAsd.PROJECT[3];
-      const name = changeCase.paramCase(project.name);
-      const path = `${projectsDirectory}/${name}`;
-      expect(fs.existsSync(`${path}/test`)).to.be.false;
-      projects.ensureProjectsDirectory();
-      fs.mkdirSync(path);
-      fs.writeFileSync(`${path}/package.json`, '{}');
-      test.grabTests(project).then(function () {
-        expect(fs.existsSync(`${path}/test`)).to.be.true;
-        done();
-      });
-    });
-    it('should install well-of-html tests', function (done) {
-      const project = dummySessionAsd.PROJECT[4];
-      const name = changeCase.paramCase(project.name);
-      const path = `${projectsDirectory}/${name}`;
-      expect(fs.existsSync(`${path}/test`)).to.be.false;
-      projects.ensureProjectsDirectory();
-      fs.mkdirSync(path);
-      fs.writeFileSync(`${path}/package.json`, '{}');
-      test.grabTests(project).then(function () {
-        expect(fs.existsSync(`${path}/test`)).to.be.true;
-        done();
-      });
-    });
-    
-    it('should install product-project tests', function (done) {
-      const project = dummySessionAsd.PROJECT[5];
-      const name = changeCase.paramCase(project.name);
-      const path = `${projectsDirectory}/${name}`;
-      expect(fs.existsSync(`${path}/test`)).to.be.false;
-      projects.ensureProjectsDirectory();
-      fs.mkdirSync(path);
-      fs.writeFileSync(`${path}/package.json`, '{}');
-      test.grabTests(project).then(function () {
-        expect(fs.existsSync(`${path}/test`)).to.be.true;
-        done();
-      });
-    });
-
-    it('should install underpants tests', function (done) {
-      const project = dummySessionAsd.PROJECT[6];
-      const name = changeCase.paramCase(project.name);
-      const path = `${projectsDirectory}/${name}`;
-      expect(fs.existsSync(`${path}/test`)).to.be.false;
-      projects.ensureProjectsDirectory();
-      fs.mkdirSync(path);
-      fs.writeFileSync(`${path}/package.json`, '{}');
-      test.grabTests(project).then(function () {
-        expect(fs.existsSync(`${path}/test`)).to.be.true;
-        done();
-      });
-    });
-
-    it('should install lodown tests', function (done) {
-      const project = dummySessionAsd.PROJECT[7];
-      const name = changeCase.paramCase(project.name);
-      const path = `${projectsDirectory}/${name}`;
-      expect(fs.existsSync(`${path}/test`)).to.be.false;
-      projects.ensureProjectsDirectory();
-      fs.mkdirSync(path);
-      fs.writeFileSync(`${path}/package.json`, '{}');
-      test.grabTests(project).then(function () {
-        expect(fs.existsSync(`${path}/test`)).to.be.true;
-        done();
-      });
-    });
-
-    it('should install lets-get-functional tests', function (done) {
-      const project = dummySessionAsd.PROJECT[8];
-      const name = changeCase.paramCase(project.name);
-      const path = `${projectsDirectory}/${name}`;
-      expect(fs.existsSync(`${path}/test`)).to.be.false;
-      projects.ensureProjectsDirectory();
-      fs.mkdirSync(path);
-      fs.writeFileSync(`${path}/package.json`, '{}');
-      test.grabTests(project).then(function () {
-        expect(fs.existsSync(`${path}/test`)).to.be.true;
-        done();
-      });
-    });
-
-    it('should install first-website tests', function (done) {
-      const project = dummySessionAsd.PROJECT[9];
-      const name = changeCase.paramCase(project.name);
-      const path = `${projectsDirectory}/${name}`;
-      expect(fs.existsSync(`${path}/test`)).to.be.false;
-      projects.ensureProjectsDirectory();
-      fs.mkdirSync(path);
-      fs.writeFileSync(`${path}/package.json`, '{}');
-      test.grabTests(project).then(function () {
-        expect(fs.existsSync(`${path}/test`)).to.be.true;
-        done();
-      });
-    });
-
-    it('should install billypedia tests', function (done) {
-      const project = dummySessionAsd.PROJECT[10];
-      const name = changeCase.paramCase(project.name);
-      const path = `${projectsDirectory}/${name}`;
-      expect(fs.existsSync(`${path}/test`)).to.be.false;
-      projects.ensureProjectsDirectory();
-      fs.mkdirSync(path);
-      fs.writeFileSync(`${path}/package.json`, '{}');
-      test.grabTests(project).then(function () {
-        expect(fs.existsSync(`${path}/test`)).to.be.true;
-        done();
-      });
-    });
-  })
-
-// Should run the tests for the selected project
+  // Should run the tests for the selected project
   describe('#runTests()', function () {
     const project = dummySessionAsd.PROJECT[0];
-
     const passTests = proxyquire('../controller/test', {
       './helpers': {
-        makeTestScript: fakeHelpers.makeTestPass
+        makeTestScript: fakeHelpers.makeTestPass,
       },
       './github': fakeHelpers,
       './env': {
-        home: fakeHelpers.home
+        home: fakeHelpers.home,
       },
-      './reporter': fakeHelpers.reportPass
+      './reporter': fakeHelpers.reportPass,
     }).runTests;
 
     const failTests = proxyquire('../controller/test', {
       './helpers': {
-        makeTestScript: fakeHelpers.makeTestFail
+        makeTestScript: fakeHelpers.makeTestFail,
       },
       './github': fakeHelpers,
       './env': {
-        home: fakeHelpers.home
+        home: fakeHelpers.home,
       },
-      './reporter': fakeHelpers.reportFail
+      './reporter': fakeHelpers.reportFail,
     }).runTests;
 
     it('should run tests and find pass', function (done) {
@@ -251,11 +110,4 @@ describe('test', function () {
       });
     });
   });
-
-})
-
-
-
-
-
-
+});
