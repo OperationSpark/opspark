@@ -109,5 +109,16 @@ describe('test', function () {
         done();
       });
     });
+
+    it('should return error if a project is not valid', function (done) {
+      const invalidProject = {
+        name: 'not-a-project',
+        path: './test/files/environment/projects/not-a-project',
+      };
+      test.runTests(invalidProject).catch(function (err) {
+        expect(err).to.exist;
+        done();
+      });
+    });
   });
 });
