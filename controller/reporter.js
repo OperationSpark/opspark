@@ -26,8 +26,8 @@ function report(testDir) {
 
     const runner = mocha.run(() => {
       process.stdout.write = stdoutWriteCopy;
-      res(runner.testResults);
     });
+    res(runner.testResults);
   });
 }
 

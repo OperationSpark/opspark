@@ -1,4 +1,6 @@
 /* global describe it expect before beforeEach afterEach */
+const os = require('node:os');
+const path = require('path');
 require('mocha');
 require('should');
 const clc = require('cli-color');
@@ -55,7 +57,7 @@ describe('test', function () {
   describe('#grabTests()-fsd', function () {
     it('should install tests', function (done) {
         console.log(dummySessions[2]);
-      const project = dummySessions[2].PROJECT[1];
+      const project = dummySessions[2].PROJECT[0];
       const name = changeCase.paramCase(project.name);
       const path = `${projectsDirectory}/${name}`;
       expect(fs.existsSync(`${path}/test`)).to.be.false;
@@ -83,7 +85,9 @@ describe('test', function () {
   });
 
   describe.only('#runTests()', function () {
-    const project = dummySessions[2].PROJECT[1];
+    const project = dummySessions[2].PROJECT[2];
+    const name = changeCase.paramCase(project.name);
+    const path = `${projectsDirectory}/${name}`;
 
     const passTests = proxyquire('../controller/test', {
       './helpers': {
@@ -107,25 +111,19 @@ describe('test', function () {
       './reporter': fakeHelpers.reportFail
     }).runTests;
 
-    it('should run tests and find pass', function (done) {
-      test.grabTests(project)
-      .then(() => console.log('test-help-me-please'))
-      .catch(err => console.log(err));
-      test.runTests(project)
-      .then(result => {
-        const stats = result.testResults.stats;
-        console.log(result)
-        expect(result.project).to.exist;
-        expect(result.testResults).to.exist;
-        expect(stats.tests).to.equal(4);
-        expect(stats.passes).to.equal(4);
-        expect(stats.pending).to.equal(0);
-        expect(stats.failures).to.equal(0);
-        done();
-      })
-      .catch(err => {
-        console.log(err);
-        done();
+    it('should run tests and get results', function (done) {
+      expect(fs.existsSync(`${path}/test`)).to.be.false;
+      projects.ensureProjectsDirectory();
+      fs.mkdirSync(path);
+      test.grabTests(project).then(function () {
+        console.log('Test grabbed!');
+        expect(fs.existsSync(`${path}/test`)).to.be.true;
+        test.runTests(project).then((results) => {
+          console.log(results.testResults.stats.tests);
+          expect(results.testResults.stats.tests).to.be.greaterThan(0);
+          done();
+        })
+        .catch(err => console.log(err));
       });
     });
 
