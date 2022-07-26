@@ -144,6 +144,83 @@ const dummySession3 = {
   ],
 };
 
+const dummySessionAsd = {
+  sessionId: 'isWGZJjnWRbRXhCiA',
+  name: 'Advance Software Development',
+  title: 'Advanced Software Development Jul 20 22 9am',
+  cohort: 'advanced-software-development-Jul-20-22-9am',
+  PROJECT: [
+    {
+      _id: 'L9YQQn63z4S7p6cba',
+      name: 'Scratch Pad',
+      desc: 'Practice the art of JavaScript by passing unit tests',
+      url: 'https://github.com/OperationSpark/scratch-pad',
+    },
+    {
+      _id: 'PJK9Pr5fmh8ZYGNE8',
+      name: 'Studies',
+      desc: 'An addition to your website project to record your programming studies',
+      url: 'https://github.com/operationspark/studies-v2',
+    },
+    {
+      _id: 'ZnRsPsdsMWPzfYZ2S',
+      name: 'Matchy',
+      desc: 'Practice all the ways to dynamically create and access data structures',
+      url: 'https://github.com/operationspark/matchy',
+    },
+    {
+      _id: 'v4sZfMFaanbqaWeNS',
+      name: 'Function Master',
+      desc: 'Master the art of Functions',
+      url: 'https://github.com/OperationSpark/function-master',
+    },
+    {
+      _id: '3MMh7sBM7FvGYYvrW',
+      name: 'Well of HTML',
+      desc: 'A run through of HTML elements',
+      url: 'https://github.com/OperationSpark/${program}-${year}-${month}-well-of-html',
+    },
+    {
+      _id: 'RDzTYJGHg34JJyb43',
+      name: 'Product Project',
+      desc: 'A real world data-driven app with drill-down, search and filter features',
+      url: 'https://github.com/operationspark/product-project',
+    },
+    {
+      _id: 'DkLWgh47DNaLK6yYY',
+      name: 'Underpants',
+      desc: 'Fun with functional Functions',
+      url: 'https://github.com/operationspark/underpants',
+    },
+    {
+      _id: 'pmMG4KckZeFHBnfGz',
+      name: 'Lodown',
+      desc: 'An npm functional programming library project',
+      url: 'https://github.com/operationspark/lodown',
+    },
+    {
+      _id: 'H5jymW66LEvSQRo4Q',
+      name: "Let's Get Functional",
+      desc: 'An exercise in problem solving in the functional idiom',
+      url: 'https://github.com/OperationSpark/lets-get-functional',
+    },
+    {
+      _id: 'Xe7HfMW7P5YipdZMc',
+      name: 'First Website',
+      desc: "A client-side web project into which we'll install many projects",
+      url: 'https://github.com/OperationSpark/first-website',
+    },
+    {
+      _id: 'aqpiasyTiZBphngQE',
+      name: 'Billypedia',
+      desc: "Gettin' jiggy with jQuery and Billy Higgins",
+      url: 'https://github.com/OperationSpark/billypedia',
+    },
+  ],
+};
+
+module.exports.dummySessionAsd = dummySessionAsd;
+
 module.exports.dummySessions = [
   dummySession,
   dummySession2,
