@@ -74,7 +74,7 @@ function selectProject({ session, projectAction }) {
             }
           ],
           function (confirm) {
-            if (confirm.install) return res(project);
+            if (confirm.in5stall) return res(project);
             return res(selectProject({ session, projectAction }));
           }
         );

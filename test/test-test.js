@@ -51,20 +51,34 @@ describe('test', function () {
     if (console.log.restore) console.log.restore();
   });
 
-  describe('#grabTests()', function () {
-    it('should install tests', function (done) {
-      const project = dummySession.PROJECT[0];
-      const name = changeCase.paramCase(project.name);
-      const path = `${projectsDirectory}/${name}`;
-      expect(fs.existsSync(`${path}/test`)).to.be.false;
-      projects.ensureProjectsDirectory();
-      fs.mkdirSync(path);
-      fs.writeFileSync(`${path}/package.json`, '{}');
-      test.grabTests(project).then(function () {
-        expect(fs.existsSync(`${path}/test`)).to.be.true;
-        done();
-      });
-    });
+  // describe('#grabTests()', function () {
+  //   it('should install tests', function (done) {
+  //     const project = dummySession.PROJECT[0];
+  //     const name = changeCase.paramCase(project.name);
+  //     const path = `${projectsDirectory}/${name}`;
+  //     expect(fs.existsSync(`${path}/test`)).to.be.false;
+  //     projects.ensureProjectsDirectory();
+  //     fs.mkdirSync(path);
+  //     fs.writeFileSync(`${path}/package.json`, '{}');
+  //     test.grabTests(project).then(function () {
+  //       expect(fs.existsSync(`${path}/test`)).to.be.true;
+  //       done();
+  //     });
+  //   });
+
+    describe('#grabTests()', function () {
+      dummySession.PROJECT.forEach((project) => {
+        it(`should install tests for ${project.name}`, function (done) {
+          const name = changeCase.paramCase(project.name);
+          const path = `${projectsDirectory}/${name}`;
+          expect(fs.existsSync(`${path}/test`)).to.be.false;
+          projects.ensureProjectsDirectory();
+          fs.mkdirSync(path);
+          fs.writeFileSync(`${path}/package.json`, '{}');
+          test.grabTests(project).then(function () {
+            expect(fs.existsSync(`${path}/test`)).to.be.true;
+            done();
+          });
 
     it('should install package.json if necessary', function (done) {
       const project = dummySession.PROJECT[1];
