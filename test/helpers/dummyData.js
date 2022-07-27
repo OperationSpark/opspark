@@ -165,3 +165,27 @@ module.exports.dummyTestPass = `{
     { "fullTitle": "Test 4" }
   ]
 }`;
+
+module.exports.dummyTest75 = `{
+  "stats": {
+    "tests": 4,
+    "passes": 3,
+    "pending": 0,
+    "failures": 1
+  },
+  "pending": [],
+  "failures": [
+    {
+      "fullTitle": "Test 1",
+      "err": {
+        "message": "Error message",
+        "stack": "Trace"
+      }
+    }
+  ],
+  "passes": [
+    { "fullTitle": "Test 2" },
+    { "fullTitle": "Test 3" },
+    { "fullTitle": "Test 4" }
+  ]
+}`;
