@@ -18,6 +18,7 @@ const projects = proxyquire('../controller/projects', {
 });
 
 const readAndParse = path => JSON.parse(fs.readFileSync(path));
+//recursively grabs projects
 
 describe.only('#installProject()', function () {
   dummySession.PROJECT.forEach((project) => {
