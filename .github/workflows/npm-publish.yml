@@ -1,23 +1,22 @@
 # !!!! THIS DOES NOT BUMP THE PACKAGE VERSION
-name: Npm Publish
 
+name: Publish Package to npmjs
 on:
   release:
-    types: [published]
-
+    types: [created]
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v1
+      - uses: actions/checkout@v3
+      # Setup .npmrc file to publish to npm
+      - uses: actions/setup-node@v3
         with:
-          node-version: 14
-          registry-url: https://registry.npmjs.org/
-      - run: npm install
-      - uses: JS-DevTools/npm-publish@v1
-        with:
-          dry-run: true # use this for testing
-          token: ${{ secrets.NPM_AUTH_TOKEN }}
+          node-version: "14"
+          registry-url: "https://registry.npmjs.org"
+      - run: npm ci
+      - run: npm publish --dry-run
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
 # https://javascript.plainenglish.io/publish-update-npm-packages-with-github-actions-e4d786ffd62a
 # https://github.com/marketplace/actions/npm-publish
