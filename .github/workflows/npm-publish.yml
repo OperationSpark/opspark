@@ -1,0 +1,21 @@
+# !!!! THIS DOES NOT BUMP THE PACKAGE VERSION
+name: Npm Publish
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+        with:
+          node-version: 14
+          registry-url: https://registry.npmjs.org/
+      - run: npm login --scope=${{secrets.NPM_EMAIL}}
+      - run: npm install
+      - run: npm publish
+      - run: npm logout --scope=${{secrets.NPM_EMAIL}}
+    env:
+      NODE_AUTH_TOKEN: ${{secrets.NPM_AUTH_TOKEN}}
+# https://javascript.plainenglish.io/publish-update-npm-packages-with-github-actions-e4d786ffd62a
