@@ -11,7 +11,8 @@
     "windows-dev": "dos2unix ./install.sh",
     "dev": "nodemon test-server.js",
     "test": "mocha ./test",
-    "preinstall": "npx npm-force-resolutions"
+    "preinstall": "npx npm-force-resolutions",
+    "test:publish": "act release -W .github/workflows/npm-publish.yml"
   },
   "resolutions": {
     "graceful-fs": "^4.2.9"
