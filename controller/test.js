@@ -21,18 +21,18 @@ const {
 let rootDirectory = `${home()}/environment`;
 let githubDir;
 
-if (cloud9User) {
-  githubDir = fs
-    .readdirSync(rootDirectory)
-    .filter(dir => /[\w]+\.github\.io/.test(dir))[0];
-  rootDirectory = `${home()}/environment/${githubDir}`;
-} else if (codenvyUser) {
-  rootDirectory = codenvyUser;
-  githubDir = fs
-    .readdirSync(rootDirectory)
-    .filter(dir => /[\w]+\.github\.io/.test(dir))[0];
-  rootDirectory = `${rootDirectory}/${githubDir}`;
-}
+// if (cloud9User) {
+//   githubDir = fs
+//     .readdirSync(rootDirectory)
+//     .filter(dir => /[\w]+\.github\.io/.test(dir))[0];
+//   rootDirectory = `${home()}/environment/${githubDir}`;
+// } else if (codenvyUser) {
+//   rootDirectory = codenvyUser;
+//   githubDir = fs
+//     .readdirSync(rootDirectory)
+//     .filter(dir => /[\w]+\.github\.io/.test(dir))[0];
+//   rootDirectory = `${rootDirectory}/${githubDir}`;
+// }
 const projectsDirectory = `${rootDirectory}/projects`;
 
 // Start of test command
@@ -145,7 +145,7 @@ function runTests(project) {
     .then(
       testResults => removeProjectTests().then(() => testResults),
       error => removeProjectTests().then(() => Promise.reject(error))
-    );
+    )
 }
 
 module.exports.runTests = runTests;

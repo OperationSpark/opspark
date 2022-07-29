@@ -1,4 +1,5 @@
 /* global describe it expect before beforeEach afterEach */
+const { home } = require('../controller/env');
 const os = require('node:os');
 const path = require('path');
 require('mocha');
@@ -22,16 +23,10 @@ const fakeHelpers = require('./helpers/fakeHelpers');
 const {
   dummySession,
   dummySessions,
-  dummyTestPass,
-  dummyTestFail
 } = require('./helpers/dummyData');
 const { runTests } = require('../controller/test');
 
-const projects = proxyquire('../controller/projects', {
-  './env': {
-    home: fakeHelpers.home
-  }
-});
+const projects = require('../controller/projects')
 
 const test = proxyquire('../controller/test', {
   './helpers': fakeHelpers,
@@ -40,7 +35,6 @@ const test = proxyquire('../controller/test', {
     home: fakeHelpers.home
   }
 });
-
 const projectsDirectory = './test/files/environment/projects';
 const projectEntriesPath =
   './test/files/workenvironmentspace/projects/projects.json';
@@ -54,146 +48,34 @@ describe('test', function () {
     if (console.log.restore) console.log.restore();
   });
 
-  describe('#grabTests()-fsd', function () {
-    it('should install tests', function (done) {
-        console.log(dummySessions[2]);
-      const project = dummySessions[2].PROJECT[0];
-      const name = changeCase.paramCase(project.name);
-      const path = `${projectsDirectory}/${name}`;
-      expect(fs.existsSync(`${path}/test`)).to.be.false;
-      projects.ensureProjectsDirectory();
-      fs.mkdirSync(path);
-      // fs.writeFileSync(`${path}/package.json`, '{}');
-      test.grabTests(project).then(function () {
-        expect(fs.existsSync(`${path}/test`)).to.be.true;
-        done();
-      });
-    });
 
-    it('should install package.json if necessary', function (done) {
-      const project = dummySessions[2].PROJECT[1];
-      const name = changeCase.paramCase(project.name);
-      const path = `${projectsDirectory}/${name}`;
-      expect(fs.existsSync(`${path}/package.json`)).to.be.false;
-      projects.ensureProjectsDirectory();
-      fs.mkdirSync(path);
-      test.grabTests(project).then(function () {
-        expect(fs.existsSync(`${path}/package.json`)).to.be.true;
-        done();
-      });
-    });
-  });
-
-  describe.only('#runTests()', function () {
-    const project = dummySessions[2].PROJECT[2];
+  describe('#runTests()', function () {
+    const project = dummySessions[2].PROJECT[1];
     const name = changeCase.paramCase(project.name);
     const path = `${projectsDirectory}/${name}`;
 
-    const passTests = proxyquire('../controller/test', {
-      './helpers': {
-        makeTestScript: fakeHelpers.makeTestPass
-      },
-      './github': fakeHelpers,
-      './env': {
-        home: fakeHelpers.home
-      },
-      './reporter': fakeHelpers.reportPass
-    }).runTests;
+    it.only('should run tests and get results', function (done) {
+      projects.installProject(project)
+      .then(() => {
+        projects.ensureProjectsDirectory();
+        test.grabTests(project).then(function () {
+          console.log('Test grabbed!');
+          expect(fs.existsSync(`${path}/test`)).to.be.true;
+          test.runTests(project).then((results) => {
+            console.log(results);
+           const { passes, pending, failures } = results.testResults
+            const tests = passes + pending + failures;
+            expect(tests).to.be.greaterThan(0);
+            test.displayResults(results)
+            .then(() => {
 
-    const failTests = proxyquire('../controller/test', {
-      './helpers': {
-        makeTestScript: fakeHelpers.makeTestFail
-      },
-      './github': fakeHelpers,
-      './env': {
-        home: fakeHelpers.home
-      },
-      './reporter': fakeHelpers.reportFail
-    }).runTests;
-
-    it('should run tests and get results', function (done) {
-      expect(fs.existsSync(`${path}/test`)).to.be.false;
-      projects.ensureProjectsDirectory();
-      fs.mkdirSync(path);
-      test.grabTests(project).then(function () {
-        console.log('Test grabbed!');
-        expect(fs.existsSync(`${path}/test`)).to.be.true;
-        test.runTests(project).then((results) => {
-          console.log(results.testResults.stats.tests);
-          expect(results.testResults.stats.tests).to.be.greaterThan(0);
-          done();
-        })
-        .catch(err => console.log(err));
-      });
-    });
-
-    it('should run tests and find failure', function (done) {
-      failTests(project).then(function (result) {
-        const stats = result.testResults.stats;
-        expect(result.project).to.exist;
-        expect(result.testResults).to.exist;
-        expect(stats.tests).to.equal(4);
-        expect(stats.passes).to.equal(0);
-        expect(stats.pending).to.equal(0);
-        expect(stats.failures).to.equal(4);
-        done();
-      });
-    });
-
-    it('should log correct stats', function (done) {
-      const log = sinon.spy(console, 'log');
-      passTests(project).then(function (result) {
-        const stats = result.testResults.stats;
-        expect(
-          log.calledWith(clc.bgBlack.white(' Total tests:    4  '))
-        ).to.be.true;
-        expect(
-          log.calledWith(clc.bgBlue.white(' Passing tests:  4  '))
-        ).to.be.true;
-        expect(
-          log.calledWith(clc.bgYellow.black(' Pending tests:  0  '))
-        ).to.be.true;
-        expect(
-          log.calledWith(clc.bgRed.white(' Failing tests:  0  '))
-        ).to.be.true;
-        done();
-      });
-    });
-
-    it('should log correct stats', function (done) {
-      const log = sinon.spy(console, 'log');
-      failTests(project).then(function (result) {
-        const stats = result.testResults.stats;
-        expect(
-          log.calledWith(clc.bgBlack.white(' Total tests:    4  '))
-        ).to.be.true;
-        expect(
-          log.calledWith(clc.bgBlue.white(' Passing tests:  0  '))
-        ).to.be.true;
-        expect(
-          log.calledWith(clc.bgYellow.black(' Pending tests:  0  '))
-        ).to.be.true;
-        expect(
-          log.calledWith(clc.bgRed.white(' Failing tests:  4  '))
-        ).to.be.true;
-        done();
-      });
-    });
-  });
-
-  describe('#displayResults()', function () {
-    it('should fail with failing results', function () {
-      const { pass } = test.displayResults({
-        testResults: JSON.parse(dummyTestFail)
-      });
-      expect(pass).to.be.false;
-    });
-
-    it('should pass with passing results', function () {
-      const { pass } = test.displayResults({
-        testResults: JSON.parse(dummyTestPass)
-      });
-      expect(pass).to.be.true;
+              done();
+            })
+            .catch(error => console.log(error));
+          })
+          .catch(err => console.log(err));
+        });
+      })
     });
   });
 });
