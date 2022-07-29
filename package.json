@@ -56,7 +56,7 @@
     "nodemon": "^2.0.19",
     "octonode": "^0.9.5",
     "process": "^0.11.10",
-    "prompt": "^0.2.14",
+    "prompt": "^1.3.0",
     "q": "^1.3.0",
     "request-promise": "^4.2.1",
     "rimraf": "^2.2.8",
