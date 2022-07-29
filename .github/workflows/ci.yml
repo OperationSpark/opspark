@@ -1,4 +1,4 @@
-name: Opspark Tool Ci
+name: Ci
 on: [push, pull_request]
 jobs:
   build:
