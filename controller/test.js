@@ -21,18 +21,18 @@ const {
 let rootDirectory = `${home()}/environment`;
 let githubDir;
 
-if (cloud9User) {
-  githubDir = fs
-    .readdirSync(rootDirectory)
-    .filter(dir => /[\w]+\.github\.io/.test(dir))[0];
-  rootDirectory = `${home()}/environment/${githubDir}`;
-} else if (codenvyUser) {
-  rootDirectory = codenvyUser;
-  githubDir = fs
-    .readdirSync(rootDirectory)
-    .filter(dir => /[\w]+\.github\.io/.test(dir))[0];
-  rootDirectory = `${rootDirectory}/${githubDir}`;
-}
+// if (cloud9User) {
+//   githubDir = fs
+//     .readdirSync(rootDirectory)
+//     .filter(dir => /[\w]+\.github\.io/.test(dir))[0];
+//   rootDirectory = `${home()}/environment/${githubDir}`;
+// } else if (codenvyUser) {
+//   rootDirectory = codenvyUser;
+//   githubDir = fs
+//     .readdirSync(rootDirectory)
+//     .filter(dir => /[\w]+\.github\.io/.test(dir))[0];
+//   rootDirectory = `${rootDirectory}/${githubDir}`;
+// }
 const projectsDirectory = `${rootDirectory}/projects`;
 
 // Start of test command
@@ -137,17 +137,15 @@ function runTests(project) {
 
       console.log(clc.bgBlue.white(`  Passing tests:  ${getFillStr(passes)}`));
       console.log(clc.bgRed.white(`  Failing tests:  ${getFillStr(failures)}`));
-      console.log(
-        clc.bgYellow.black(`  Pending tests:  ${getFillStr(pending)}`)
-      );
-      console.log(clc.bgBlack.white(`  Total tests:    ${getFillStr(tests)}`));
+      console.log(clc.bgYellow.black(`  Pending tests:  ${getFillStr(pending)}`));
+      console.log(clc.bgBlack.white(`  Total tests:  ${getFillStr(tests)}`));
 
       return { project, testResults };
     })
     .then(
       testResults => removeProjectTests().then(() => testResults),
       error => removeProjectTests().then(() => Promise.reject(error))
-    );
+    )
 }
 
 module.exports.runTests = runTests;
@@ -169,14 +167,27 @@ function displayResults({ testResults }) {
       console.log(`> > > ${stackLineTwo}`.grey);
     });
 
-    return { pass: false };
+    //part divided by the whole 3/4 = 75%
+    //use math.round to round to the nearest whole percent
+    let grade = Math.round(100 * (testResults.stats.passes / testResults.stats.tests))
+    if(grade > 75) {
+      console.log(
+        clc.yellow(`You have passed ${grade}% of the test.`)
+      )
+    } else {
+      console.log(
+        clc.red(`You have passed ${grade}% of the test.`)
+      )
+    }
+
+    return { pass: false, grade: grade };
   }
 
   console.log(
     clc.green('You did it! 100% complete, now please run'),
     clc.red('os submit')
   );
-  return { pass: true };
+  return { pass: true, grade: 100 };
 }
 
 module.exports.displayResults = displayResults;

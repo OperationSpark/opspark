@@ -17,6 +17,7 @@
         "--colors",
         "${workspaceFolder}/test"
       ],
+      
       "internalConsoleOptions": "openOnSessionStart"
     },
     {
