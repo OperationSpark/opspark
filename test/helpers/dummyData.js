@@ -178,7 +178,6 @@ const dummySessionAsd = {
 };
 
 module.exports.dummySessionAsd = dummySessionAsd;
-
 module.exports.dummySessions = [
   dummySession,
   dummySession2,
@@ -237,6 +236,30 @@ module.exports.dummyTestPass = `{
   "failures": [],
   "passes": [
     { "fullTitle": "Test 1" },
+    { "fullTitle": "Test 2" },
+    { "fullTitle": "Test 3" },
+    { "fullTitle": "Test 4" }
+  ]
+}`;
+
+module.exports.dummyTest75 = `{
+  "stats": {
+    "tests": 4,
+    "passes": 3,
+    "pending": 0,
+    "failures": 1
+  },
+  "pending": [],
+  "failures": [
+    {
+      "fullTitle": "Test 1",
+      "err": {
+        "message": "Error message",
+        "stack": "Trace"
+      }
+    }
+  ],
+  "passes": [
     { "fullTitle": "Test 2" },
     { "fullTitle": "Test 3" },
     { "fullTitle": "Test 4" }
