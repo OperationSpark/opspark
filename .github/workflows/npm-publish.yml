@@ -15,7 +15,7 @@ jobs:
           node-version: "16"
           registry-url: "https://registry.npmjs.org"
       - run: npm ci
-      - run: npm publish --dry-run
+      - run: npm publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
 # https://javascript.plainenglish.io/publish-update-npm-packages-with-github-actions-e4d786ffd62a
