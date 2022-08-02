@@ -21,18 +21,18 @@ const {
 let rootDirectory = `${home()}/environment`;
 let githubDir;
 
-if (cloud9User) {
-  githubDir = fs
-    .readdirSync(rootDirectory)
-    .filter(dir => /[\w]+\.github\.io/.test(dir))[0];
-  rootDirectory = `${home()}/environment/${githubDir}`;
-} else if (codenvyUser) {
-  rootDirectory = codenvyUser;
-  githubDir = fs
-    .readdirSync(rootDirectory)
-    .filter(dir => /[\w]+\.github\.io/.test(dir))[0];
-  rootDirectory = `${rootDirectory}/${githubDir}`;
-}
+// if (cloud9User) {
+//   githubDir = fs
+//     .readdirSync(rootDirectory)
+//     .filter(dir => /[\w]+\.github\.io/.test(dir))[0];
+//   rootDirectory = `${home()}/environment/${githubDir}`;
+// } else if (codenvyUser) {
+//   rootDirectory = codenvyUser;
+//   githubDir = fs
+//     .readdirSync(rootDirectory)
+//     .filter(dir => /[\w]+\.github\.io/.test(dir))[0];
+//   rootDirectory = `${rootDirectory}/${githubDir}`;
+// }
 const projectsDirectory = `${rootDirectory}/projects`;
 
 // Start of test command
@@ -137,17 +137,15 @@ function runTests(project) {
 
       console.log(clc.bgBlue.white(`  Passing tests:  ${getFillStr(passes)}`));
       console.log(clc.bgRed.white(`  Failing tests:  ${getFillStr(failures)}`));
-      console.log(
-        clc.bgYellow.black(`  Pending tests:  ${getFillStr(pending)}`)
-      );
-      console.log(clc.bgBlack.white(`  Total tests:    ${getFillStr(tests)}`));
+      console.log(clc.bgYellow.black(`  Pending tests:  ${getFillStr(pending)}`));
+      console.log(clc.bgBlack.white(`  Total tests:  ${getFillStr(tests)}`));
 
       return { project, testResults };
     })
     .then(
       testResults => removeProjectTests().then(() => testResults),
       error => removeProjectTests().then(() => Promise.reject(error))
-    );
+    )
 }
 
 module.exports.runTests = runTests;
