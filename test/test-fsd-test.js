@@ -23,6 +23,10 @@ const fakeHelpers = require('./helpers/fakeHelpers');
 const {
   dummySession,
   dummySessions,
+  dummyTestPass,
+  dummyTest75,
+  dummyTest85,
+  dummyTestFail,
 } = require('./helpers/dummyData');
 const { runTests } = require('../controller/test');
 
@@ -49,33 +53,35 @@ describe('test', function () {
   });
 
 
-  describe('#runTests()', function () {
-    const project = dummySessions[2].PROJECT[1];
-    const name = changeCase.paramCase(project.name);
-    const path = `${projectsDirectory}/${name}`;
+  describe('#displayResults()', function () {
+    it('should fail with failing results', function () {
+      const { pass } = test.displayResults({
+        testResults: JSON.parse(dummyTestFail)
+      });
+      expect(pass).to.be.false;
+    });
 
-    it.only('should run tests and get results', function (done) {
-      projects.installProject(project)
-      .then(() => {
-        projects.ensureProjectsDirectory();
-        test.grabTests(project).then(function () {
-          console.log('Test grabbed!');
-          expect(fs.existsSync(`${path}/test`)).to.be.true;
-          test.runTests(project).then((results) => {
-            console.log(results);
-           const { passes, pending, failures } = results.testResults
-            const tests = passes + pending + failures;
-            expect(tests).to.be.greaterThan(0);
-            test.displayResults(results)
-            .then(() => {
+    it('should show the right percent, 75%', function () {
+      const { pass, grade } = test.displayResults({
+        testResults: JSON.parse(dummyTest75)
+      });
+      expect(pass).to.be.false;
+      expect(grade).to.equal(75);
+    });
 
-              done();
-            })
-            .catch(error => console.log(error));
-          })
-          .catch(err => console.log(err));
-        });
-      })
+    it('should round up to the nearest whole number', function () {
+      const { pass, grade } = test.displayResults({
+        testResults: JSON.parse(dummyTest85)
+      });
+      expect(pass).to.be.false;
+      expect(grade % 1).to.equal(0);
+    });
+
+    it('should pass with passing results', function () {
+      const { pass } = test.displayResults({
+        testResults: JSON.parse(dummyTestPass)
+      });
+      expect(pass).to.be.true;
     });
   });
 });
