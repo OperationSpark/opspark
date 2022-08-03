@@ -75,9 +75,10 @@ function createGist({ project, stats }) {
     type: 'PROJECT',
     tests: stats.tests,
     passes: stats.passes,
-    failures: stats.failures
+    failures: stats.failures,
+    grade: Math.round(100 * (stats.passes / stats.tests))
   };
-
+console.log(files);
   let content = {
     public: true,
     description: 'Project results',
@@ -91,6 +92,7 @@ function createGist({ project, stats }) {
   content = JSON.stringify(content);
   return new Promise(function (res, rej) {
     console.log(clc.yellow('Creating gist. . .'));
+    //issue with the command, saying that something was not found: Logan V
     const cmd = createGistHelper(
       github.grabLocalLogin(),
       github.grabLocalAuthToken(),
@@ -111,6 +113,9 @@ function ensureGistExists({ project, gist, tries }) {
   return new Promise(function (res, rej) {
     if (tries < 4) {
       console.log(`Ensuring gist exists. . . Attempt ${tries}`.yellow);
+      //this is the issue here gist is undefined, cmd.
+      //need to rework command?
+      //or an issue in github?
       const cmd = readGistHelper(gist.files['grade.txt'].raw_url);
       exec(cmd, function (err, stdout, stderr) {
         if (err) {

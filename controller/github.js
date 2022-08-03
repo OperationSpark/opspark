@@ -265,7 +265,7 @@ function grabLocalLogin() {
   if (!git) {
     throw new Error(`There is no file at ${userFilePath}.`);
   }
-  return git.login;
+  return git.username;
 }
 
 module.exports.grabLocalLogin = grabLocalLogin;
