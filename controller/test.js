@@ -170,15 +170,8 @@ function displayResults({ testResults }) {
     //part divided by the whole 3/4 = 75%
     //use math.round to round to the nearest whole percent
     let grade = Math.round(100 * (testResults.stats.passes / testResults.stats.tests))
-    if(grade > 75) {
-      console.log(
-        clc.yellow(`You have passed ${grade}% of the test.`)
-      )
-    } else {
-      console.log(
-        clc.red(`You have passed ${grade}% of the test.`)
-      )
-    }
+    const clcMethod = grade > 75 ? clc.yellow : clc.red;
+    console.log(clcMethod(`You have passed ${grade}% of the test.`));
 
     return { pass: false, grade: grade };
   }

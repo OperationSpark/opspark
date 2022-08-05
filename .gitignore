@@ -41,3 +41,6 @@ files.json
 project-lock.json
 test/files/environment/projects
 .secrets
+
+user
+auth

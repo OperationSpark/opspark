@@ -75,7 +75,8 @@ function createGist({ project, stats }) {
     type: 'PROJECT',
     tests: stats.tests,
     passes: stats.passes,
-    failures: stats.failures
+    failures: stats.failures,
+    grade: Math.round(100 * (stats.passes / stats.tests))
   };
 
   let content = {
@@ -91,6 +92,7 @@ function createGist({ project, stats }) {
   content = JSON.stringify(content);
   return new Promise(function (res, rej) {
     console.log(clc.yellow('Creating gist. . .'));
+
     const cmd = createGistHelper(
       github.grabLocalLogin(),
       github.grabLocalAuthToken(),
