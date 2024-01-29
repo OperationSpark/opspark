@@ -3,7 +3,7 @@ const fs = require('fs');
 const changeCase = require('change-case');
 const exec = require('child_process').exec;
 
-const { codenvyUser, home, cloud9User } = require('./env');
+const { home } = require('./env');
 const janitor = require('./janitor');
 const github = require('./github');
 const greenlight = require('./greenlight');
@@ -18,8 +18,7 @@ const {
   execAsync
 } = require('./helpers');
 
-let rootDirectory = `${home()}/environment`;
-let githubDir;
+const rootDirectory = `${home()}/environment`;
 
 // if (cloud9User) {
 //   githubDir = fs
@@ -70,7 +69,7 @@ module.exports.test = test;
 function grabTests(project) {
   return new Promise(function (res, rej) {
     const name = changeCase.paramCase(project.name);
-    console.log(`Downloading tests for ${name}. . .`.yellow);
+    console.log(clc.yellow(`Downloading tests for ${name}. . .`));
     const directory = `${projectsDirectory}/${name}`;
     const cmd = downloadProjectTests(
       project.url,
@@ -137,7 +136,9 @@ function runTests(project) {
 
       console.log(clc.bgBlue.white(`  Passing tests:  ${getFillStr(passes)}`));
       console.log(clc.bgRed.white(`  Failing tests:  ${getFillStr(failures)}`));
-      console.log(clc.bgYellow.black(`  Pending tests:  ${getFillStr(pending)}`));
+      console.log(
+        clc.bgYellow.black(`  Pending tests:  ${getFillStr(pending)}`)
+      );
       console.log(clc.bgBlack.white(`  Total tests:  ${getFillStr(tests)}`));
 
       return { project, testResults };
@@ -145,7 +146,7 @@ function runTests(project) {
     .then(
       testResults => removeProjectTests().then(() => testResults),
       error => removeProjectTests().then(() => Promise.reject(error))
-    )
+    );
 }
 
 module.exports.runTests = runTests;
@@ -161,15 +162,17 @@ function displayResults({ testResults }) {
       const stackLineOne = stack[0];
       const stackLineTwo = stack[1];
       const errorInfo = stackLineOne.slice(stackLineOne.indexOf(':'));
-      console.log(`${i + 1}) ${whichTest}`.red.bold.underline);
-      console.log(`> > > ${message}`.red);
-      console.log(`> > > ${errorInfo}`.grey);
-      console.log(`> > > ${stackLineTwo}`.grey);
+      console.log(clc.red.bold.underline(`${i + 1}) ${whichTest}`));
+      console.log(clc.red(`> > > ${message}`));
+      console.log(clc.xterm(252)(`> > > ${errorInfo}`));
+      console.log(clc.xterm(252)(`> > > ${stackLineTwo}`));
     });
 
     //part divided by the whole 3/4 = 75%
     //use math.round to round to the nearest whole percent
-    let grade = Math.round(100 * (testResults.stats.passes / testResults.stats.tests))
+    let grade = Math.round(
+      100 * (testResults.stats.passes / testResults.stats.tests)
+    );
     const clcMethod = grade > 75 ? clc.yellow : clc.red;
     console.log(clcMethod(`You have passed ${grade}% of the test.`));
 

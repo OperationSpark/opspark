@@ -4,13 +4,11 @@ const util = require('util');
 const prompt = require('inquirer').prompt;
 const mkdirp = require('mkdirp');
 const fsJson = require('fs-json')();
-const octonode = require('octonode');
-const rp = require('request-promise');
+
 const exec = require('child_process').exec;
 
 const env = require('./env');
 const config = require('../config.json');
-const janitor = require('./janitor');
 const {
   createGithubToken,
   deleteGithubToken,
@@ -300,7 +298,7 @@ function deauthorizeUser() {
         console.log(clc.blue('Successfully logged out!'));
         res(true);
       })
-      .catch(err => rej(`${err}`.red));
+      .catch(err => rej(clc.red(`${err}`)));
   });
 }
 

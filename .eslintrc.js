@@ -15,7 +15,7 @@ module.exports = {
     'func-names': 'off',
     'consistent-return': 'off',
     'prefer-arrow-callback': 'off',
-    'arrow-parens': 'as-needed',
+    'arrow-parens': 'off',
     // Windows friendly -- does not show errors on every line of every file
     'no-unused-vars': 1,
     'linebreak-style': 0

@@ -1,15 +1,10 @@
 /* global describe it expect before beforeEach afterEach */
 require('mocha');
 require('should');
-const clc = require('cli-color');
+
 const fs = require('fs');
-const _ = require('lodash');
-const util = require('util');
-const sinon = require('sinon');
-const prompt = require('prompt');
 const rimraf = require('rimraf');
-const process = require('process');
-const fsJson = require('fs-json')();
+
 const expect = require('chai').expect;
 const bddStdin = require('bdd-stdin');
 const proxyquire = require('proxyquire');
@@ -26,7 +21,8 @@ const projects = proxyquire('../controller/projects', {
   }
 });
 
-const readAndParse = path => JSON.parse(fs.readFileSync(path));
+const readAndParse = path =>
+  JSON.parse(fs.readFileSync(path).toString('utf-8'));
 const projectsDirectory = './test/files/environment/projects';
 const projectEntriesPath = './test/files/environment/projects/projects.json';
 
@@ -112,7 +108,7 @@ describe('projects', function () {
         .selectProject({ session: dummySession, projectAction: 'install' })
         .then(function (project) {
           expect(project).to.be.an.object;
-          expect(project.name).to.equal('Matchy');
+          expect(project.name).to.equal('Function Master');
           expect(project._id).to.exist;
           expect(project._session).to.exist;
           expect(project.desc).to.exist;
@@ -123,6 +119,14 @@ describe('projects', function () {
   });
 
   describe('#installProject()', function () {
+    before(function (done) {
+      if (fs.existsSync(projectsDirectory)) {
+        rimraf(projectsDirectory, () => done());
+      } else {
+        done();
+      }
+    });
+
     it('should install project', function (done) {
       projects.installProject(dummySession.PROJECT[2]).then(function (project) {
         expect(project).to.be.an.object;
@@ -235,12 +239,22 @@ describe('projects', function () {
     it('should shelve project', function (done) {
       const path = `${projectsDirectory}/underpants`;
       const newPath = `${projectsDirectory}/_underpants`;
-      expect(fs.existsSync(path)).to.be.true;
-      expect(fs.existsSync(newPath)).to.be.false;
+      expect(fs.existsSync(path), `path: "${path}" should initially exist`).to
+        .be.true;
+      expect(
+        fs.existsSync(newPath),
+        `path: "${newPath}" should not initially exist`
+      ).to.be.false;
       bddStdin('y\n');
       projects.shelveProject(dummySession.PROJECT[0]).then(function (resPath) {
-        expect(fs.existsSync(path)).to.be.false;
-        expect(fs.existsSync(newPath)).to.be.true;
+        expect(
+          fs.existsSync(path),
+          `path: "${path}" should not exist`
+        ).to.be.false;
+        expect(
+          fs.existsSync(newPath),
+          `path: "${newPath}" should exist`
+        ).to.be.true;
         expect(resPath).to.equal(newPath);
         done();
       });

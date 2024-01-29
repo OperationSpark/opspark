@@ -112,7 +112,7 @@ module.exports.createGist = createGist;
 function ensureGistExists({ project, gist, tries }) {
   return new Promise(function (res, rej) {
     if (tries < 4) {
-      console.log(`Ensuring gist exists. . . Attempt ${tries}`.yellow);
+      console.log(clc.yellow(`Ensuring gist exists. . . Attempt ${tries}`));
       const cmd = readGistHelper(gist.files['grade.txt'].raw_url);
       exec(cmd, function (err, stdout, stderr) {
         if (err) {

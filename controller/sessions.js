@@ -2,7 +2,6 @@ const clc = require('cli-color');
 const _ = require('lodash');
 const inquirer = require('inquirer');
 const { waterfall } = require('async');
-const changeCase = require('change-case');
 
 const projects = require('./projects');
 
@@ -34,7 +33,7 @@ function selectSession(sessions) {
           ],
           function (response) {
             if (response.class === cancelOption) {
-              console.log(`${projects.action} cancelled, bye bye!`.green);
+              console.log(clc.green(`${projects.action} cancelled, bye bye!`));
               process.exitCode = 0;
               process.exit();
             }
