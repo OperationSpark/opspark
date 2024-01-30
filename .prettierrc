@@ -2,7 +2,6 @@
   "arrowParens": "avoid",
   "bracketSpacing": true,
   "endOfLine": "lf",
-  "htmlWhitespaceSensitivity": "css",
   "insertPragma": false,
   "singleAttributePerLine": false,
   "bracketSameLine": false,
@@ -18,7 +17,5 @@
   "trailingComma": "none",
   "useTabs": false,
   "embeddedLanguageFormatting": "auto",
-  "vueIndentScriptAndStyle": false,
-  "filepath": "/Users/opsparkowl/Documents/opspark/dev_shop/opspark/.eslintrc.js",
   "parser": "babel"
 }
