@@ -2,7 +2,7 @@ const clc = require('cli-color');
 const rp = require('request-promise');
 
 const github = require('./github');
-const { devGreenlightHost, isDevMode } = require('../config');
+const { devGreenlightHost, isDevMode } = require('../dev-config');
 
 const GREENLIGHT = 'https://greenlight.operationspark.org';
 // TODO: Switch URI for live version
