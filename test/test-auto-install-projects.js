@@ -17,20 +17,20 @@ const projects = proxyquire('../controller/projects', {
   }
 });
 
-const readAndParse = path => JSON.parse(fs.readFileSync(path));
-//recursively grabs projects
+const readAndParse = path => JSON.parse(fs.readFileSync(path, 'utf-8'));
+// recursively grabs projects
 
 describe('#installProject()', function () {
-  dummySession.PROJECT.forEach((project) => {
+  dummySession.PROJECT.forEach(project => {
     it(`should install project for ${project.name}`, function (done) {
       projects.installProject(project).then(function (results) {
-        expect(results).to.be.an.object;
+        expect(results).to.be.an('object');
         expect(results.name).to.exist;
         expect(results._id).to.exist;
         expect(results.desc).to.exist;
         expect(results.url).to.exist;
         done();
       });
-  })
+    });
   });
-  });
+});

@@ -1,7 +1,7 @@
 #! /usr/bin/env node
 
 'use strict';
-
+require('dotenv').config();
 const program = require('commander');
 const fs = require('fs');
 const pjson = require('./package.json');

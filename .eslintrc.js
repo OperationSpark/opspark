@@ -3,7 +3,7 @@ module.exports = {
   plugins: ['import'],
   rules: {
     // enable additional rules
-    quotes: ['error', 'single'],
+    quotes: ['error', 'single', { "avoidEscape": true }],
     semi: ['error', 'always'],
 
     // disable rules from base configurations

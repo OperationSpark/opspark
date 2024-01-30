@@ -2,11 +2,11 @@ const clc = require('cli-color');
 const rp = require('request-promise');
 
 const github = require('./github');
+const { devGreenlightHost, isDevMode } = require('../config');
 
-// TODO: Switch URI for live version
-const LOCALHOST = 'http://localhost:3000';
 const GREENLIGHT = 'https://greenlight.operationspark.org';
-const URI = GREENLIGHT;
+// TODO: Switch URI for live version
+const URI = isDevMode ? devGreenlightHost : GREENLIGHT;
 
 module.exports.URI = URI;
 

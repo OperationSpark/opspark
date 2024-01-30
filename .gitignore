@@ -44,3 +44,4 @@ test/files/environment/projects
 
 user
 auth
+.env*

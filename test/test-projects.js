@@ -92,7 +92,7 @@ describe('projects', function () {
       projects
         .selectProject({ session: dummySession, projectAction: 'install' })
         .then(function (project) {
-          expect(project).to.be.an.object;
+          expect(project).to.be.an('object');
           expect(project.name).to.equal('Function Master');
           expect(project._id).to.exist;
           expect(project._session).to.exist;
@@ -107,7 +107,7 @@ describe('projects', function () {
       projects
         .selectProject({ session: dummySession, projectAction: 'install' })
         .then(function (project) {
-          expect(project).to.be.an.object;
+          expect(project).to.be.an('object');
           expect(project.name).to.equal('Function Master');
           expect(project._id).to.exist;
           expect(project._session).to.exist;
@@ -129,7 +129,7 @@ describe('projects', function () {
 
     it('should install project', function (done) {
       projects.installProject(dummySession.PROJECT[2]).then(function (project) {
-        expect(project).to.be.an.object;
+        expect(project).to.be.an('object');
         expect(project.name).to.equal('Matchy');
         expect(project._id).to.exist;
         expect(project._session).to.exist;
@@ -141,7 +141,7 @@ describe('projects', function () {
 
     it('should install project', function (done) {
       projects.installProject(dummySession.PROJECT[3]).then(function (project) {
-        expect(project).to.be.an.object;
+        expect(project).to.be.an('object');
         expect(project.name).to.equal('Function Master');
         expect(project._id).to.exist;
         expect(project._session).to.exist;
