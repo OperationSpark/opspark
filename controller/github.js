@@ -135,8 +135,10 @@ function writeUser(auth) {
         const { id, message } = JSON.parse(stdout);
         if (err) {
           rej(err);
+          return;
         } else if (message) {
           rej(message);
+          return;
         }
         ensureApplicationDirectory();
         fsJson.saveSync(userFilePath, {
@@ -289,17 +291,14 @@ function grabLocalAuthToken() {
 
 module.exports.grabLocalAuthToken = grabLocalAuthToken;
 
-function deauthorizeUser() {
-  return new Promise(function (res, rej) {
-    promptForUserInfo()
-      // .then(deleteAuth)
-      .then(deleteUserInfo)
-      .then(() => {
-        console.log(clc.blue('Successfully logged out!'));
-        res(true);
-      })
-      .catch(err => rej(clc.red(`${err}`)));
-  });
+async function deauthorizeUser() {
+  try {
+    deleteUserInfo();
+    console.log(clc.blue('Successfully logged out!'));
+    return true;
+  } catch (error) {
+    return Promise.reject(clc.red(`${error}`));
+  }
 }
 
 module.exports.deauthorizeUser = deauthorizeUser;
