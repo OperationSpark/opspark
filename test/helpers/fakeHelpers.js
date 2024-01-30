@@ -1,5 +1,10 @@
-const fs = require('fs');
-const { dummyUser, dummyAuth, dummyGistGood, dummyTestPass, dummyTestFail } = require('./dummyData');
+const {
+  dummyUser,
+  dummyAuth,
+  dummyGistGood,
+  dummyTestPass,
+  dummyTestFail
+} = require('./dummyData');
 
 module.exports.home = () => './test/files';
 
@@ -29,12 +34,15 @@ module.exports.deleteGistHelper = () => `echo ${dummyUser}`;
 
 module.exports.readGistHelper = () => `echo ${dummyUser}`;
 
-module.exports.downloadProject = (url, token, directory) => `mkdir ${directory} ${directory}/.git ${directory}/.svn ${directory}/.master ${directory}/test`;
+module.exports.downloadProject = (url, token, directory) =>
+  `mkdir ${directory} ${directory}/.git ${directory}/.svn ${directory}/.master ${directory}/test`;
 
-module.exports.downloadProjectTests = (url, token, directory) => `mkdir ${directory}/test ${directory}/node_modules`;
+module.exports.downloadProjectTests = (url, token, directory) =>
+  `mkdir ${directory}/test ${directory}/node_modules`;
 
 // package.json must be parse-able, so echoing an empty object into it
-module.exports.downloadProjectPackage = (url, token, directory) => `echo {} > ${directory}/package.json`;
+module.exports.downloadProjectPackage = (url, token, directory) =>
+  `echo {} > ${directory}/package.json`;
 
 module.exports.makeTestPass = () => `echo '${dummyTestPass}'`;
 
@@ -43,3 +51,5 @@ module.exports.makeTestFail = () => `echo '${dummyTestFail}'`;
 module.exports.reportPass = () => Promise.resolve(JSON.parse(dummyTestPass));
 
 module.exports.reportFail = () => Promise.resolve(JSON.parse(dummyTestFail));
+
+module.exports.getGithubID = () => `echo  '{ "id": ${dummyUser.id} }'`;

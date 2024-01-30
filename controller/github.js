@@ -93,6 +93,12 @@ function promptForUserInfo() {
 
 module.exports.promptForUserInfo = promptForUserInfo;
 
+/**
+ *
+ * @param {object} auth
+ * @param {string} auth.token GitHub Personal Access Token
+ * @returns {Promise<{token: string}>}
+ */
 function writeAuth(auth) {
   deleteAuth();
   console.log(clc.yellow('Writing auth. . .'));
@@ -333,6 +339,10 @@ function deleteUser() {
 
 module.exports.deleteUser = deleteUser;
 
+// TODO: Should be async
+/**
+ * Deletes the auth and user files.
+ */
 function deleteUserInfo() {
   console.log(clc.red('Deleting files. . .'));
   deleteAuth();

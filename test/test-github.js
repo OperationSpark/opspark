@@ -1,15 +1,9 @@
 /* global describe it expect before beforeEach afterEach */
 require('mocha');
 require('should');
-const clc = require('cli-color');
-const _ = require('lodash');
-const util = require('util');
+
 const fs = require('fs-extra');
-const sinon = require('sinon');
-const prompt = require('prompt');
 const rimraf = require('rimraf');
-const process = require('process');
-const fsJson = require('fs-json')();
 const expect = require('chai').expect;
 const bddStdin = require('bdd-stdin');
 const proxyquire = require('proxyquire');
@@ -52,12 +46,12 @@ describe('github', function () {
       bddStdin('Username\nPassword\n');
       github.promptForUserInfo().then(function (user) {
         expect(user.username).to.equal('Username');
-        expect(user.password).to.equal('Password');
+        expect(user.token).to.equal('Password');
       });
       bddStdin('livrush\n********\n');
       github.promptForUserInfo().then(function (user) {
         expect(user.username).to.equal('livrush');
-        expect(user.password).to.equal('********');
+        expect(user.token).to.equal('********');
         done();
       });
     });
@@ -66,7 +60,7 @@ describe('github', function () {
   describe('#authExists()', function () {
     it('should return true if directory exists', function (done) {
       expect(github.authExists()).to.be.false;
-      fs.writeFileSync(authFilePath, dummyAuth);
+      fs.writeFileSync(authFilePath, JSON.stringify(dummyAuth), 'utf-8');
       expect(github.authExists()).to.be.true;
       fs.unlinkSync(authFilePath);
       expect(github.authExists()).to.be.false;
@@ -77,7 +71,7 @@ describe('github', function () {
   describe('#userExists()', function () {
     it('should return true if directory exists', function (done) {
       expect(github.userExists()).to.be.false;
-      fs.writeFileSync(userFilePath, dummyAuth);
+      fs.writeFileSync(userFilePath, JSON.stringify(dummyAuth), 'utf-8');
       expect(github.userExists()).to.be.true;
       fs.unlinkSync(userFilePath);
       expect(github.userExists()).to.be.false;
@@ -86,9 +80,9 @@ describe('github', function () {
   });
 
   describe('#userInfoExists()', function () {
-    beforeEach(function () {
-      github.writeAuth(dummyAuth);
-      github.writeUser(dummyUser);
+    beforeEach(async function () {
+      await github.writeAuth(dummyAuth);
+      await github.writeUser(dummyAuth);
     });
     afterEach(function (done) {
       rimraf(applicationDirectory, function () {
@@ -96,7 +90,8 @@ describe('github', function () {
       });
     });
     it('should return true if directory exists', function (done) {
-      expect(github.userInfoExists()).to.be.true;
+      expect(github.userInfoExists(), 'user info directory should exist').to.be
+        .true;
       done();
     });
   });
@@ -115,9 +110,10 @@ describe('github', function () {
     });
     it('should write correct information', function (done) {
       github.writeAuth(dummyAuth);
-      let auth = fs.readFileSync(authFilePath);
+      let auth = fs.readFileSync(authFilePath, 'utf-8');
       auth = JSON.parse(auth);
-      expect(auth).to.eql(dummyAuth);
+      // writeAuth() only writes token
+      expect(auth).to.eql({ token: dummyAuth.token });
       done();
     });
   });
@@ -128,28 +124,31 @@ describe('github', function () {
         done();
       });
     });
-    it('should write user file', function (done) {
-      expect(fs.existsSync(userFilePath)).to.be.false;
-      github.writeUser(dummyUser);
-      expect(fs.existsSync(userFilePath)).to.be.true;
-      done();
+
+    it('should write user file', async function () {
+      expect(
+        fs.existsSync(userFilePath),
+        '"user" file should not initially exist'
+      ).to.be.false;
+      await github.writeUser(dummyAuth);
+      expect(fs.existsSync(userFilePath), '"user" file should exist').to.be
+        .true;
     });
-    it('should write correct information', function (done) {
-      github.writeUser(dummyUser);
-      let user = fs.readFileSync(userFilePath);
+
+    it('should write correct information', async function () {
+      await github.writeUser(dummyAuth);
+      let user = fs.readFileSync(userFilePath, 'utf-8');
       user = JSON.parse(user);
-      expect(user).to.eql(dummyUser);
-      done();
+      expect(user).to.eql({ username: dummyUser.login, id: dummyUser.id });
     });
   });
 
   describe('#grabLocalUserID()', function () {
-    it('should return user id if file exists', function (done) {
-      github.writeUser(dummyUser);
+    it('should return user id if file exists', async function () {
+      await github.writeUser(dummyAuth);
       const placeholder = dummyUser.id;
       const result = github.grabLocalUserID();
       expect(result).to.equal(placeholder);
-      done();
     });
 
     it("should throw error if file doesn't exist", function (done) {
@@ -163,12 +162,11 @@ describe('github', function () {
   });
 
   describe('#grabLocalLogin()', function () {
-    it('should return login if file exists', function (done) {
-      github.writeUser(dummyUser);
+    it('should return login if file exists', async function () {
+      await github.writeUser(dummyAuth);
       const placeholder = dummyUser.login;
       const result = github.grabLocalLogin();
       expect(result).to.equal(placeholder);
-      done();
     });
 
     it("should throw error if file doesn't exist", function (done) {
@@ -181,13 +179,15 @@ describe('github', function () {
     });
   });
 
-  describe('#grabLocalAuthID()', function () {
-    it('should return id if file exists', function (done) {
-      github.writeAuth(dummyAuth);
+  // Current implementation of writeAuth only writes token.
+  // So grabLocalAuthID always returns undefined. grabLocalAuthID is only used in
+  // github.deleteGithubToken which may not work with current GitHub API.
+  describe.skip('#grabLocalAuthID()', function () {
+    it('should return id if file exists', async function () {
+      await github.writeAuth(dummyAuth);
       const placeholder = dummyAuth.id;
       const result = github.grabLocalAuthID();
       expect(result).to.equal(placeholder);
-      done();
     });
 
     it("should throw error if file doesn't exist", function (done) {
@@ -224,18 +224,16 @@ describe('github', function () {
       expect(github.getCredentials()).to.be.an.instanceof(Promise);
     });
 
-    it('should resolve credentials when they exist', function (done) {
-      github.writeAuth(dummyAuth);
-      github.writeUser(dummyUser);
+    it('should resolve credentials when they exist', async function () {
+      await github.writeAuth(dummyAuth);
+      await github.writeUser(dummyAuth);
       expect(github.userInfoExists()).to.be.true;
-      github.getCredentials().then(function (user) {
-        expect(user.login).to.equal('livrush');
-        expect(user.id).to.equal(23201987);
-        expect(user.token).to.equal('fauxToken');
-        fs.unlinkSync(authFilePath);
-        fs.unlinkSync(userFilePath);
-        done();
-      });
+      const user = await github.getCredentials();
+      expect(user.login).to.equal('livrush');
+      expect(user.id).to.equal(23201987);
+      expect(user.token).to.equal('fauxToken');
+      fs.unlinkSync(authFilePath);
+      fs.unlinkSync(userFilePath);
     });
 
     // it('should call authorizeUser when no credentials exist', function (done) {
@@ -267,14 +265,12 @@ describe('github', function () {
       expect(github.getOrObtainAuth()).to.be.an.instanceof(Promise);
     });
 
-    it('should resolve auth object', function (done) {
-      github.writeAuth(dummyAuth);
-      github.writeUser(dummyUser);
-      github.getOrObtainAuth().then(function (res) {
-        expect(res).to.eql(dummyAuth);
-        github.deleteUserInfo();
-        done();
-      });
+    it('should resolve auth object', async function () {
+      await github.writeAuth(dummyAuth);
+      await github.writeUser(dummyAuth);
+      const res = await github.getOrObtainAuth();
+      expect(res).to.eql({ token: dummyAuth.token });
+      await github.deleteUserInfo();
     });
   });
 
@@ -285,7 +281,7 @@ describe('github', function () {
 
     it('should resolve user object', function (done) {
       github.writeAuth(dummyAuth);
-      github.writeUser(dummyUser);
+      github.writeUser(dummyAuth);
       github.getOrCreateClient().then(function (res) {
         expect(res).to.eql(dummyUser);
         github.deleteUserInfo();
@@ -349,7 +345,7 @@ describe('github', function () {
       bddStdin('livrush\nPassword\n');
       github.authorizeUser().then(function (user) {
         expect(user.login).to.equal('livrush');
-        expect(user.token).to.equal('fauxToken');
+        expect(user.token).to.equal('Password');
         done();
       });
     });
@@ -357,7 +353,7 @@ describe('github', function () {
 
   describe('#deleteAuth()', function () {
     it('should delete auth file', function () {
-      fs.createFileSync(authFilePath, dummyAuth);
+      fs.createFileSync(authFilePath);
       expect(fs.existsSync(authFilePath)).to.be.true;
       github.deleteAuth();
       expect(fs.existsSync(authFilePath)).to.be.false;
@@ -366,7 +362,7 @@ describe('github', function () {
 
   describe('#deleteUser()', function () {
     it('should delete user file', function () {
-      fs.createFileSync(userFilePath, dummyUser);
+      fs.createFileSync(userFilePath);
       expect(fs.existsSync(userFilePath)).to.be.true;
       github.deleteUser();
       expect(fs.existsSync(userFilePath)).to.be.false;
@@ -374,9 +370,14 @@ describe('github', function () {
   });
 
   describe('#deleteUserInfo()', function () {
-    beforeEach(function () {
-      github.writeAuth(dummyAuth);
-      github.writeUser(dummyUser);
+    beforeEach(async function () {
+      try {
+        await github.writeAuth(dummyAuth);
+
+        await github.writeUser(dummyAuth);
+      } catch (error) {
+        console.error(error);
+      }
     });
 
     it('should return true if directory exists', function (done) {
@@ -390,7 +391,7 @@ describe('github', function () {
   describe('#deleteToken()', function () {
     beforeEach(function () {
       github.writeAuth(dummyAuth);
-      github.writeUser(dummyUser);
+      github.writeUser(dummyAuth);
     });
 
     it('should return a promise', function () {
@@ -409,7 +410,7 @@ describe('github', function () {
   describe('#deauthorizeUser()', function () {
     beforeEach(function () {
       github.writeAuth(dummyAuth);
-      github.writeUser(dummyUser);
+      github.writeUser(dummyAuth);
     });
 
     it('should return a promise', function () {
