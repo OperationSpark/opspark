@@ -236,9 +236,31 @@ describe('projects', function () {
   });
 
   describe('#shelveProject()', function () {
+    function removeTestProjectFiles() {
+      [
+        `${projectsDirectory}/underpants`,
+        `${projectsDirectory}/scratch-pad`,
+        `${projectsDirectory}/_underpants`,
+        `${projectsDirectory}/__underpants`,
+        `${projectsDirectory}/_scratch-pad`,
+        `${projectsDirectory}/__scratch-pad`
+      ].forEach(path => {
+        if (fs.existsSync(path)) {
+          rimraf(path, () => {});
+        }
+      });
+    }
+
+    beforeEach(removeTestProjectFiles);
+    afterEach(removeTestProjectFiles);
+
     it('should shelve project', function (done) {
       const path = `${projectsDirectory}/underpants`;
       const newPath = `${projectsDirectory}/_underpants`;
+
+      // Simulate initial project install
+      fs.mkdirSync(path);
+
       expect(fs.existsSync(path), `path: "${path}" should initially exist`).to
         .be.true;
       expect(
@@ -263,12 +285,19 @@ describe('projects', function () {
     it('should shelve projects infinitely', function (done) {
       const path = `${projectsDirectory}/underpants`;
       expect(fs.existsSync(path)).to.be.false;
+      // Simulate initial project install
       fs.mkdirSync(path);
+
       const newPath = `${projectsDirectory}/_underpants`;
+      fs.mkdirSync(newPath);
+
       const newestPath = `${projectsDirectory}/__underpants`;
-      expect(fs.existsSync(path)).to.be.true;
-      expect(fs.existsSync(newPath)).to.be.true;
-      expect(fs.existsSync(newestPath)).to.be.false;
+      expect(fs.existsSync(path), 'initial project directories should exist').to
+        .be.true;
+      expect(fs.existsSync(newPath), 'initial project directories should exist')
+        .to.be.true;
+      expect(fs.existsSync(newestPath), 'shelved project should not yet exist')
+        .to.be.false;
       bddStdin('y\n');
       projects.shelveProject(dummySession.PROJECT[0]).then(function (resPath) {
         expect(fs.existsSync(path)).to.be.false;
@@ -282,6 +311,9 @@ describe('projects', function () {
     it('should shelve project', function (done) {
       const path = `${projectsDirectory}/scratch-pad`;
       const newPath = `${projectsDirectory}/_scratch-pad`;
+      // Simulate initial project install
+      fs.mkdirSync(path);
+
       expect(fs.existsSync(path)).to.be.true;
       expect(fs.existsSync(newPath)).to.be.false;
       bddStdin('y\n');
@@ -297,7 +329,10 @@ describe('projects', function () {
       const path = `${projectsDirectory}/scratch-pad`;
       expect(fs.existsSync(path)).to.be.false;
       fs.mkdirSync(path);
+
       const newPath = `${projectsDirectory}/_scratch-pad`;
+      fs.mkdirSync(newPath);
+
       const newestPath = `${projectsDirectory}/__scratch-pad`;
       expect(fs.existsSync(path)).to.be.true;
       expect(fs.existsSync(newPath)).to.be.true;
