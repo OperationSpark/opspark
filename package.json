@@ -41,7 +41,6 @@
     "change-case": "^2.2.0",
     "cheerio": "^0.22.0",
     "cli-color": "^2.0.1",
-    "cli-view": "^1.0.0",
     "commander": "^2.11.0",
     "cross-env": "^7.0.3",
     "dotenv": "^16.4.1",
