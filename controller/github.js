@@ -4,13 +4,11 @@ const util = require('util');
 const prompt = require('inquirer').prompt;
 const mkdirp = require('mkdirp');
 const fsJson = require('fs-json')();
-const octonode = require('octonode');
-const rp = require('request-promise');
+
 const exec = require('child_process').exec;
 
 const env = require('./env');
 const config = require('../config.json');
-const janitor = require('./janitor');
 const {
   createGithubToken,
   deleteGithubToken,
@@ -95,6 +93,12 @@ function promptForUserInfo() {
 
 module.exports.promptForUserInfo = promptForUserInfo;
 
+/**
+ *
+ * @param {object} auth
+ * @param {string} auth.token GitHub Personal Access Token
+ * @returns {Promise<{token: string}>}
+ */
 function writeAuth(auth) {
   deleteAuth();
   console.log(clc.yellow('Writing auth. . .'));
@@ -137,8 +141,10 @@ function writeUser(auth) {
         const { id, message } = JSON.parse(stdout);
         if (err) {
           rej(err);
+          return;
         } else if (message) {
           rej(message);
+          return;
         }
         ensureApplicationDirectory();
         fsJson.saveSync(userFilePath, {
@@ -291,17 +297,14 @@ function grabLocalAuthToken() {
 
 module.exports.grabLocalAuthToken = grabLocalAuthToken;
 
-function deauthorizeUser() {
-  return new Promise(function (res, rej) {
-    promptForUserInfo()
-      // .then(deleteAuth)
-      .then(deleteUserInfo)
-      .then(() => {
-        console.log(clc.blue('Successfully logged out!'));
-        res(true);
-      })
-      .catch(err => rej(`${err}`.red));
-  });
+async function deauthorizeUser() {
+  try {
+    deleteUserInfo();
+    console.log(clc.blue('Successfully logged out!'));
+    return true;
+  } catch (error) {
+    return Promise.reject(clc.red(`${error}`));
+  }
 }
 
 module.exports.deauthorizeUser = deauthorizeUser;
@@ -336,6 +339,10 @@ function deleteUser() {
 
 module.exports.deleteUser = deleteUser;
 
+// TODO: Should be async
+/**
+ * Deletes the auth and user files.
+ */
 function deleteUserInfo() {
   console.log(clc.red('Deleting files. . .'));
   deleteAuth();

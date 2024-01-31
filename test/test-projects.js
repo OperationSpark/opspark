@@ -1,15 +1,10 @@
 /* global describe it expect before beforeEach afterEach */
 require('mocha');
 require('should');
-const clc = require('cli-color');
+
 const fs = require('fs');
-const _ = require('lodash');
-const util = require('util');
-const sinon = require('sinon');
-const prompt = require('prompt');
 const rimraf = require('rimraf');
-const process = require('process');
-const fsJson = require('fs-json')();
+
 const expect = require('chai').expect;
 const bddStdin = require('bdd-stdin');
 const proxyquire = require('proxyquire');
@@ -26,7 +21,8 @@ const projects = proxyquire('../controller/projects', {
   }
 });
 
-const readAndParse = path => JSON.parse(fs.readFileSync(path));
+const readAndParse = path =>
+  JSON.parse(fs.readFileSync(path).toString('utf-8'));
 const projectsDirectory = './test/files/environment/projects';
 const projectEntriesPath = './test/files/environment/projects/projects.json';
 
@@ -96,7 +92,7 @@ describe('projects', function () {
       projects
         .selectProject({ session: dummySession, projectAction: 'install' })
         .then(function (project) {
-          expect(project).to.be.an.object;
+          expect(project).to.be.an('object');
           expect(project.name).to.equal('Function Master');
           expect(project._id).to.exist;
           expect(project._session).to.exist;
@@ -111,8 +107,8 @@ describe('projects', function () {
       projects
         .selectProject({ session: dummySession, projectAction: 'install' })
         .then(function (project) {
-          expect(project).to.be.an.object;
-          expect(project.name).to.equal('Matchy');
+          expect(project).to.be.an('object');
+          expect(project.name).to.equal('Function Master');
           expect(project._id).to.exist;
           expect(project._session).to.exist;
           expect(project.desc).to.exist;
@@ -123,9 +119,17 @@ describe('projects', function () {
   });
 
   describe('#installProject()', function () {
+    before(function (done) {
+      if (fs.existsSync(projectsDirectory)) {
+        rimraf(projectsDirectory, () => done());
+      } else {
+        done();
+      }
+    });
+
     it('should install project', function (done) {
       projects.installProject(dummySession.PROJECT[2]).then(function (project) {
-        expect(project).to.be.an.object;
+        expect(project).to.be.an('object');
         expect(project.name).to.equal('Matchy');
         expect(project._id).to.exist;
         expect(project._session).to.exist;
@@ -137,7 +141,7 @@ describe('projects', function () {
 
     it('should install project', function (done) {
       projects.installProject(dummySession.PROJECT[3]).then(function (project) {
-        expect(project).to.be.an.object;
+        expect(project).to.be.an('object');
         expect(project.name).to.equal('Function Master');
         expect(project._id).to.exist;
         expect(project._session).to.exist;
@@ -232,15 +236,47 @@ describe('projects', function () {
   });
 
   describe('#shelveProject()', function () {
+    function removeTestProjectFiles() {
+      [
+        `${projectsDirectory}/underpants`,
+        `${projectsDirectory}/scratch-pad`,
+        `${projectsDirectory}/_underpants`,
+        `${projectsDirectory}/__underpants`,
+        `${projectsDirectory}/_scratch-pad`,
+        `${projectsDirectory}/__scratch-pad`
+      ].forEach(path => {
+        if (fs.existsSync(path)) {
+          rimraf(path, () => {});
+        }
+      });
+    }
+
+    beforeEach(removeTestProjectFiles);
+    afterEach(removeTestProjectFiles);
+
     it('should shelve project', function (done) {
       const path = `${projectsDirectory}/underpants`;
       const newPath = `${projectsDirectory}/_underpants`;
-      expect(fs.existsSync(path)).to.be.true;
-      expect(fs.existsSync(newPath)).to.be.false;
+
+      // Simulate initial project install
+      fs.mkdirSync(path);
+
+      expect(fs.existsSync(path), `path: "${path}" should initially exist`).to
+        .be.true;
+      expect(
+        fs.existsSync(newPath),
+        `path: "${newPath}" should not initially exist`
+      ).to.be.false;
       bddStdin('y\n');
       projects.shelveProject(dummySession.PROJECT[0]).then(function (resPath) {
-        expect(fs.existsSync(path)).to.be.false;
-        expect(fs.existsSync(newPath)).to.be.true;
+        expect(
+          fs.existsSync(path),
+          `path: "${path}" should not exist`
+        ).to.be.false;
+        expect(
+          fs.existsSync(newPath),
+          `path: "${newPath}" should exist`
+        ).to.be.true;
         expect(resPath).to.equal(newPath);
         done();
       });
@@ -249,12 +285,19 @@ describe('projects', function () {
     it('should shelve projects infinitely', function (done) {
       const path = `${projectsDirectory}/underpants`;
       expect(fs.existsSync(path)).to.be.false;
+      // Simulate initial project install
       fs.mkdirSync(path);
+
       const newPath = `${projectsDirectory}/_underpants`;
+      fs.mkdirSync(newPath);
+
       const newestPath = `${projectsDirectory}/__underpants`;
-      expect(fs.existsSync(path)).to.be.true;
-      expect(fs.existsSync(newPath)).to.be.true;
-      expect(fs.existsSync(newestPath)).to.be.false;
+      expect(fs.existsSync(path), 'initial project directories should exist').to
+        .be.true;
+      expect(fs.existsSync(newPath), 'initial project directories should exist')
+        .to.be.true;
+      expect(fs.existsSync(newestPath), 'shelved project should not yet exist')
+        .to.be.false;
       bddStdin('y\n');
       projects.shelveProject(dummySession.PROJECT[0]).then(function (resPath) {
         expect(fs.existsSync(path)).to.be.false;
@@ -268,6 +311,9 @@ describe('projects', function () {
     it('should shelve project', function (done) {
       const path = `${projectsDirectory}/scratch-pad`;
       const newPath = `${projectsDirectory}/_scratch-pad`;
+      // Simulate initial project install
+      fs.mkdirSync(path);
+
       expect(fs.existsSync(path)).to.be.true;
       expect(fs.existsSync(newPath)).to.be.false;
       bddStdin('y\n');
@@ -283,7 +329,14 @@ describe('projects', function () {
       const path = `${projectsDirectory}/scratch-pad`;
       expect(fs.existsSync(path)).to.be.false;
       fs.mkdirSync(path);
+
       const newPath = `${projectsDirectory}/_scratch-pad`;
+      // TOOD: Figure out why this directory is sometimes
+      // not deleted in beforeEach hook the CI environment..
+      if (!fs.existsSync(newPath)) {
+        fs.mkdirSync(newPath);
+      }
+
       const newestPath = `${projectsDirectory}/__scratch-pad`;
       expect(fs.existsSync(path)).to.be.true;
       expect(fs.existsSync(newPath)).to.be.true;

@@ -14,9 +14,6 @@
     "preinstall": "npx npm-force-resolutions",
     "test:publish": "act release -W .github/workflows/npm-publish.yml"
   },
-  "resolutions": {
-    "graceful-fs": "^4.2.9"
-  },
   "repository": {
     "type": "git",
     "url": "https://github.com/OperationSpark/opspark.git"
@@ -47,8 +44,9 @@
     "cli-view": "^1.0.0",
     "commander": "^2.11.0",
     "cross-env": "^7.0.3",
+    "dotenv": "^16.4.1",
     "express": "^4.15.3",
-    "fs-extra": "^0.18.0",
+    "fs-extra": "^11.2.0",
     "fs-json": "^0.1.2",
     "inquirer": "^0.8.0",
     "jquery": "^3.3.1",

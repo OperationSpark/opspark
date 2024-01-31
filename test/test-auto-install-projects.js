@@ -4,6 +4,7 @@ require('should');
 const fs = require('fs');
 const expect = require('chai').expect;
 const proxyquire = require('proxyquire');
+const rimraf = require('rimraf');
 
 const fakeHelpers = require('./helpers/fakeHelpers');
 
@@ -17,20 +18,27 @@ const projects = proxyquire('../controller/projects', {
   }
 });
 
-const readAndParse = path => JSON.parse(fs.readFileSync(path));
-//recursively grabs projects
+const projectsDirectory = './test/files/environment/projects';
 
 describe('#installProject()', function () {
-  dummySession.PROJECT.forEach((project) => {
+  before(function (done) {
+    if (fs.existsSync(projectsDirectory)) {
+      rimraf(projectsDirectory, () => done());
+    } else {
+      done();
+    }
+  });
+
+  dummySession.PROJECT.forEach(project => {
     it(`should install project for ${project.name}`, function (done) {
       projects.installProject(project).then(function (results) {
-        expect(results).to.be.an.object;
+        expect(results).to.be.an('object');
         expect(results.name).to.exist;
         expect(results._id).to.exist;
         expect(results.desc).to.exist;
         expect(results.url).to.exist;
         done();
       });
-  })
+    });
   });
-  });
+});

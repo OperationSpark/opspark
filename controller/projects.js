@@ -55,7 +55,7 @@ function selectProject({ session, projectAction }) {
           ],
           function (response) {
             if (response.project === cancelOption) {
-              console.log(`${action} cancelled, bye bye!`.green);
+              console.log(clc.green(`${action} cancelled, bye bye!`));
               process.exitCode = 0;
               process.exit();
             }
@@ -126,7 +126,7 @@ function installProject(project) {
     const projectName = changeCase.paramCase(project.name);
     const projectDirectory = `${projectsDirectory}/${projectName}`;
     if (ensureProjectDirectory(projectDirectory)) {
-      rej(`${project.name} already installed!`.red);
+      rej(clc.red(`${project.name} already installed!`));
     }
     console.log(
       clc.yellow('Installing project %s, please wait...'),
@@ -152,9 +152,9 @@ function uninstallProject(project) {
       {
         type: 'confirm',
         name: 'delete',
-        message:
+        message: clc.bgRed(
           `Are you sure you want to delete ${project.name}? This cannot be undone.`
-            .bgRed
+        )
       },
       function (confirm) {
         if (confirm.delete) {

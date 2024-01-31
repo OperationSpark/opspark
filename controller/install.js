@@ -22,7 +22,7 @@ module.exports = function () {
     .catch(janitor.error(clc.red('Failure installing project')))
     .then(projects.initializeProject)
     .catch(janitor.error(clc.red('Failure initializing')))
-    .then(res => console.log(`Successfully installed ${res.name}!`.blue))
+    .then(res => console.log(clc.blue(`Successfully installed ${res.name}!`)))
     .catch(err => {
       console.error(err);
     });
