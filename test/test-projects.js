@@ -331,7 +331,11 @@ describe('projects', function () {
       fs.mkdirSync(path);
 
       const newPath = `${projectsDirectory}/_scratch-pad`;
-      fs.mkdirSync(newPath);
+      // TOOD: Figure out why this directory is sometimes
+      // not deleted in beforeEach hook the CI environment..
+      if (!fs.existsSync(newPath)) {
+        fs.mkdirSync(newPath);
+      }
 
       const newestPath = `${projectsDirectory}/__scratch-pad`;
       expect(fs.existsSync(path)).to.be.true;
