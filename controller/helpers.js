@@ -1,4 +1,3 @@
-const octonode = require('octonode');
 const exec = require('child_process').exec;
 
 module.exports.execAsync = function execAsync(cmd) {
@@ -6,19 +5,6 @@ module.exports.execAsync = function execAsync(cmd) {
     exec(cmd, (err, stdout, stderr) => {
       if (err) return rej(err);
       return res({ stdout, stderr });
-    });
-  });
-};
-
-module.exports.createClient = function (token) {
-  return octonode.client(token);
-};
-
-module.exports.getClient = function (client, username) {
-  return new Promise(function (res, rej) {
-    client.get(`/users/${username}`, {}, function (err, status, body) {
-      if (err) rej(err);
-      else res(body);
     });
   });
 };

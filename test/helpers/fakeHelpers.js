@@ -10,8 +10,6 @@ module.exports.home = () => './test/files';
 
 module.exports.createClient = () => dummyUser;
 
-module.exports.getClient = () => new Promise((res, rej) => res(dummyUser));
-
 module.exports.createGithubToken = () => `echo '${JSON.stringify(dummyAuth)}'`;
 
 module.exports.deleteGithubToken = () => 'echo ""';
