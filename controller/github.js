@@ -3,7 +3,7 @@ const fs = require('fs');
 const util = require('util');
 const prompt = require('inquirer').prompt;
 const mkdirp = require('mkdirp');
-const fsJson = require('fs-json')();
+const fsJson = require('../vendor/fs-json')();
 
 const exec = require('child_process').exec;
 

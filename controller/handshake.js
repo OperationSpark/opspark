@@ -1,7 +1,7 @@
 const clc = require('cli-color');
 const fs = require('fs');
 const mkdirp = require('mkdirp');
-const fsJson = require('fs-json')();
+const fsJson = require('../vendor/fs-json')();
 const rp = require('request-promise');
 const greenlight = require('./greenlight');
 
@@ -10,14 +10,6 @@ const view = require('../view');
 
 const filePath = `${env.home()}/opspark`;
 const URI = greenlight.URI;
-
-function readHandshake() {
-  const path = `${filePath}/handshake`;
-  if (!fs.existsSync(path)) {
-    return console.log('No handshake stored, run "os init-hs" to create');
-  }
-  return fsJson.loadSync(path);
-}
 
 // Checks if directory exists and creates if not
 function checkForDirectory(path) {
