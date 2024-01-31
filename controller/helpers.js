@@ -5,7 +5,7 @@ module.exports.execAsync = function execAsync(cmd) {
   return new Promise((res, rej) => {
     exec(cmd, (err, stdout, stderr) => {
       if (err) return rej(err);
-      return res(stdout, stderr);
+      return res({ stdout, stderr });
     });
   });
 };
@@ -27,7 +27,12 @@ module.exports.createGithubToken = function (username, password, note) {
   return `curl -u "${username}:${password}" -d '{"scopes":["public_repo", "repo", "gist"],"note":"${note}","note_url":"https://www.npmjs.com/package/opspark"}' https://api.github.com/authorizations`;
 };
 
-module.exports.deleteGithubToken = function (username, password, userAgent, authID) {
+module.exports.deleteGithubToken = function (
+  username,
+  password,
+  userAgent,
+  authID
+) {
   return `curl -X "DELETE" -u "${username}:${password}" -A "${userAgent}" -H "Accept: application/json" https://api.github.com/authorizations/${authID}`;
 };
 
@@ -63,11 +68,11 @@ module.exports.readGistHelper = function (url) {
   return `curl ${url}`;
 };
 
-module.exports.installProjectDependenciesCmd = function(directory) {
+module.exports.installProjectDependenciesCmd = function (directory) {
   return `npm install --prefix ${directory} --loglevel=error`;
 };
 
-module.exports.removeProjectTestsCmd = function(directory) {
+module.exports.removeProjectTestsCmd = function (directory) {
   return `rm -rf ${directory}/test`;
 };
 

@@ -7,7 +7,7 @@ const sessions = require('./sessions');
 
 module.exports = function () {
   console.log(clc.blue('Beginning shelve process!'));
-  projects.action = 'shelve';
+  projects.action = () => 'shelve';
   github
     .getCredentials()
     .catch(janitor.error(clc.red('Failure getting credentials')))

@@ -39,7 +39,7 @@ const projectsDirectory = `${rootDirectory}/projects`;
 // that user wants to be tested
 function test() {
   console.log(clc.blue('Beginning test process!'));
-  projects.action = 'test';
+  projects.action = () => 'test';
   github
     .getCredentials()
     .catch(janitor.error(clc.red('Failure getting credentials')))
@@ -62,10 +62,13 @@ function test() {
 }
 
 module.exports.test = test;
-
-// Runs svn export to download the tests for the specific project
-// and places them in the correct directory
-// Then calls setEnv
+/**
+ * Runs svn export to download the tests for the specific project
+ * and places them in the correct directory
+ * Then calls setEnv
+ * @param {*} project
+ * @returns Promise<object>
+ */
 function grabTests(project) {
   return new Promise(function (res, rej) {
     const name = changeCase.paramCase(project.name);
@@ -168,15 +171,15 @@ function displayResults({ testResults }) {
       console.log(clc.xterm(252)(`> > > ${stackLineTwo}`));
     });
 
-    //part divided by the whole 3/4 = 75%
-    //use math.round to round to the nearest whole percent
-    let grade = Math.round(
+    // part divided by the whole 3/4 = 75%
+    // use math.round to round to the nearest whole percent
+    const grade = Math.round(
       100 * (testResults.stats.passes / testResults.stats.tests)
     );
     const clcMethod = grade > 75 ? clc.yellow : clc.red;
     console.log(clcMethod(`You have passed ${grade}% of the test.`));
 
-    return { pass: false, grade: grade };
+    return { pass: false, grade };
   }
 
   console.log(
