@@ -1,9 +1,18 @@
 module.exports = {
   extends: 'airbnb-base',
   plugins: ['import'],
+  env: {
+    node: true,
+    es6: true,
+    mocha: true
+  },
+  globals: {
+    fetch: false,
+    URL: false
+  },
   rules: {
     // enable additional rules
-    quotes: ['error', 'single', { "avoidEscape": true }],
+    quotes: ['error', 'single', { avoidEscape: true }],
     semi: ['error', 'always'],
 
     // disable rules from base configurations
