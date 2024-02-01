@@ -34,10 +34,16 @@ const projectEntriesPath = `${rootDirectory}/projects/projects.json`;
 const projectsDirectory = `${rootDirectory}/projects`;
 const cancelOption = '[cancel]';
 
-let action = null;
+let action = '';
 
-module.exports.action = () => action;
+module.exports.action = action;
 
+/**
+ *
+ * @param {{ session: *, projectAction: string}} param0
+ *
+ * @returns Promise<*>
+ */
 function selectProject({ session, projectAction }) {
   action = projectAction;
   const projects = listProjects(session, action);
