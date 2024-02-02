@@ -70,7 +70,7 @@ class GithubAPI {
   async downloadProjectPackage(url, directory) {
     const files = ['package.json', '.npmrc'];
     const { owner, repo } = GithubAPI.parseRepoUrl(url);
-    files.map(async filePath => {
+    const promises = files.map(async filePath => {
       const res = await this._client.rest.repos.getContent({
         mediaType: { format: 'raw' },
         owner,
@@ -84,6 +84,8 @@ class GithubAPI {
         encoding: 'utf8'
       });
     });
+
+    await Promise.all(promises);
   }
   /**
    * Downloads the files in a GitHub API contents response.
