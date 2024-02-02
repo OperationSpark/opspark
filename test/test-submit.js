@@ -1,19 +1,8 @@
-/* global describe it expect before beforeEach afterEach */
+/* global describe it */
 require('mocha');
 require('should');
-const clc = require('cli-color');
-const fs = require('fs');
-const _ = require('lodash');
-const util = require('util');
-const sinon = require('sinon');
-const prompt = require('prompt');
-const rimraf = require('rimraf');
-const process = require('process');
-const fsJson = require('fs-json')();
 const expect = require('chai').expect;
-const bddStdin = require('bdd-stdin');
 const proxyquire = require('proxyquire');
-const changeCase = require('change-case');
 
 const fakeHelpers = require('./helpers/fakeHelpers');
 

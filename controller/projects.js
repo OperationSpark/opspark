@@ -3,7 +3,7 @@ const fs = require('fs');
 const _ = require('lodash');
 const mkdirp = require('mkdirp');
 const rimraf = require('rimraf');
-const fsJson = require('fs-json')();
+const fsJson = require('../vendor/fs-json')();
 const program = require('commander');
 const prompt = require('inquirer').prompt;
 const changeCase = require('change-case');
@@ -34,10 +34,16 @@ const projectEntriesPath = `${rootDirectory}/projects/projects.json`;
 const projectsDirectory = `${rootDirectory}/projects`;
 const cancelOption = '[cancel]';
 
-let action = null;
+let action = '';
 
-module.exports.action = () => action;
+module.exports.action = action;
 
+/**
+ *
+ * @param {{ session: *, projectAction: string}} param0
+ *
+ * @returns Promise<*>
+ */
 function selectProject({ session, projectAction }) {
   action = projectAction;
   const projects = listProjects(session, action);

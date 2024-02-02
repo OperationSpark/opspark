@@ -274,22 +274,6 @@ describe('github', function () {
     });
   });
 
-  describe('#getOrCreateClient()', function () {
-    it('should return a promise', function () {
-      expect(github.getOrCreateClient()).to.be.an.instanceof(Promise);
-    });
-
-    it('should resolve user object', function (done) {
-      github.writeAuth(dummyAuth);
-      github.writeUser(dummyAuth);
-      github.getOrCreateClient().then(function (res) {
-        expect(res).to.eql(dummyUser);
-        github.deleteUserInfo();
-        done();
-      });
-    });
-  });
-
   describe('#obtainAndWriteAuth()', function () {
     it('should return a promise', function () {
       expect(github.obtainAndWriteAuth(dummyAuth)).to.be.an.instanceof(Promise);
@@ -307,28 +291,6 @@ describe('github', function () {
     it('should send on auth data', function (done) {
       github.obtainAndWriteAuth(dummyAuth).then(function (result) {
         expect(result).to.eql(dummyAuth);
-        done();
-      });
-    });
-  });
-
-  describe('#obtainAndWriteUser()', function () {
-    it('should return a promise', function () {
-      expect(github.obtainAndWriteUser(dummyUser)).to.be.an.instanceof(Promise);
-    });
-
-    it('should create auth file', function (done) {
-      github.deleteUser();
-      expect(github.userExists()).to.be.false;
-      github.obtainAndWriteUser(dummyUser).then(function () {
-        expect(github.userExists()).to.be.true;
-        done();
-      });
-    });
-
-    it('should send on auth data', function (done) {
-      github.obtainAndWriteUser(dummyUser).then(function (result) {
-        expect(result).to.eql(dummyUser);
         done();
       });
     });

@@ -1,36 +1,18 @@
-/* global describe it expect before beforeEach afterEach */
-const { home } = require('../controller/env');
-const os = require('node:os');
-const path = require('path');
+/* global describe it before afterEach */
 require('mocha');
 require('should');
-const clc = require('cli-color');
-const fs = require('fs');
-const _ = require('lodash');
-const util = require('util');
-const sinon = require('sinon');
-const prompt = require('prompt');
 const rimraf = require('rimraf');
-const process = require('process');
-const fsJson = require('fs-json')();
 const expect = require('chai').expect;
-const bddStdin = require('bdd-stdin');
 const proxyquire = require('proxyquire');
-const changeCase = require('change-case');
 
 const fakeHelpers = require('./helpers/fakeHelpers');
 
 const {
-  dummySession,
-  dummySessions,
   dummyTestPass,
   dummyTest75,
   dummyTest85,
-  dummyTestFail,
+  dummyTestFail
 } = require('./helpers/dummyData');
-const { runTests } = require('../controller/test');
-
-const projects = require('../controller/projects')
 
 const test = proxyquire('../controller/test', {
   './helpers': fakeHelpers,
@@ -40,8 +22,6 @@ const test = proxyquire('../controller/test', {
   }
 });
 const projectsDirectory = './test/files/environment/projects';
-const projectEntriesPath =
-  './test/files/workenvironmentspace/projects/projects.json';
 
 describe('test', function () {
   before(function (done) {
@@ -51,7 +31,6 @@ describe('test', function () {
   afterEach(function () {
     if (console.log.restore) console.log.restore();
   });
-
 
   describe('#displayResults()', function () {
     it('should fail with failing results', function () {

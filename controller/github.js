@@ -3,7 +3,7 @@ const fs = require('fs');
 const util = require('util');
 const prompt = require('inquirer').prompt;
 const mkdirp = require('mkdirp');
-const fsJson = require('fs-json')();
+const fsJson = require('../vendor/fs-json')();
 
 const exec = require('child_process').exec;
 
@@ -14,8 +14,6 @@ const {
   deleteGithubToken,
   readGithubAuths,
   checkGithubAuth,
-  createClient,
-  getClient,
   getGithubID
 } = require('./helpers');
 
@@ -23,9 +21,7 @@ const applicationDirectory = `${env.home()}/opspark`;
 const authFilePath = `${applicationDirectory}/auth`;
 const userFilePath = `${applicationDirectory}/user`;
 let _auth;
-let _user;
 let _client;
-let _opspark;
 
 // TODO : consider the "module level" vars, like _client in this implementation, are they necessary.
 
@@ -66,6 +62,10 @@ function authorizeUser() {
 
 module.exports.authorizeUser = authorizeUser;
 
+/**
+ * Prompts the user for their GitHub username and personal access token (PAT).
+ * @returns {Promise<{username: string, token: string}>}
+ */
 function promptForUserInfo() {
   return new Promise(function (res, rej) {
     prompt(
@@ -84,6 +84,7 @@ function promptForUserInfo() {
           conform: () => true
         }
       ],
+      /** @param {{username: string, token: string}} user */
       function (user) {
         res(user);
       }
@@ -97,7 +98,8 @@ module.exports.promptForUserInfo = promptForUserInfo;
  *
  * @param {object} auth
  * @param {string} auth.token GitHub Personal Access Token
- * @returns {Promise<{token: string}>}
+ * @param {string} auth.username GitHub username
+ * @returns {Promise<{token: string, username: string}>}
  */
 function writeAuth(auth) {
   deleteAuth();
@@ -131,6 +133,12 @@ function obtainAndWriteAuth({ username, password }) {
 
 module.exports.obtainAndWriteAuth = obtainAndWriteAuth;
 
+/**
+ * Writes the user to the file system. This function
+ * will overwrite any existing user file.
+ * @param {{ token: string, username: string}} auth
+ * @returns
+ */
 function writeUser(auth) {
   deleteUser();
   console.log(clc.yellow('Writing user. . .'));
@@ -160,37 +168,6 @@ function writeUser(auth) {
 }
 
 module.exports.writeUser = writeUser;
-
-function obtainAndWriteUser(user) {
-  console.log(clc.yellow('Grabbing user. . .'));
-  return new Promise(function (res, rej) {
-    getOrCreateClient()
-      .then(function (client) {
-        getClient(client, user.username)
-          .catch(err => rej(err))
-          .then(writeUser)
-          .then(user => res(user));
-      })
-      .catch(err => console.error(err));
-  });
-}
-
-module.exports.obtainAndWriteUser = obtainAndWriteUser;
-
-function getOrCreateClient() {
-  return new Promise(function (res, rej) {
-    if (_client) return res(_client);
-    getOrObtainAuth()
-      .then(function (auth) {
-        _client = createClient(auth.token);
-        // _opspark = _client.org('OperationSpark');
-        res(_client);
-      })
-      .catch(err => console.error(err));
-  });
-}
-
-module.exports.getOrCreateClient = getOrCreateClient;
 
 function getOrObtainAuth() {
   return new Promise(function (res) {
@@ -223,6 +200,7 @@ function hasAuthorization(token) {
     exec(cmd, function (err, stdout, stderr) {
       if (err) return rej(err);
       if (typeof stdout === 'string') {
+        // eslint-disable-next-line no-param-reassign
         stdout = JSON.parse(stdout);
       }
       res(stdout);
