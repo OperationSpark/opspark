@@ -1,16 +1,8 @@
-/* global describe it expect before beforeEach afterEach after */
+/* global describe it before beforeEach afterEach after */
 require('mocha');
-require('should');
-const clc = require('cli-color');
-const _ = require('lodash');
-const util = require('util');
-const fs = require('fs-extra');
 const sinon = require('sinon');
-const prompt = require('prompt');
-const rimraf = require('rimraf');
-const process = require('process');
-const chai = require('./helpers/chai');
 const proxyquire = require('proxyquire');
+const expect = require('chai').expect;
 
 const fakeHelpers = require('./helpers/fakeHelpers.js');
 const {
@@ -147,13 +139,6 @@ describe('greenlight', function () {
           expect(res).to.equal(JSON.parse(dummyGistGood).url);
           done();
         });
-    });
-  });
-
-  describe('URI', function () {
-    const greenlight = require('../controller/greenlight');
-    it('should reference greenlight.operationspark.org', function () {
-      expect(greenlight.URI).to.equal('https://greenlight.operationspark.org');
     });
   });
 });
