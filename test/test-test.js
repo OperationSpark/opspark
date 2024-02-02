@@ -10,6 +10,7 @@ const changeCase = require('change-case');
 
 const fakeHelpers = require('./helpers/fakeHelpers');
 
+const { TEST_GITHUB_TOKEN } = process.env;
 const {
   dummySession,
   dummyTestPass,
@@ -22,13 +23,23 @@ const projects = proxyquire('../controller/projects', {
   }
 });
 
-const test = proxyquire('../controller/test', {
+const testModuleMockRequires = {
   './helpers': fakeHelpers,
   './github': fakeHelpers,
+  './github-api': fakeHelpers,
   './env': {
     home: fakeHelpers.home
   }
-});
+};
+
+// If TEST_GITHUB_TOKEN is set, use the real github-api,
+// otherwise use mock the behavior with fakeHelpers
+if (TEST_GITHUB_TOKEN) {
+  // @ts-ignore (must be optional)
+  delete testModuleMockRequires['./github-api'];
+}
+
+const test = proxyquire('../controller/test', testModuleMockRequires);
 
 const projectsDirectory = './test/files/environment/projects';
 
@@ -73,25 +84,31 @@ describe('test', function () {
 
   describe('#runTests()', function () {
     const project = dummySession.PROJECT[1];
-
-    const passTests = proxyquire('../controller/test', {
-      './helpers': {
-        makeTestScript: fakeHelpers.makeTestPass
-      },
+    const defaultMockRequires = {
       './github': fakeHelpers,
+      './github-api': fakeHelpers,
       './env': {
         home: fakeHelpers.home
+      }
+    };
+
+    if (TEST_GITHUB_TOKEN) {
+      // @ts-ignore (must be optional)
+      delete defaultMockRequires['./github-api'];
+    }
+
+    const passTests = proxyquire('../controller/test', {
+      ...defaultMockRequires,
+      './helpers': {
+        makeTestScript: fakeHelpers.makeTestPass
       },
       './reporter': fakeHelpers.reportPass
     }).runTests;
 
     const failTests = proxyquire('../controller/test', {
+      ...defaultMockRequires,
       './helpers': {
         makeTestScript: fakeHelpers.makeTestFail
-      },
-      './github': fakeHelpers,
-      './env': {
-        home: fakeHelpers.home
       },
       './reporter': fakeHelpers.reportFail
     }).runTests;

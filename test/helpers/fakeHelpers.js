@@ -1,3 +1,4 @@
+const fs = require('node:fs/promises');
 const {
   dummyUser,
   dummyAuth,
@@ -6,6 +7,7 @@ const {
   dummyTestFail
 } = require('./dummyData');
 
+const { TEST_GITHUB_TOKEN } = process.env;
 module.exports.home = () => './test/files';
 
 module.exports.createClient = () => dummyUser;
@@ -24,7 +26,8 @@ module.exports.grabLocalLogin = () => `echo ${dummyUser.login}`;
 
 module.exports.grabLocalAuthID = () => `echo ${dummyAuth.id}`;
 
-module.exports.grabLocalAuthToken = () => `echo ${dummyAuth.token}`;
+module.exports.grabLocalAuthToken = () =>
+  `${TEST_GITHUB_TOKEN || dummyAuth.token}`;
 
 module.exports.createGistHelper = () => `echo '${dummyGistGood}'`;
 
@@ -35,12 +38,31 @@ module.exports.readGistHelper = () => `echo ${dummyUser}`;
 module.exports.downloadProject = (url, token, directory) =>
   `mkdir ${directory} ${directory}/.git ${directory}/.svn ${directory}/.master ${directory}/test`;
 
-module.exports.downloadProjectTests = (url, token, directory) =>
-  `mkdir ${directory}/test ${directory}/node_modules`;
+module.exports.getClient = () => ({
+  /**
+   * Mocks the behavior real method, which fetches the project tests from github.
+   * @param {string} url
+   * @param {string} directory
+   * @returns
+   */
+  async downloadProjectTests(url, directory) {
+    return Promise.all([
+      fs.mkdir(`${directory}/test`, { recursive: true }),
+      fs.mkdir(`${directory}/node_modules`, { recursive: true })
+    ]);
+  },
 
-// package.json must be parse-able, so echoing an empty object into it
-module.exports.downloadProjectPackage = (url, token, directory) =>
-  `echo {} > ${directory}/package.json`;
+  /**
+   * Mocks the behavior real method, which fetches the project's package.json file.
+   * @param {string} url
+   * @param {string} directory
+   * @returns
+   */
+  async downloadProjectPackage(url, directory) {
+    // package.json must be parse-able JSON, so writing an empty object into it
+    return fs.writeFile(`${directory}/package.json`, '{}', 'utf-8');
+  }
+});
 
 module.exports.makeTestPass = () => `echo '${dummyTestPass}'`;
 

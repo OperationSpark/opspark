@@ -22,13 +22,23 @@ const projects = proxyquire('../controller/projects', {
   }
 });
 
-const test = proxyquire('../controller/test', {
+const testModuleMockRequires = {
   './helpers': fakeHelpers,
   './github': fakeHelpers,
+  './github-api': fakeHelpers,
   './env': {
     home: fakeHelpers.home
   }
-});
+};
+
+// If TEST_GITHUB_TOKEN is set, use the real github-api,
+// otherwise use mock the behavior with fakeHelpers
+if (process.env.TEST_GITHUB_TOKEN) {
+  // @ts-ignore (must be optional)
+  delete testModuleMockRequires['./github-api'];
+}
+
+const test = proxyquire('../controller/test', testModuleMockRequires);
 
 const projectsDirectory = './test/files/environment/projects';
 
@@ -43,7 +53,7 @@ describe('test', function () {
 
   // Should install tests for the selected project
   describe('#grabTests()', function () {
-    dummySessionAsd.PROJECT.forEach((project) => {
+    dummySessionAsd.PROJECT.forEach(project => {
       it(`should install tests for ${project.name}`, function (done) {
         const name = changeCase.paramCase(project.name);
         const path = `${projectsDirectory}/${name}`;
@@ -64,24 +74,24 @@ describe('test', function () {
     const project = dummySessionAsd.PROJECT[0];
     const passTests = proxyquire('../controller/test', {
       './helpers': {
-        makeTestScript: fakeHelpers.makeTestPass,
+        makeTestScript: fakeHelpers.makeTestPass
       },
       './github': fakeHelpers,
       './env': {
-        home: fakeHelpers.home,
+        home: fakeHelpers.home
       },
-      './reporter': fakeHelpers.reportPass,
+      './reporter': fakeHelpers.reportPass
     }).runTests;
 
     const failTests = proxyquire('../controller/test', {
       './helpers': {
-        makeTestScript: fakeHelpers.makeTestFail,
+        makeTestScript: fakeHelpers.makeTestFail
       },
       './github': fakeHelpers,
       './env': {
-        home: fakeHelpers.home,
+        home: fakeHelpers.home
       },
-      './reporter': fakeHelpers.reportFail,
+      './reporter': fakeHelpers.reportFail
     }).runTests;
 
     it('should run tests and find pass', function (done) {
@@ -113,7 +123,7 @@ describe('test', function () {
     it('should return error if a project is not valid', function (done) {
       const invalidProject = {
         name: 'not-a-project',
-        path: './test/files/environment/projects/not-a-project',
+        path: './test/files/environment/projects/not-a-project'
       };
       test.runTests(invalidProject).catch(function (err) {
         expect(err).to.exist;
