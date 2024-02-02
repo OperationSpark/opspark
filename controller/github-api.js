@@ -1,4 +1,4 @@
-const fs = require('fs');
+const fs = require('node:fs/promises');
 const path = require('path');
 const { Octokit } = require('octokit');
 const { version } = require('../package.json');
@@ -55,10 +55,11 @@ class GithubAPI {
       return;
     }
 
-    fs.mkdirSync(path.join(directory, 'test'), { recursive: true });
-    res.data.forEach(async content => {
-      await this._downloadFiles(content, directory);
-    });
+    await fs.mkdir(path.join(directory, 'test'), { recursive: true });
+    const promises = res.data.map(async content =>
+      this._downloadFiles(content, directory)
+    );
+    await Promise.all(promises);
   }
 
   /**
@@ -79,7 +80,7 @@ class GithubAPI {
       if (res.status !== 200) {
         throw new Error('Failed to download package');
       }
-      fs.writeFileSync(path.join(directory, filePath), res.data, {
+      await fs.writeFile(path.join(directory, filePath), res.data, {
         encoding: 'utf8'
       });
     });
@@ -102,11 +103,13 @@ class GithubAPI {
     const filePath = path.join(directory, contents.path);
     const res = await fetch(contents.download_url);
     if (!res.ok || !res.body) {
-      throw new Error('Failed to download file');
+      throw new Error(
+        `Failed to download file: ${contents.path}\n${res.statusText}`
+      );
     }
 
     const fileContents = await res.text();
-    fs.writeFileSync(filePath, fileContents, { encoding: 'utf8' });
+    await fs.writeFile(filePath, fileContents, { encoding: 'utf8' });
   }
 }
 
