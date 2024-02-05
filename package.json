@@ -7,8 +7,6 @@
     "node": ">=6.0.0"
   },
   "scripts": {
-    "postinstall": "bash ./install.sh",
-    "windows-dev": "dos2unix ./install.sh",
     "dev": "nodemon test-server.js",
     "test": "mocha ./test",
     "test:publish": "act release -W .github/workflows/npm-publish.yml"
