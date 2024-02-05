@@ -19,9 +19,11 @@ const {
 const rootDirectory = `${home()}/environment`;
 const projectsDirectory = `${rootDirectory}/projects`;
 
-// Start of test command
-// Runs the listProjectsOf function from projects to select project
-// that user wants to be tested
+/**
+ * `test` command entry point.
+ * Runs the `listProjectsOf` function from projects to select project
+ * that user wants to be tested.
+ */
 function test() {
   console.log(clc.blue('Beginning test process!'));
   projects.action = 'test';

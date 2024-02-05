@@ -8,7 +8,7 @@ const { version } = require('../package.json');
 
 class GithubAPI {
   /**
-   *
+   * Creates a new GitHub API client.
    * @param {string} token
    * @returns
    */
@@ -20,7 +20,7 @@ class GithubAPI {
   }
 
   /**
-   *
+   * Parses a GitHub repository URL and returns the owner and repo.
    * @param {string} url
    * @returns {{owner: string, repo: string}}
    */
@@ -32,7 +32,7 @@ class GithubAPI {
     };
   }
   /**
-   *
+   * Downloads the tests for a project from GitHub into the specified `directory`.
    * @param {string} url
    * @param {string} directory
    */
@@ -118,7 +118,7 @@ class GithubAPI {
 let _client;
 module.exports = {
   /**
-   *
+   * Returns a new or existing GitHub API client.
    * @param {string} token
    * @returns {GithubAPI}
    */
