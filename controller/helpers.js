@@ -30,16 +30,16 @@ module.exports.checkGithubAuth = function (token, userAgent) {
   return `curl -A ${userAgent} https://api.github.com/?access_token=${token}`;
 };
 
-module.exports.downloadProject = function (url, token, directory) {
-  return `svn co ${url}/trunk --password ${token} ${directory}`;
-};
-
-module.exports.downloadProjectTests = function (url, token, directory) {
-  return `svn export ${url}/trunk/test --password ${token} ${directory}/test`;
-};
-
-module.exports.downloadProjectPackage = function (url, token, directory) {
-  return `svn export ${url}/trunk/package.json --password ${token} ${directory}/package.json && svn export ${url}/trunk/.npmrc --password ${token} ${directory}/.npmrc`;
+/**
+ * @param {string} gitUrl
+ * @param {string} token
+ * @param {string} directory
+ * @returns string
+ */
+module.exports.downloadProject = function (gitUrl, token, directory) {
+  const parsed = new URL(gitUrl);
+  const withPAT = `https://${token}@${parsed.host}${parsed.pathname}.git`;
+  return `git clone ${withPAT} ${directory}`;
 };
 
 module.exports.createGistHelper = function (username, token, content) {

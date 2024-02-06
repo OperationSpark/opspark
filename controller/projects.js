@@ -195,7 +195,8 @@ function shelveProject(project) {
     }, '');
     const cmd = `mv ${path}/${name} ${path}/${underscores}_${name}`;
     console.log(clc.yellow('Shelving project. . .'));
-    exec(cmd, function () {
+    exec(cmd, function (err) {
+      if (err) return rej(err);
       res(`${path}/${underscores}_${name}`);
     });
   });

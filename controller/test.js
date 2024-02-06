@@ -1,45 +1,32 @@
 const clc = require('cli-color');
 const fs = require('fs');
 const changeCase = require('change-case');
-const exec = require('child_process').exec;
 
 const { home } = require('./env');
 const janitor = require('./janitor');
 const github = require('./github');
+const { getClient } = require('./github-api');
 const greenlight = require('./greenlight');
 const sessions = require('./sessions');
 const projects = require('./projects');
 const report = require('./reporter');
 const {
-  downloadProjectTests,
-  downloadProjectPackage,
   installProjectDependenciesCmd,
   removeProjectTestsCmd,
   execAsync
 } = require('./helpers');
 
 const rootDirectory = `${home()}/environment`;
-
-// if (cloud9User) {
-//   githubDir = fs
-//     .readdirSync(rootDirectory)
-//     .filter(dir => /[\w]+\.github\.io/.test(dir))[0];
-//   rootDirectory = `${home()}/environment/${githubDir}`;
-// } else if (codenvyUser) {
-//   rootDirectory = codenvyUser;
-//   githubDir = fs
-//     .readdirSync(rootDirectory)
-//     .filter(dir => /[\w]+\.github\.io/.test(dir))[0];
-//   rootDirectory = `${rootDirectory}/${githubDir}`;
-// }
 const projectsDirectory = `${rootDirectory}/projects`;
 
-// Start of test command
-// Runs the listProjectsOf function from projects to select project
-// that user wants to be tested
+/**
+ * `test` command entry point.
+ * Runs the `listProjectsOf` function from projects to select project
+ * that user wants to be tested.
+ */
 function test() {
   console.log(clc.blue('Beginning test process!'));
-  projects.action = () => 'test';
+  projects.action = 'test';
   github
     .getCredentials()
     .catch(janitor.error(clc.red('Failure getting credentials')))
@@ -62,47 +49,45 @@ function test() {
 }
 
 module.exports.test = test;
+
 /**
- * Runs svn export to download the tests for the specific project
- * and places them in the correct directory
- * Then calls setEnv
- * @param {*} project
- * @returns Promise<object>
+ * @typedef {{
+ *  _id: string;
+ *  _session: string;
+ *  desc: string;
+ *  name: string;
+ *  url: string;
+ * }} Project
  */
-function grabTests(project) {
-  return new Promise(function (res, rej) {
-    const name = changeCase.paramCase(project.name);
-    console.log(clc.yellow(`Downloading tests for ${name}. . .`));
-    const directory = `${projectsDirectory}/${name}`;
-    const cmd = downloadProjectTests(
-      project.url,
-      github.grabLocalAuthToken(),
-      directory
-    );
-    const pckgCmd = downloadProjectPackage(
-      project.url,
-      github.grabLocalAuthToken(),
-      directory
-    );
-    if (fs.existsSync(`${directory}/test`)) {
-      console.log(clc.green('Skipping tests.'));
-      res(project);
-    } else {
-      exec(cmd, function (error) {
-        if (error) return rej(error);
-        console.log(clc.green('Successfully downloaded tests!'));
-        if (!fs.existsSync(`${directory}/package.json`)) {
-          console.log(clc.yellow(`Downloading Package.json for ${name}. . .`));
-          exec(pckgCmd, function () {
-            console.log(clc.green('Package.json successfully installed'));
-            res(project);
-          });
-        } else {
-          res(project);
-        }
-      });
-    }
-  });
+
+/**
+ * Downloads the tests for a project from GitHub and
+ * installs them in the project's "test" directory.
+ * @param {Project} project
+ * @returns {Promise<Project>}
+ */
+async function grabTests(project) {
+  const name = changeCase.paramCase(project.name);
+  console.log(clc.yellow(`Downloading tests for ${name}. . .`));
+  const directory = `${projectsDirectory}/${name}`;
+
+  if (fs.existsSync(`${directory}/test`)) {
+    console.log(clc.green('Skipping tests.'));
+    return project;
+  }
+
+  const ghClient = getClient(github.grabLocalAuthToken());
+  await ghClient.downloadProjectTests(project.url, directory);
+  console.log(clc.green('Successfully downloaded tests!'));
+
+  if (!fs.existsSync(`${directory}/package.json`)) {
+    console.log(clc.yellow(`Downloading Package.json for ${name}. . .`));
+    await ghClient.downloadProjectPackage(project.url, directory);
+    console.log(clc.green('Package.json successfully installed'));
+    return project;
+  }
+
+  return project;
 }
 
 module.exports.grabTests = grabTests;
