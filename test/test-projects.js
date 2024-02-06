@@ -236,19 +236,25 @@ describe('projects', function () {
   });
 
   describe('#shelveProject()', function () {
-    function removeTestProjectFiles() {
-      [
-        `${projectsDirectory}/underpants`,
-        `${projectsDirectory}/scratch-pad`,
-        `${projectsDirectory}/_underpants`,
-        `${projectsDirectory}/__underpants`,
-        `${projectsDirectory}/_scratch-pad`,
-        `${projectsDirectory}/__scratch-pad`
-      ].forEach(path => {
-        if (fs.existsSync(path)) {
-          rimraf(path, () => {});
-        }
-      });
+    async function removeTestProjectFiles() {
+      return Promise.all(
+        [
+          `${projectsDirectory}/underpants`,
+          `${projectsDirectory}/scratch-pad`,
+          `${projectsDirectory}/_underpants`,
+          `${projectsDirectory}/__underpants`,
+          `${projectsDirectory}/_scratch-pad`,
+          `${projectsDirectory}/__scratch-pad`
+        ].map(
+          path =>
+            new Promise((resolve, reject) => {
+              if (fs.existsSync(path)) {
+                rimraf(path, resolve);
+              }
+              resolve(true);
+            })
+        )
+      );
     }
 
     beforeEach(removeTestProjectFiles);
@@ -269,14 +275,10 @@ describe('projects', function () {
       ).to.be.false;
       bddStdin('y\n');
       projects.shelveProject(dummySession.PROJECT[0]).then(function (resPath) {
-        expect(
-          fs.existsSync(path),
-          `path: "${path}" should not exist`
-        ).to.be.false;
-        expect(
-          fs.existsSync(newPath),
-          `path: "${newPath}" should exist`
-        ).to.be.true;
+        expect(fs.existsSync(path), `path: "${path}" should not exist`).to.be
+          .false;
+        expect(fs.existsSync(newPath), `path: "${newPath}" should exist`).to.be
+          .true;
         expect(resPath).to.equal(newPath);
         done();
       });
