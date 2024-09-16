@@ -10,6 +10,8 @@ module.exports.execAsync = function execAsync(cmd) {
 };
 
 module.exports.createGithubToken = function (username, password, note) {
+  // Create a Personal Access Token for opspark util https://github.com/settings/tokens
+  // Check history here: https://github.com/settings/security
   return `curl -u "${username}:${password}" -d '{"scopes":["public_repo", "repo", "gist"],"note":"${note}","note_url":"https://www.npmjs.com/package/opspark"}' https://api.github.com/authorizations`;
 };
 
